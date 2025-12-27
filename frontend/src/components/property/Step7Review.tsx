@@ -1,0 +1,272 @@
+import { UseFormReturn } from 'react-hook-form'
+import { PropertyFormData } from '../../types/property'
+
+interface Props {
+  form: UseFormReturn<PropertyFormData>
+}
+
+export default function Step7Review({ form }: Props) {
+  const { watch } = form
+  const formData = watch()
+
+  const formatPrice = (amount?: number, currency: string = 'INR') => {
+    if (!amount) return 'Not specified'
+    const symbol = currency === 'INR' ? '₹' : currency === 'USD' ? '$' : currency === 'EUR' ? '€' : '£'
+    return `${symbol} ${amount.toLocaleString('en-IN')}`
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Review & Submit</h2>
+        <p className="text-gray-600">Review all details before submitting your property listing</p>
+      </div>
+
+      {/* Category & Transaction */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Category & Transaction</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="text-sm text-gray-600">Transaction Type</p>
+            <p className="font-medium">{formData.transactionType}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-600">Property Category</p>
+            <p className="font-medium">{formData.propertyCategory}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-600">Property Sub-Type</p>
+            <p className="font-medium">{formData.propertySubType}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Location */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Location</h3>
+        <div className="space-y-2">
+          <p className="font-medium">{formData.location.address}</p>
+          <p className="text-sm text-gray-600">
+            {formData.location.locality}, {formData.location.area}, {formData.location.city}, {formData.location.state}
+          </p>
+          <p className="text-sm text-gray-600">Pincode: {formData.location.pincode}</p>
+          {formData.location.coordinates.coordinates[0] !== 0 && (
+            <p className="text-xs text-gray-500">
+              Coordinates: {formData.location.coordinates.coordinates[1].toFixed(6)}, {formData.location.coordinates.coordinates[0].toFixed(6)}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Property Details */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Property Details</h3>
+        <div className="space-y-2">
+          <p className="font-medium text-lg">{formData.title}</p>
+          <p className="text-sm text-gray-600">{formData.description}</p>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+            <div>
+              <p className="text-sm text-gray-600">Ownership</p>
+              <p className="font-medium">{formData.ownershipType}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Possession</p>
+              <p className="font-medium">{formData.possessionStatus}</p>
+            </div>
+            {formData.propertyAge && (
+              <div>
+                <p className="text-sm text-gray-600">Age</p>
+                <p className="font-medium">{formData.propertyAge} years</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Category-Specific Details */}
+      {formData.propertyCategory === 'RESIDENTIAL' && formData.residential && (
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Residential Details</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {formData.residential.bhk && (
+              <div>
+                <p className="text-sm text-gray-600">BHK</p>
+                <p className="font-medium">{formData.residential.bhk} BHK</p>
+              </div>
+            )}
+            {formData.residential.bathrooms && (
+              <div>
+                <p className="text-sm text-gray-600">Bathrooms</p>
+                <p className="font-medium">{formData.residential.bathrooms}</p>
+              </div>
+            )}
+            {formData.residential.furnishing && (
+              <div>
+                <p className="text-sm text-gray-600">Furnishing</p>
+                <p className="font-medium">{formData.residential.furnishing.replace('_', ' ')}</p>
+              </div>
+            )}
+            {formData.residential.parking && (
+              <div>
+                <p className="text-sm text-gray-600">Parking</p>
+                <p className="font-medium">{formData.residential.parking}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {formData.propertyCategory === 'COMMERCIAL' && formData.commercial && (
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Commercial Details</h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div>
+              <p className="text-sm text-gray-600">Built-up Area</p>
+              <p className="font-medium">{formData.commercial.builtUpArea} sqft</p>
+            </div>
+            {formData.commercial.carpetArea && (
+              <div>
+                <p className="text-sm text-gray-600">Carpet Area</p>
+                <p className="font-medium">{formData.commercial.carpetArea} sqft</p>
+              </div>
+            )}
+            {formData.commercial.powerLoad && (
+              <div>
+                <p className="text-sm text-gray-600">Power Load</p>
+                <p className="font-medium">{formData.commercial.powerLoad} kVA</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {formData.propertyCategory === 'LAND' && formData.land && (
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Land Details</h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div>
+              <p className="text-sm text-gray-600">Plot Area</p>
+              <p className="font-medium">{formData.land.plotArea} {formData.land.areaUnit}</p>
+            </div>
+            {formData.land.frontage && (
+              <div>
+                <p className="text-sm text-gray-600">Frontage</p>
+                <p className="font-medium">{formData.land.frontage} ft</p>
+              </div>
+            )}
+            {formData.land.depth && (
+              <div>
+                <p className="text-sm text-gray-600">Depth</p>
+                <p className="font-medium">{formData.land.depth} ft</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Pricing */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Pricing</h3>
+        <div className="space-y-2">
+          {formData.transactionType === 'SELL' && formData.pricing.expectedPrice && (
+            <div>
+              <p className="text-sm text-gray-600">Expected Price</p>
+              <p className="font-medium text-xl">{formatPrice(formData.pricing.expectedPrice, formData.pricing.currency)}</p>
+            </div>
+          )}
+          {formData.transactionType === 'RENT' && formData.pricing.rentAmount && (
+            <div>
+              <p className="text-sm text-gray-600">Monthly Rent</p>
+              <p className="font-medium text-xl">{formatPrice(formData.pricing.rentAmount, formData.pricing.currency)}</p>
+            </div>
+          )}
+          {formData.pricing.maintenanceCharges && (
+            <div>
+              <p className="text-sm text-gray-600">Maintenance Charges</p>
+              <p className="font-medium">{formatPrice(formData.pricing.maintenanceCharges, formData.pricing.currency)}/month</p>
+            </div>
+          )}
+          <div>
+            <p className="text-sm text-gray-600">Price Negotiable</p>
+            <p className="font-medium">{formData.pricing.priceNegotiable ? 'Yes' : 'No'}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Media */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Media</h3>
+        <div>
+          <p className="text-sm text-gray-600 mb-2">Images</p>
+          <div className="grid grid-cols-4 gap-2">
+            {formData.media.images?.slice(0, 4).map((img, index) => (
+              <img
+                key={index}
+                src={img}
+                alt={`Preview ${index + 1}`}
+                className="w-full h-20 object-cover rounded border border-gray-300"
+              />
+            ))}
+          </div>
+          {formData.media.images && formData.media.images.length > 4 && (
+            <p className="text-xs text-gray-500 mt-2">+{formData.media.images.length - 4} more images</p>
+          )}
+        </div>
+      </div>
+
+      {/* Legal */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Legal Status</h3>
+        <div className="space-y-2">
+          <div className="flex items-center">
+            <span className={`w-3 h-3 rounded-full mr-2 ${formData.legal.titleClear ? 'bg-green-500' : 'bg-red-500'}`} />
+            <span className="text-sm">Title Clear: {formData.legal.titleClear ? 'Yes' : 'No'}</span>
+          </div>
+          <div className="flex items-center">
+            <span className={`w-3 h-3 rounded-full mr-2 ${formData.legal.encumbranceFree ? 'bg-green-500' : 'bg-red-500'}`} />
+            <span className="text-sm">Encumbrance Free: {formData.legal.encumbranceFree ? 'Yes' : 'No'}</span>
+          </div>
+          <div>
+            <p className="text-sm text-gray-600">Litigation Status</p>
+            <p className="font-medium">{formData.legal.litigationStatus}</p>
+          </div>
+          {formData.legal.reraNumber && (
+            <div>
+              <p className="text-sm text-gray-600">RERA Number</p>
+              <p className="font-medium">{formData.legal.reraNumber}</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* MG Asset DNA Preview */}
+      <div className="bg-gradient-to-r from-primary-50 to-blue-50 border border-primary-200 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">🧬 MG Asset DNA™ Preview</h3>
+        <p className="text-sm text-gray-600 mb-4">
+          Your property will receive a unique Asset DNA ID and verification score after submission.
+        </p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-white rounded-lg p-3 text-center">
+            <p className="text-xs text-gray-600">Verification Score</p>
+            <p className="text-lg font-bold text-primary-600">Calculating...</p>
+          </div>
+          <div className="bg-white rounded-lg p-3 text-center">
+            <p className="text-xs text-gray-600">Legal Risk</p>
+            <p className="text-lg font-bold">Analyzing...</p>
+          </div>
+          <div className="bg-white rounded-lg p-3 text-center">
+            <p className="text-xs text-gray-600">Trust Score</p>
+            <p className="text-lg font-bold">Calculating...</p>
+          </div>
+          <div className="bg-white rounded-lg p-3 text-center">
+            <p className="text-xs text-gray-600">Geo-Verified</p>
+            <p className="text-lg font-bold text-green-600">
+              {formData.location.coordinates.coordinates[0] !== 0 ? '✓' : '✗'}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+

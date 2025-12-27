@@ -1,0 +1,360 @@
+import express, { Router } from 'express';
+import { body } from 'express-validator';
+import Property from '../models/Property';
+import { authenticate, authorize, AuthRequest } from '../middleware/auth';
+import { validatePropertyListing, validateResidentialProperty, validateLandProperty, validateCommercialProperty } from '../utils/validation';
+import { generateAssetId, createOrUpdateAssetDNA } from '../utils/assetDNA';
+import { checkDuplicateListing, checkPriceAnomaly, checkListingRateLimit } from '../utils/fraudDetection';
+import { validationResult } from 'express-validator';
+
+const router: Router = express.Router();
+
+/**
+ * @route   POST /api/properties
+ * @desc    Create a new property listing
+ * @access  Private (Owner, Broker, Developer)
+ */
+router.post(
+  '/',
+  authenticate,
+  authorize('OWNER', 'BROKER', 'DEVELOPER', 'ADMIN'),
+  [
+    ...validatePropertyListing(),
+    body('media.images')
+      .isArray({ min: 3 })
+      .withMessage('At least 3 images are required'),
+  ],
+  async (req: AuthRequest, res) => {
+    try {
+      // Check validation errors
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      // Check rate limit
+      const rateLimit = await checkListingRateLimit(req.user!.userId);
+      if (!rateLimit.allowed) {
+        return res.status(429).json({
+          error: 'Rate limit exceeded',
+          message: `You can only create ${rateLimit.remaining} more listings today`,
+        });
+      }
+
+      // Check for duplicates
+      const duplicateCheck = await checkDuplicateListing(req.body, req.user!.userId);
+      if (duplicateCheck.isDuplicate) {
+        return res.status(409).json({
+          error: 'Duplicate listing detected',
+          message: 'A similar property already exists at this location',
+          similarProperties: duplicateCheck.similarProperties.map((p) => ({
+            id: p._id,
+            title: p.title,
+            location: p.location,
+          })),
+        });
+      }
+
+      // Check price anomaly
+      const priceCheck = await checkPriceAnomaly(req.body);
+      if (priceCheck.isAnomaly) {
+        // Warning but allow submission
+        console.warn(`Price anomaly detected for user ${req.user!.userId}: ${priceCheck.reason}`);
+      }
+
+      // Generate Asset DNA ID
+      const assetId = generateAssetId();
+
+      // Create property
+      const propertyData = {
+        ...req.body,
+        assetId,
+        listedBy: req.user!.userId,
+        status: 'DRAFT', // Will be set to PENDING on final submission
+      };
+
+      const property = new Property(propertyData);
+      await property.save();
+
+      // Create Asset DNA
+      await createOrUpdateAssetDNA(property, assetId);
+      await property.save();
+
+      res.status(201).json({
+        success: true,
+        property: {
+          id: property._id,
+          assetId: property.assetId,
+          status: property.status,
+          assetDNA: property.assetDNA,
+        },
+        warnings: priceCheck.isAnomaly ? [priceCheck.reason] : [],
+      });
+    } catch (error: any) {
+      console.error('Error creating property:', error);
+      res.status(500).json({
+        error: 'Failed to create property listing',
+        message: error.message,
+      });
+    }
+  }
+);
+
+/**
+ * @route   PUT /api/properties/:id
+ * @desc    Update a property listing
+ * @access  Private (Owner of listing, Admin)
+ */
+router.put(
+  '/:id',
+  authenticate,
+  validatePropertyListing(),
+  async (req: AuthRequest, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const property = await Property.findById(req.params.id);
+
+      if (!property) {
+        return res.status(404).json({ error: 'Property not found' });
+      }
+
+      // Check ownership or admin
+      if (property.listedBy.toString() !== req.user!.userId && req.user!.role !== 'ADMIN') {
+        return res.status(403).json({ error: 'Not authorized to update this property' });
+      }
+
+      // Don't allow changing assetId
+      const { assetId, ...updateData } = req.body;
+
+      Object.assign(property, updateData);
+      await property.save();
+
+      // Update Asset DNA if location or legal info changed
+      if (updateData.location || updateData.legal) {
+        await createOrUpdateAssetDNA(property, property.assetId);
+        await property.save();
+      }
+
+      res.json({
+        success: true,
+        property,
+      });
+    } catch (error: any) {
+      console.error('Error updating property:', error);
+      res.status(500).json({
+        error: 'Failed to update property listing',
+        message: error.message,
+      });
+    }
+  }
+);
+
+/**
+ * @route   POST /api/properties/:id/submit
+ * @desc    Submit property for review (change status from DRAFT to PENDING)
+ * @access  Private (Owner of listing)
+ */
+router.post(
+  '/:id/submit',
+  authenticate,
+  async (req: AuthRequest, res) => {
+    try {
+      const property = await Property.findById(req.params.id);
+
+      if (!property) {
+        return res.status(404).json({ error: 'Property not found' });
+      }
+
+      if (property.listedBy.toString() !== req.user!.userId) {
+        return res.status(403).json({ error: 'Not authorized' });
+      }
+
+      if (property.status !== 'DRAFT') {
+        return res.status(400).json({
+          error: 'Property is not in draft status',
+          currentStatus: property.status,
+        });
+      }
+
+      // Validate required fields
+      if (!property.media.images || property.media.images.length < 3) {
+        return res.status(400).json({
+          error: 'At least 3 images are required before submission',
+        });
+      }
+
+      if (!property.location.coordinates?.coordinates) {
+        return res.status(400).json({
+          error: 'Location coordinates are required',
+        });
+      }
+
+      property.status = 'PENDING';
+      property.publishedAt = new Date();
+      await property.save();
+
+      res.json({
+        success: true,
+        message: 'Property submitted for review',
+        property: {
+          id: property._id,
+          status: property.status,
+          assetDNA: property.assetDNA,
+        },
+      });
+    } catch (error: any) {
+      console.error('Error submitting property:', error);
+      res.status(500).json({
+        error: 'Failed to submit property',
+        message: error.message,
+      });
+    }
+  }
+);
+
+/**
+ * @route   GET /api/properties/:id
+ * @desc    Get property by ID
+ * @access  Public
+ */
+router.get('/:id', async (req, res) => {
+  try {
+    const property = await Property.findById(req.params.id)
+      .populate('listedBy', 'firstName lastName email role trustScore')
+      .select('-__v');
+
+    if (!property) {
+      return res.status(404).json({ error: 'Property not found' });
+    }
+
+    // Increment views
+    property.views += 1;
+    await property.save();
+
+    res.json({
+      success: true,
+      property,
+    });
+  } catch (error: any) {
+    console.error('Error fetching property:', error);
+    res.status(500).json({
+      error: 'Failed to fetch property',
+      message: error.message,
+    });
+  }
+});
+
+/**
+ * @route   GET /api/properties
+ * @desc    Get all properties with filters
+ * @access  Public
+ */
+router.get('/', async (req, res) => {
+  try {
+    const {
+      transactionType,
+      propertyCategory,
+      city,
+      state,
+      minPrice,
+      maxPrice,
+      minArea,
+      maxArea,
+      status,
+      page = 1,
+      limit = 20,
+    } = req.query;
+
+    const query: any = {};
+
+    if (transactionType) query.transactionType = transactionType;
+    if (propertyCategory) query.propertyCategory = propertyCategory;
+    if (city) query['location.city'] = new RegExp(city as string, 'i');
+    if (state) query['location.state'] = new RegExp(state as string, 'i');
+    if (status) query.status = status;
+    else query.status = 'APPROVED'; // Default to approved only
+
+    // Price filters
+    if (minPrice || maxPrice) {
+      query.$or = [
+        { 'pricing.expectedPrice': {} },
+        { 'pricing.rentAmount': {} },
+      ];
+      if (minPrice) {
+        query.$or[0]['pricing.expectedPrice'].$gte = Number(minPrice);
+        query.$or[1]['pricing.rentAmount'].$gte = Number(minPrice);
+      }
+      if (maxPrice) {
+        query.$or[0]['pricing.expectedPrice'].$lte = Number(maxPrice);
+        query.$or[1]['pricing.rentAmount'].$lte = Number(maxPrice);
+      }
+    }
+
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const properties = await Property.find(query)
+      .populate('listedBy', 'firstName lastName role trustScore')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(Number(limit))
+      .select('-__v');
+
+    const total = await Property.countDocuments(query);
+
+    res.json({
+      success: true,
+      properties,
+      pagination: {
+        page: Number(page),
+        limit: Number(limit),
+        total,
+        pages: Math.ceil(total / Number(limit)),
+      },
+    });
+  } catch (error: any) {
+    console.error('Error fetching properties:', error);
+    res.status(500).json({
+      error: 'Failed to fetch properties',
+      message: error.message,
+    });
+  }
+});
+
+/**
+ * @route   DELETE /api/properties/:id
+ * @desc    Delete a property listing
+ * @access  Private (Owner, Admin)
+ */
+router.delete('/:id', authenticate, async (req: AuthRequest, res) => {
+  try {
+    const property = await Property.findById(req.params.id);
+
+    if (!property) {
+      return res.status(404).json({ error: 'Property not found' });
+    }
+
+    if (property.listedBy.toString() !== req.user!.userId && req.user!.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Not authorized' });
+    }
+
+    await Property.findByIdAndDelete(req.params.id);
+
+    res.json({
+      success: true,
+      message: 'Property deleted successfully',
+    });
+  } catch (error: any) {
+    console.error('Error deleting property:', error);
+    res.status(500).json({
+      error: 'Failed to delete property',
+      message: error.message,
+    });
+  }
+});
+
+export default router;
+
