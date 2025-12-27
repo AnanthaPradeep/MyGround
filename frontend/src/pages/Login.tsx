@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { useAuthStore } from '../store/authStore'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
+import Logo from '../components/Logo'
 
 interface LoginForm {
   email: string
@@ -48,7 +49,9 @@ export default function Login() {
       <div className="max-w-md w-full space-y-8">
         {/* Logo & Header */}
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-primary-600 mb-2">MyGround</h1>
+          <div className="flex justify-center mb-4">
+            <Logo showText={true} size="lg" />
+          </div>
           <h2 className="text-2xl font-semibold text-gray-900">Welcome Back</h2>
           <p className="mt-2 text-sm text-gray-600">
             Sign in to your account to continue

@@ -1,62 +1,56 @@
-import { useState, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
-import api from '../services/api'
+import { useProperties } from '../hooks/useProperties'
+import { Property } from '../types/property'
 import PropertyCard from '../components/PropertyCard'
 import AdvancedFilters from '../components/AdvancedFilters'
-
-interface Property {
-  _id: string
-  title: string
-  location: {
-    city: string
-    area: string
-    locality: string
-  }
-  pricing: {
-    expectedPrice?: number
-    rentAmount?: number
-    currency: string
-  }
-  media: {
-    images: string[]
-  }
-  assetDNA: {
-    verificationScore: number
-    legalRisk: string
-    assetTrustScore: number
-  }
-  propertyCategory: string
-  transactionType: string
-  views: number
-  saves: number
-}
+import Logo from '../components/Logo'
 
 export default function Properties() {
   const [searchParams, setSearchParams] = useSearchParams()
-  const [properties, setProperties] = useState<Property[]>([])
-  const [loading, setLoading] = useState(true)
   const [showFilters, setShowFilters] = useState(false)
   const [sortBy, setSortBy] = useState('newest')
 
-  useEffect(() => {
-    fetchProperties()
-  }, [searchParams, sortBy])
+  // Build filters from URL params
+  const filters = useMemo(() => {
+    const filterObj: Record<string, any> = {}
+    searchParams.forEach((value, key) => {
+      if (value) filterObj[key] = value
+    })
+    return filterObj
+  }, [searchParams])
 
-  const fetchProperties = async () => {
-    setLoading(true)
-    try {
-      const params = new URLSearchParams(searchParams)
-      params.append('page', '1')
-      params.append('limit', '20')
-      
-      const response = await api.get(`/properties?${params.toString()}`)
-      setProperties(response.data.properties || [])
-    } catch (error) {
-      console.error('Error fetching properties:', error)
-    } finally {
-      setLoading(false)
+  const { properties: allProperties, loading } = useProperties({ 
+    useSampleData: true,
+    filters 
+  })
+
+  // Apply sorting
+  const properties = useMemo(() => {
+    const sorted = [...allProperties]
+    switch (sortBy) {
+      case 'price-low':
+        return sorted.sort((a, b) => {
+          const priceA = a.pricing.expectedPrice || a.pricing.rentAmount || 0
+          const priceB = b.pricing.expectedPrice || b.pricing.rentAmount || 0
+          return priceA - priceB
+        })
+      case 'price-high':
+        return sorted.sort((a, b) => {
+          const priceA = a.pricing.expectedPrice || a.pricing.rentAmount || 0
+          const priceB = b.pricing.expectedPrice || b.pricing.rentAmount || 0
+          return priceB - priceA
+        })
+      case 'verified':
+        return sorted.sort((a, b) => {
+          const scoreA = a.assetDNA?.verificationScore || 0
+          const scoreB = b.assetDNA?.verificationScore || 0
+          return scoreB - scoreA
+        })
+      default:
+        return sorted
     }
-  }
+  }, [allProperties, sortBy])
 
   const handleFilterChange = (key: string, value: any) => {
     const params = new URLSearchParams(searchParams)
@@ -74,9 +68,7 @@ export default function Properties() {
       <nav className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link to="/" className="flex items-center">
-              <h1 className="text-2xl font-bold text-primary-600">MyGround</h1>
-            </Link>
+            <Logo showText={true} size="md" />
             <Link to="/" className="text-gray-700 hover:text-primary-600">
               Back to Home
             </Link>

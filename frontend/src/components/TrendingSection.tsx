@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom'
 
 export default function TrendingSection() {
   const trendingTabs = [
-    { id: 'trending', label: '🔥 Trending Localities', count: 12 },
-    { id: 'drops', label: '📉 Price Drops', count: 8 },
-    { id: 'verified', label: '✅ Newly Verified', count: 15 },
-    { id: 'yield', label: '💰 High Yield', count: 10 },
+    { id: 'trending', label: 'Trending Localities', count: 12 },
+    { id: 'drops', label: 'Price Drops', count: 8 },
+    { id: 'verified', label: 'Newly Verified', count: 15 },
+    { id: 'yield', label: 'High Yield', count: 10 },
   ]
 
   const [activeTab, setActiveTab] = useState('trending')
@@ -41,10 +41,10 @@ export default function TrendingSection() {
         {/* Content based on active tab */}
         <div className="bg-white rounded-lg p-6">
           <p className="text-gray-600 text-center py-8">
-            {activeTab === 'trending' && '🔥 Top searched areas in major cities'}
-            {activeTab === 'drops' && '📉 Properties with recent price reductions'}
-            {activeTab === 'verified' && '✅ Recently verified properties with complete Asset DNA'}
-            {activeTab === 'yield' && '💰 High rental yield investment opportunities'}
+            {activeTab === 'trending' && 'Top searched areas in major cities'}
+            {activeTab === 'drops' && 'Properties with recent price reductions'}
+            {activeTab === 'verified' && 'Recently verified properties with complete Asset DNA'}
+            {activeTab === 'yield' && 'High rental yield investment opportunities'}
           </p>
           <Link
             to={`/properties?filter=${activeTab}`}

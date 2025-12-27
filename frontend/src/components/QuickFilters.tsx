@@ -1,10 +1,35 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 
 export default function QuickFilters() {
   const navigate = useNavigate()
   const [selectedTransaction, setSelectedTransaction] = useState<string>('')
   const [selectedCategory, setSelectedCategory] = useState<string>('')
+  const transactionScrollRef = useRef<HTMLDivElement>(null)
+  const categoryScrollRef = useRef<HTMLDivElement>(null)
+  const [transactionOverflows, setTransactionOverflows] = useState(false)
+  const [categoryOverflows, setCategoryOverflows] = useState(false)
+
+  const checkOverflow = (ref: React.RefObject<HTMLDivElement>, setOverflow: (value: boolean) => void) => {
+    if (ref.current) {
+      const hasOverflow = ref.current.scrollWidth > ref.current.clientWidth
+      setOverflow(hasOverflow)
+    }
+  }
+
+  useEffect(() => {
+    checkOverflow(transactionScrollRef, setTransactionOverflows)
+    checkOverflow(categoryScrollRef, setCategoryOverflows)
+
+    const handleResize = () => {
+      checkOverflow(transactionScrollRef, setTransactionOverflows)
+      checkOverflow(categoryScrollRef, setCategoryOverflows)
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const handleFilter = (type: string, value: string) => {
     if (type === 'transaction') {
@@ -16,58 +41,120 @@ export default function QuickFilters() {
     }
   }
 
+  const scroll = (ref: React.RefObject<HTMLDivElement>, direction: 'left' | 'right') => {
+    if (ref.current) {
+      const scrollAmount = 200
+      ref.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      })
+    }
+  }
+
   return (
     <div className="mt-8 space-y-4">
       {/* Transaction Type Pills */}
       <div>
         <p className="text-primary-100 text-sm mb-2">Transaction Type</p>
-        <div className="flex flex-wrap gap-2">
-          {['SELL', 'RENT', 'LEASE', 'LAND'].map((type) => (
+        <div className="relative">
+          {transactionOverflows && (
             <button
-              key={type}
-              onClick={() => handleFilter('transaction', type)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                selectedTransaction === type
-                  ? 'bg-white text-primary-600'
-                  : 'bg-white/20 text-white hover:bg-white/30'
-              }`}
+              onClick={() => scroll(transactionScrollRef, 'left')}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full backdrop-blur-sm"
+              aria-label="Scroll left"
             >
-              {type}
+              <ChevronLeftIcon className="w-5 h-5" />
             </button>
-          ))}
+          )}
+          <div
+            ref={transactionScrollRef}
+            className={`flex gap-2 overflow-x-auto scrollbar-hide scroll-smooth ${
+              transactionOverflows ? 'px-8' : 'px-0'
+            }`}
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {['SELL', 'RENT', 'LEASE', 'BUY'].map((type) => (
+              <button
+                key={type}
+                onClick={() => handleFilter('transaction', type)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
+                  selectedTransaction === type
+                    ? 'bg-white text-primary-600'
+                    : 'bg-white/20 text-white hover:bg-white/30'
+                }`}
+              >
+                {type}
+              </button>
+            ))}
+          </div>
+          {transactionOverflows && (
+            <button
+              onClick={() => scroll(transactionScrollRef, 'right')}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full backdrop-blur-sm"
+              aria-label="Scroll right"
+            >
+              <ChevronRightIcon className="w-5 h-5" />
+            </button>
+          )}
         </div>
       </div>
 
       {/* Property Category Pills */}
       <div>
         <p className="text-primary-100 text-sm mb-2">Property Type</p>
-        <div className="flex flex-wrap gap-2">
-          {['RESIDENTIAL', 'COMMERCIAL', 'INDUSTRIAL', 'LAND', 'SPECIAL'].map((category) => (
+        <div className="relative">
+          {categoryOverflows && (
             <button
-              key={category}
-              onClick={() => handleFilter('category', category)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                selectedCategory === category
-                  ? 'bg-white text-primary-600'
-                  : 'bg-white/20 text-white hover:bg-white/30'
-              }`}
+              onClick={() => scroll(categoryScrollRef, 'left')}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full backdrop-blur-sm"
+              aria-label="Scroll left"
             >
-              {category}
+              <ChevronLeftIcon className="w-5 h-5" />
             </button>
-          ))}
+          )}
+          <div
+            ref={categoryScrollRef}
+            className={`flex gap-2 overflow-x-auto scrollbar-hide scroll-smooth ${
+              categoryOverflows ? 'px-8' : 'px-0'
+            }`}
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {['RESIDENTIAL', 'COMMERCIAL', 'INDUSTRIAL', 'LAND', 'SPECIAL', 'ISLAND'].map((category) => (
+              <button
+                key={category}
+                onClick={() => handleFilter('category', category)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
+                  selectedCategory === category
+                    ? 'bg-white text-primary-600'
+                    : 'bg-white/20 text-white hover:bg-white/30'
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+          {categoryOverflows && (
+            <button
+              onClick={() => scroll(categoryScrollRef, 'right')}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full backdrop-blur-sm"
+              aria-label="Scroll right"
+            >
+              <ChevronRightIcon className="w-5 h-5" />
+            </button>
+          )}
         </div>
       </div>
 
       {/* Quick Action Buttons */}
       <div className="flex flex-wrap gap-2 pt-2">
         <button className="px-4 py-2 bg-white/20 text-white rounded-full text-sm font-medium hover:bg-white/30">
-          ✓ Verified Only
+          Verified Only
         </button>
         <button className="px-4 py-2 bg-white/20 text-white rounded-full text-sm font-medium hover:bg-white/30">
-          🏠 Ready to Move
+          Ready to Move
         </button>
         <button className="px-4 py-2 bg-white/20 text-white rounded-full text-sm font-medium hover:bg-white/30">
-          🏗️ Under Construction
+          Under Construction
         </button>
       </div>
     </div>

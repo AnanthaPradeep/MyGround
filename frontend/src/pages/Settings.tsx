@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
+import { UserIcon, BellIcon, LockClosedIcon, ShieldCheckIcon } from '@heroicons/react/24/outline'
 import ProtectedRoute from '../components/ProtectedRoute'
 import UserDropdown from '../components/UserDropdown'
 import toast from 'react-hot-toast'
+import Logo from '../components/Logo'
 
 export default function Settings() {
   const { user } = useAuthStore()
@@ -26,9 +28,7 @@ export default function Settings() {
         <nav className="bg-white shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
-              <Link to="/" className="flex items-center">
-                <h1 className="text-2xl font-bold text-primary-600">MyGround</h1>
-              </Link>
+              <Logo showText={true} size="md" />
               <div className="flex items-center space-x-4">
                 <Link to="/" className="text-gray-700 hover:text-primary-600">
                   Back to Home
@@ -52,24 +52,27 @@ export default function Settings() {
               <div className="bg-white rounded-lg shadow-sm p-4">
                 <nav className="space-y-2">
                   {[
-                    { id: 'account', label: 'Account', icon: '👤' },
-                    { id: 'notifications', label: 'Notifications', icon: '🔔' },
-                    { id: 'privacy', label: 'Privacy', icon: '🔒' },
-                    { id: 'security', label: 'Security', icon: '🛡️' },
-                  ].map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveTab(tab.id as any)}
-                      className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-colors ${
-                        activeTab === tab.id
-                          ? 'bg-primary-50 text-primary-600 font-medium'
-                          : 'text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      <span>{tab.icon}</span>
-                      <span>{tab.label}</span>
-                    </button>
-                  ))}
+                    { id: 'account', label: 'Account', icon: UserIcon },
+                    { id: 'notifications', label: 'Notifications', icon: BellIcon },
+                    { id: 'privacy', label: 'Privacy', icon: LockClosedIcon },
+                    { id: 'security', label: 'Security', icon: ShieldCheckIcon },
+                  ].map((tab) => {
+                    const Icon = tab.icon
+                    return (
+                      <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id as any)}
+                        className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                          activeTab === tab.id
+                            ? 'bg-primary-50 text-primary-600 font-medium'
+                            : 'text-gray-700 hover:bg-gray-50'
+                        }`}
+                      >
+                        <Icon className="w-5 h-5" />
+                        <span>{tab.label}</span>
+                      </button>
+                    )
+                  })}
                 </nav>
               </div>
             </div>

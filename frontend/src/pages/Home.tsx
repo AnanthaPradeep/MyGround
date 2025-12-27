@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import { ShieldCheckIcon, MapPinIcon, ScaleIcon } from '@heroicons/react/24/outline'
 import { useAuthStore } from '../store/authStore'
-import api from '../services/api'
+import { useProperties } from '../hooks/useProperties'
 import PropertyCard from '../components/PropertyCard'
 import SearchBar from '../components/SearchBar'
 import QuickFilters from '../components/QuickFilters'
@@ -10,53 +10,11 @@ import ExploreByPurpose from '../components/ExploreByPurpose'
 import TrendingSection from '../components/TrendingSection'
 import AssetDNAPreview from '../components/AssetDNAPreview'
 import UserDropdown from '../components/UserDropdown'
-
-interface Property {
-  _id: string
-  title: string
-  location: {
-    city: string
-    area: string
-    locality: string
-  }
-  pricing: {
-    expectedPrice?: number
-    rentAmount?: number
-    currency: string
-  }
-  media: {
-    images: string[]
-  }
-  assetDNA: {
-    verificationScore: number
-    legalRisk: string
-    assetTrustScore: number
-  }
-  propertyCategory: string
-  transactionType: string
-  views: number
-  saves: number
-}
+import Logo from '../components/Logo'
 
 export default function Home() {
   const { isAuthenticated } = useAuthStore()
-  const [properties, setProperties] = useState<Property[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    fetchProperties()
-  }, [])
-
-  const fetchProperties = async () => {
-    try {
-      const response = await api.get('/properties?limit=12&status=APPROVED')
-      setProperties(response.data.properties || [])
-    } catch (error) {
-      console.error('Error fetching properties:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const { properties, loading } = useProperties({ useSampleData: true })
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -64,10 +22,7 @@ export default function Home() {
       <nav className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link to="/" className="flex items-center">
-              <h1 className="text-2xl font-bold text-primary-600">MyGround</h1>
-              <span className="ml-2 text-xs text-gray-500">MG</span>
-            </Link>
+            <Logo showText={true} size="md" />
             
             <div className="flex items-center space-x-4">
               {isAuthenticated ? (
@@ -108,7 +63,7 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-primary-600 to-blue-600 text-white py-16">
+      <section className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -138,7 +93,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
-              🧬 Know the Truth Before You Visit
+              Know the Truth Before You Visit
             </h2>
             <p className="text-gray-600">
               Every property on MyGround comes with MG Asset DNA™ - a unique verification system
@@ -212,7 +167,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">🧬</span>
+                <ShieldCheckIcon className="w-8 h-8 text-primary-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">MG Asset DNA™</h3>
               <p className="text-gray-600">
@@ -222,7 +177,7 @@ export default function Home() {
 
             <div className="text-center">
               <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">📍</span>
+                <MapPinIcon className="w-8 h-8 text-primary-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Geo-Verified</h3>
               <p className="text-gray-600">
@@ -232,7 +187,7 @@ export default function Home() {
 
             <div className="text-center">
               <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl">⚖️</span>
+                <ScaleIcon className="w-8 h-8 text-primary-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Legal Transparency</h3>
               <p className="text-gray-600">
@@ -259,7 +214,7 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-r from-primary-600 to-blue-600 text-white">
+      <section className="py-16 bg-gradient-to-r from-primary-600 to-primary-700 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
           <p className="text-xl text-primary-100 mb-8">

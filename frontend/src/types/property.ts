@@ -1,5 +1,5 @@
-export type TransactionType = 'SELL' | 'RENT' | 'LEASE' | 'SUB_LEASE' | 'FRACTIONAL';
-export type PropertyCategory = 'RESIDENTIAL' | 'COMMERCIAL' | 'INDUSTRIAL' | 'LAND' | 'SPECIAL';
+export type TransactionType = 'SELL' | 'RENT' | 'LEASE' | 'BUY' | 'SUB_LEASE' | 'FRACTIONAL';
+export type PropertyCategory = 'RESIDENTIAL' | 'COMMERCIAL' | 'INDUSTRIAL' | 'LAND' | 'SPECIAL' | 'ISLAND';
 export type OwnershipType = 'FREEHOLD' | 'LEASEHOLD' | 'GOVERNMENT' | 'TRUST';
 export type PossessionStatus = 'READY' | 'UNDER_CONSTRUCTION' | 'PRE_LAUNCH';
 export type FurnishingType = 'FULLY_FURNISHED' | 'SEMI_FURNISHED' | 'UNFURNISHED';
@@ -111,5 +111,42 @@ export interface PropertyFormData {
   pricing: Pricing;
   media: Media;
   legal: Legal;
+}
+
+export interface ListedBy {
+  firstName: string;
+  lastName: string;
+  role: string;
+  trustScore: number;
+  _id?: string;
+}
+
+export interface Property {
+  _id: string;
+  assetId?: string;
+  title: string;
+  description: string;
+  transactionType: TransactionType;
+  propertyCategory: PropertyCategory;
+  propertySubType: string;
+  location: Location;
+  ownershipType: OwnershipType;
+  possessionStatus: PossessionStatus;
+  propertyAge?: number;
+  residential?: ResidentialDetails;
+  commercial?: CommercialDetails;
+  land?: LandDetails;
+  pricing: Pricing;
+  media: Media;
+  legal: Legal;
+  assetDNA?: AssetDNA;
+  listedBy: ListedBy | string;
+  status?: string;
+  isVerified?: boolean;
+  views?: number;
+  saves?: number;
+  inquiries?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 

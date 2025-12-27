@@ -1,55 +1,9 @@
 import { UseFormReturn } from 'react-hook-form'
 import { PropertyFormData } from '../../types/property'
+import { PROPERTY_SUBTYPES, TRANSACTION_TYPES, PROPERTY_CATEGORIES } from '../../constants/propertyTypes'
 
 interface Props {
   form: UseFormReturn<PropertyFormData>
-}
-
-const PROPERTY_SUBTYPES = {
-  RESIDENTIAL: [
-    'Apartment / Flat',
-    'Builder Floor',
-    'Independent House / Villa',
-    'Studio Apartment',
-    'Penthouse',
-    'Duplex / Triplex',
-    'Co-living',
-    'Serviced Apartment',
-  ],
-  COMMERCIAL: [
-    'Office (IT)',
-    'Office (Non-IT)',
-    'Co-working Space',
-    'Retail Shop',
-    'Showroom',
-    'Mall Space',
-    'Hotel / Hospitality',
-    'Business Center',
-  ],
-  INDUSTRIAL: [
-    'Warehouse',
-    'Factory / Manufacturing Unit',
-    'Logistics Park',
-    'Cold Storage',
-    'Industrial Shed',
-  ],
-  LAND: [
-    'Residential Plot',
-    'Commercial Plot',
-    'Agricultural Land',
-    'Farm Land',
-    'Industrial Land',
-    'SEZ Land',
-    'Institutional Land',
-  ],
-  SPECIAL: [
-    'Island',
-    'Resort',
-    'Heritage Property',
-    'School / Hospital Property',
-    'Data Center',
-    'Airport / Port Asset',
-  ],
 }
 
 export default function Step1Category({ form }: Props) {
@@ -70,7 +24,7 @@ export default function Step1Category({ form }: Props) {
           Transaction Type <span className="text-red-500">*</span>
         </label>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          {['SELL', 'RENT', 'LEASE', 'SUB_LEASE', 'FRACTIONAL'].map((type) => (
+          {TRANSACTION_TYPES.map((type) => (
             <label
               key={type}
               className={`cursor-pointer p-4 border-2 rounded-lg text-center transition-colors ${
@@ -100,7 +54,7 @@ export default function Step1Category({ form }: Props) {
           Property Category <span className="text-red-500">*</span>
         </label>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          {['RESIDENTIAL', 'COMMERCIAL', 'INDUSTRIAL', 'LAND', 'SPECIAL'].map((category) => (
+          {PROPERTY_CATEGORIES.map((category) => (
             <label
               key={category}
               className={`cursor-pointer p-4 border-2 rounded-lg text-center transition-colors ${

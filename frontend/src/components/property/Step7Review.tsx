@@ -1,4 +1,5 @@
 import { UseFormReturn } from 'react-hook-form'
+import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/solid'
 import { PropertyFormData } from '../../types/property'
 
 interface Props {
@@ -241,7 +242,7 @@ export default function Step7Review({ form }: Props) {
 
       {/* MG Asset DNA Preview */}
       <div className="bg-gradient-to-r from-primary-50 to-blue-50 border border-primary-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">🧬 MG Asset DNA™ Preview</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">MG Asset DNA™ Preview</h3>
         <p className="text-sm text-gray-600 mb-4">
           Your property will receive a unique Asset DNA ID and verification score after submission.
         </p>
@@ -260,8 +261,18 @@ export default function Step7Review({ form }: Props) {
           </div>
           <div className="bg-white rounded-lg p-3 text-center">
             <p className="text-xs text-gray-600">Geo-Verified</p>
-            <p className="text-lg font-bold text-green-600">
-              {formData.location.coordinates.coordinates[0] !== 0 ? '✓' : '✗'}
+            <p className="text-lg font-bold text-green-600 flex items-center justify-center space-x-1">
+              {formData.location.coordinates.coordinates[0] !== 0 ? (
+                <>
+                  <CheckCircleIcon className="w-5 h-5" />
+                  <span>Yes</span>
+                </>
+              ) : (
+                <>
+                  <XCircleIcon className="w-5 h-5 text-red-600" />
+                  <span className="text-red-600">No</span>
+                </>
+              )}
             </p>
           </div>
         </div>

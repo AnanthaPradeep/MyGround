@@ -1,19 +1,6 @@
 import { Link } from 'react-router-dom'
-
-interface Property {
-  _id: string
-  title: string
-  location: {
-    city: string
-    area: string
-  }
-  assetDNA: {
-    verificationScore: number
-    legalRisk: string
-    assetTrustScore: number
-    priceVsLocalAverage: number
-  }
-}
+import { Property } from '../types/property'
+import { ShieldCheckIcon, MapPinIcon } from '@heroicons/react/24/solid'
 
 interface Props {
   properties: Property[]
@@ -38,7 +25,7 @@ export default function AssetDNAPreview({ properties }: Props) {
         >
           <div className="flex items-center justify-between mb-4">
             <h4 className="font-semibold text-gray-900 text-sm line-clamp-1">{property.title}</h4>
-            <span className="text-2xl">🧬</span>
+            <ShieldCheckIcon className="w-6 h-6 text-primary-600" />
           </div>
 
           <div className="space-y-3">
@@ -83,9 +70,10 @@ export default function AssetDNAPreview({ properties }: Props) {
             </div>
 
             {/* Location */}
-            <div className="pt-2 border-t border-primary-200">
+            <div className="pt-2 border-t border-primary-200 flex items-center space-x-1">
+              <MapPinIcon className="w-4 h-4 text-gray-500" />
               <p className="text-xs text-gray-600">
-                📍 {property.location.area}, {property.location.city}
+                {property.location.area}, {property.location.city}
               </p>
             </div>
           </div>

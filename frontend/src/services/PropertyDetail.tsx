@@ -2,9 +2,8 @@ import { useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useProperty } from '../hooks/useProperties'
 import { formatPrice } from '../utils/formatters'
-import { HeartIcon, CheckCircleIcon, XCircleIcon, PhotoIcon } from '@heroicons/react/24/outline'
+import { HeartIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid'
-import Logo from '../components/Logo'
 
 export default function PropertyDetail() {
   const { id } = useParams<{ id: string }>()
@@ -61,7 +60,9 @@ export default function PropertyDetail() {
       <nav className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Logo showText={true} size="md" />
+            <Link to="/" className="flex items-center">
+              <h1 className="text-2xl font-bold text-primary-600">MyGround</h1>
+            </Link>
             <Link to="/" className="text-gray-700 hover:text-primary-600">
               Back to Home
             </Link>
@@ -84,7 +85,9 @@ export default function PropertyDetail() {
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-400">
-                    <PhotoIcon className="w-24 h-24" />
+                    <svg className="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
                   </div>
                 )}
               </div>

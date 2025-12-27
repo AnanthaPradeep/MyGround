@@ -5,6 +5,7 @@ import api from '../services/api'
 import ProtectedRoute from '../components/ProtectedRoute'
 import UserDropdown from '../components/UserDropdown'
 import toast from 'react-hot-toast'
+import Logo from '../components/Logo'
 
 export default function Profile() {
   const { user, updateUser } = useAuthStore()
@@ -53,9 +54,7 @@ export default function Profile() {
         <nav className="bg-white shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
-              <Link to="/" className="flex items-center">
-                <h1 className="text-2xl font-bold text-primary-600">MyGround</h1>
-              </Link>
+              <Logo showText={true} size="md" />
               <div className="flex items-center space-x-4">
                 <Link to="/" className="text-gray-700 hover:text-primary-600">
                   Back to Home

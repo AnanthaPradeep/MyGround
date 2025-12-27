@@ -1,30 +1,31 @@
 import { Link } from 'react-router-dom'
+import { HomeIcon, BriefcaseIcon, MapIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline'
 
 export default function ExploreByPurpose() {
   const purposes = [
     {
-      icon: '🏡',
+      icon: HomeIcon,
       title: 'Buy a Home',
       description: 'Find your dream home',
       link: '/properties?transactionType=SELL&propertyCategory=RESIDENTIAL',
       color: 'from-blue-500 to-blue-600',
     },
     {
-      icon: '💼',
+      icon: BriefcaseIcon,
       title: 'Invest for Returns',
       description: 'Commercial & rental properties',
       link: '/properties?transactionType=RENT',
       color: 'from-green-500 to-green-600',
     },
     {
-      icon: '🌾',
+      icon: MapIcon,
       title: 'Buy Land',
       description: 'Residential & commercial plots',
       link: '/properties?propertyCategory=LAND',
       color: 'from-yellow-500 to-yellow-600',
     },
     {
-      icon: '🏢',
+      icon: BuildingOfficeIcon,
       title: 'Lease Commercial',
       description: 'Office spaces & retail',
       link: '/properties?transactionType=LEASE&propertyCategory=COMMERCIAL',
@@ -41,17 +42,20 @@ export default function ExploreByPurpose() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {purposes.map((purpose, index) => (
-            <Link
-              key={index}
-              to={purpose.link}
-              className={`bg-gradient-to-br ${purpose.color} rounded-xl p-6 text-white hover:shadow-lg transition-shadow`}
-            >
-              <div className="text-4xl mb-4">{purpose.icon}</div>
-              <h3 className="text-xl font-semibold mb-2">{purpose.title}</h3>
-              <p className="text-white/90 text-sm">{purpose.description}</p>
-            </Link>
-          ))}
+          {purposes.map((purpose, index) => {
+            const Icon = purpose.icon
+            return (
+              <Link
+                key={index}
+                to={purpose.link}
+                className={`bg-gradient-to-br ${purpose.color} rounded-xl p-6 text-white hover:shadow-lg transition-shadow`}
+              >
+                <Icon className="w-12 h-12 mb-4" />
+                <h3 className="text-xl font-semibold mb-2">{purpose.title}</h3>
+                <p className="text-white/90 text-sm">{purpose.description}</p>
+              </Link>
+            )
+          })}
         </div>
       </div>
     </section>

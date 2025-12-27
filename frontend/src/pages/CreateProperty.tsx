@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
+import { CheckIcon } from '@heroicons/react/24/solid'
 import toast from 'react-hot-toast'
 import api from '../services/api'
 import { PropertyFormData } from '../types/property'
@@ -11,6 +12,8 @@ import Step4Pricing from '../components/property/Step4Pricing'
 import Step5Media from '../components/property/Step5Media'
 import Step6Legal from '../components/property/Step6Legal'
 import Step7Review from '../components/property/Step7Review'
+import UserDropdown from '../components/UserDropdown'
+import Logo from '../components/Logo'
 
 const STEPS = [
   { id: 1, name: 'Category', component: Step1Category },
@@ -115,8 +118,23 @@ export default function CreateProperty() {
   const CurrentStepComponent = STEPS[currentStep - 1].component
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50">
+      {/* Navigation */}
+      <nav className="bg-white shadow-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <Logo showText={true} size="md" />
+            <div className="flex items-center space-x-4">
+              <Link to="/" className="text-gray-700 hover:text-primary-600">
+                Back to Home
+              </Link>
+              <UserDropdown />
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">List Your Property</h1>
@@ -138,7 +156,11 @@ export default function CreateProperty() {
                         : 'bg-gray-200 text-gray-600'
                     }`}
                   >
-                    {currentStep > step.id ? '✓' : step.id}
+                    {currentStep > step.id ? (
+                      <CheckIcon className="w-5 h-5" />
+                    ) : (
+                      step.id
+                    )}
                   </div>
                   <span
                     className={`mt-2 text-xs font-medium ${

@@ -1,7 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuthStore } from './store/authStore'
+import SplashScreen from './components/SplashScreen'
 import CreateProperty from './pages/CreateProperty'
 import Home from './pages/Home'
 import Login from './pages/Login'
@@ -14,15 +15,35 @@ import Settings from './pages/Settings'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
-  const { checkAuth, isAuthenticated } = useAuthStore()
+  const { checkAuth } = useAuthStore()
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    checkAuth()
+    // Initialize app: check auth and load resources
+    const initializeApp = async () => {
+      try {
+        await checkAuth()
+      } catch (error) {
+        console.error('Auth check failed:', error)
+      } finally {
+        // Small delay to ensure smooth transition
+        setTimeout(() => {
+          setIsLoading(false)
+        }, 500)
+      }
+    }
+
+    initializeApp()
   }, [checkAuth])
+
+  const handleSplashComplete = () => {
+    setIsLoading(false)
+  }
 
   return (
     <Router>
-      <div className="min-h-screen bg-gray-50">
+      {isLoading && <SplashScreen onComplete={handleSplashComplete} minDisplayTime={1500} />}
+      <div className={`min-h-screen bg-gray-50 ${isLoading ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
@@ -32,7 +53,7 @@ function App() {
           <Route
             path="/properties/create"
             element={
-              <ProtectedRoute requiredRole={['OWNER', 'BROKER', 'DEVELOPER', 'ADMIN']}>
+              <ProtectedRoute requiredRole={['USER', 'OWNER', 'BROKER', 'DEVELOPER', 'ADMIN']}>
                 <CreateProperty />
               </ProtectedRoute>
             }

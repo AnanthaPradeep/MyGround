@@ -1,19 +1,11 @@
 import { UseFormReturn } from 'react-hook-form'
 import { PropertyFormData } from '../../types/property'
 import { useState } from 'react'
+import { INDIAN_STATES } from '../../constants/propertyTypes'
 
 interface Props {
   form: UseFormReturn<PropertyFormData>
 }
-
-const INDIAN_STATES = [
-  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
-  'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand',
-  'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur',
-  'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
-  'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
-  'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Delhi', 'Puducherry',
-]
 
 export default function Step2Location({ form }: Props) {
   const { register, watch, setValue, formState: { errors } } = form
