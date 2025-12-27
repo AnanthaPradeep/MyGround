@@ -24,6 +24,14 @@
   color: #111827 !important; /* text-gray-900 */
 }
 
+/* Search bar button alignment */
+form[class*="max-w-5xl"] button[type="submit"] {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100% !important;
+}
+
 /* Splash Screen Animations */
 @keyframes bounce-delay {
   0%, 80%, 100% {

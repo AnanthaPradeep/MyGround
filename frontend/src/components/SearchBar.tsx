@@ -25,7 +25,7 @@ export default function SearchBar() {
   const budgetRef = useRef<HTMLDivElement>(null)
 
   // Fetch data from API (set useSampleData to false when backend is ready)
-  const { propertyTypes, loading: loadingPropertyTypes } = usePropertyTypes({ useSampleData: true })
+  const { propertyTypes } = usePropertyTypes({ useSampleData: true })
   const { selectedCurrency } = useCurrencyStore()
   const { budgetRanges, loading: loadingBudgetRanges } = useBudgetRanges({
     useSampleData: true,
@@ -35,40 +35,43 @@ export default function SearchBar() {
   const formatBudgetDisplay = () => {
     const currencySymbol = selectedCurrency?.symbol || '₹'
     
-    if (minBudget && maxBudget) {
-      const min = parseFloat(minBudget)
-      const max = parseFloat(maxBudget)
+    // Helper function to format a number
+    const formatNumber = (num: number): string => {
+      if (isNaN(num) || num <= 0) return ''
       
-      // Format based on currency (INR uses L/Cr, others use K/M/B)
       if (selectedCurrency?.code === 'INR') {
-        const minFormatted = min >= 10000000 ? `${(min / 10000000).toFixed(1)}Cr` : `${(min / 100000).toFixed(0)}L`
-        const maxFormatted = max >= 10000000 ? `${(max / 10000000).toFixed(1)}Cr` : `${(max / 100000).toFixed(0)}L`
-        return `${currencySymbol}${minFormatted} - ${currencySymbol}${maxFormatted}`
+        if (num >= 10000000) {
+          return `${(num / 10000000).toFixed(1)}Cr`
+        } else if (num >= 100000) {
+          return `${(num / 100000).toFixed(0)}L`
+        } else {
+          return num.toLocaleString('en-IN')
+        }
       } else {
-        // For other currencies, use standard formatting
-        const minFormatted = min >= 1000000 ? `${(min / 1000000).toFixed(1)}M` : min >= 1000 ? `${(min / 1000).toFixed(0)}K` : min.toFixed(0)
-        const maxFormatted = max >= 1000000 ? `${(max / 1000000).toFixed(1)}M` : max >= 1000 ? `${(max / 1000).toFixed(0)}K` : max.toFixed(0)
-        return `${currencySymbol}${minFormatted} - ${currencySymbol}${maxFormatted}`
-      }
-    } else if (minBudget) {
-      const min = parseFloat(minBudget)
-      if (selectedCurrency?.code === 'INR') {
-        const minFormatted = min >= 10000000 ? `${(min / 10000000).toFixed(1)}Cr` : `${(min / 100000).toFixed(0)}L`
-        return `Min: ${currencySymbol}${minFormatted}`
-      } else {
-        const minFormatted = min >= 1000000 ? `${(min / 1000000).toFixed(1)}M` : min >= 1000 ? `${(min / 1000).toFixed(0)}K` : min.toFixed(0)
-        return `Min: ${currencySymbol}${minFormatted}`
-      }
-    } else if (maxBudget) {
-      const max = parseFloat(maxBudget)
-      if (selectedCurrency?.code === 'INR') {
-        const maxFormatted = max >= 10000000 ? `${(max / 10000000).toFixed(1)}Cr` : `${(max / 100000).toFixed(0)}L`
-        return `Max: ${currencySymbol}${maxFormatted}`
-      } else {
-        const maxFormatted = max >= 1000000 ? `${(max / 1000000).toFixed(1)}M` : max >= 1000 ? `${(max / 1000).toFixed(0)}K` : max.toFixed(0)
-        return `Max: ${currencySymbol}${maxFormatted}`
+        if (num >= 1000000) {
+          return `${(num / 1000000).toFixed(1)}M`
+        } else if (num >= 1000) {
+          return `${(num / 1000).toFixed(0)}K`
+        } else {
+          return num.toFixed(0)
+        }
       }
     }
+    
+    const min = minBudget ? parseFloat(minBudget) : NaN
+    const max = maxBudget ? parseFloat(maxBudget) : NaN
+    
+    const minFormatted = !isNaN(min) ? formatNumber(min) : ''
+    const maxFormatted = !isNaN(max) ? formatNumber(max) : ''
+    
+    if (minFormatted && maxFormatted) {
+      return `${currencySymbol}${minFormatted} - ${currencySymbol}${maxFormatted}`
+    } else if (minFormatted) {
+      return `Min: ${currencySymbol}${minFormatted}`
+    } else if (maxFormatted) {
+      return `Max: ${currencySymbol}${maxFormatted}`
+    }
+    
     return 'Budget'
   }
 
@@ -113,7 +116,7 @@ export default function SearchBar() {
 
   return (
     <form onSubmit={handleSearch} className="w-full max-w-5xl mx-auto px-2 sm:px-0 relative z-10" style={{ overflow: 'visible' }}>
-      <div className="bg-white rounded-2xl sm:rounded-full border border-gray-300 shadow-lg flex flex-col sm:flex-row items-stretch sm:items-center" style={{ overflow: 'visible' }}>
+      <div className="bg-white rounded-2xl sm:rounded-full border border-gray-300 shadow-lg flex flex-col sm:flex-row items-stretch" style={{ overflow: 'visible' }}>
         {/* Location Input */}
         <div className="flex-1 flex items-center px-3 sm:px-4 md:px-6 py-3 sm:py-3.5 md:py-4 border-b sm:border-b-0 sm:border-r border-gray-200 min-w-0">
           <MapPinIcon className="w-5 h-5 text-primary-600 flex-shrink-0 mr-2 sm:mr-3" />
@@ -290,13 +293,15 @@ export default function SearchBar() {
         </div>
 
         {/* Search Button */}
-        <button
-          type="submit"
-          className="bg-primary-600 hover:bg-primary-700 text-white px-4 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 flex items-center justify-center gap-2 font-semibold text-sm sm:text-base transition-colors rounded-b-2xl sm:rounded-r-full whitespace-nowrap min-w-[100px] sm:min-w-[120px]"
-        >
-          <MagnifyingGlassIcon className="w-5 h-5 flex-shrink-0" />
-          <span className="hidden sm:inline">Search</span>
-        </button>
+        <div className="flex items-center rounded-b-2xl sm:rounded-r-full sm:rounded-l-none overflow-hidden flex-shrink-0">
+          <button
+            type="submit"
+            className="bg-primary-600 hover:bg-primary-700 text-white px-4 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 flex items-center justify-center gap-2 font-semibold text-sm sm:text-base transition-colors whitespace-nowrap min-w-[100px] sm:min-w-[120px] w-full"
+          >
+            <MagnifyingGlassIcon className="w-5 h-5 flex-shrink-0" />
+            <span className="hidden sm:inline">Search</span>
+          </button>
+        </div>
       </div>
     </form>
   )
