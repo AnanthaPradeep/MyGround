@@ -1,22 +1,127 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useProperty } from '../hooks/useProperties'
 import { formatPrice } from '../utils/formatters'
-import { HeartIcon, CheckCircleIcon, XCircleIcon, PhotoIcon, MapPinIcon } from '@heroicons/react/24/outline'
+import { HeartIcon, CheckCircleIcon, XCircleIcon, PhotoIcon, MapPinIcon, TrashIcon, PauseIcon, PlayIcon, Bars3Icon } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid'
 import MapPicker from '../components/MapPicker'
 import Logo from '../components/Logo'
 import HeaderSearchBar from '../components/HeaderSearchBar'
 import HeaderIcons from '../components/HeaderIcons'
 import HeaderLocation from '../components/HeaderLocation'
+import MobileMenu from '../components/MobileMenu'
 import { PageLoader } from '../components/Loader'
+import { useAuthStore } from '../store/authStore'
+import api from '../services/api'
+import toast from 'react-hot-toast'
 
 export default function PropertyDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { property, loading } = useProperty(id || '', true)
+  const { user, isAuthenticated } = useAuthStore()
+  const { property, loading, refetch } = useProperty(id || '', false) // Fetch from API
   const [isSaved, setIsSaved] = useState(false)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
+  const [deleting, setDeleting] = useState(false)
+  const [pausing, setPausing] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+  // Check if current user is the property owner
+  // Handle both string (ObjectId) and object (populated) formats
+  // This must recalculate whenever property or user changes
+  const isOwner = useMemo(() => {
+    // If property or user is not loaded yet, return false
+    if (!property || !isAuthenticated || !user || !user.id) {
+      return false
+    }
+
+    // Get the listedBy ID in string format
+    let listedById: string | null = null
+    
+    if (typeof property.listedBy === 'string') {
+      // If it's a string (ObjectId), use it directly
+      listedById = String(property.listedBy).trim()
+    } else if (property.listedBy && typeof property.listedBy === 'object') {
+      // If it's an object (populated), get _id (MongoDB) or id
+      const listedByObj = property.listedBy as any
+      // Try _id first (MongoDB default), then id
+      if (listedByObj._id) {
+        listedById = String(listedByObj._id).trim()
+      } else if (listedByObj.id) {
+        listedById = String(listedByObj.id).trim()
+      }
+    }
+
+    // If we couldn't extract listedBy ID, return false
+    if (!listedById) {
+      return false
+    }
+
+    // Compare with user.id (ensure both are strings and trimmed)
+    const userId = String(user.id).trim()
+    const isOwnerResult = listedById === userId
+
+    // Debug logging (remove in production)
+    if (import.meta.env.DEV) {
+      console.log('Ownership check:', {
+        listedById,
+        userId,
+        isOwner: isOwnerResult,
+        listedByType: typeof property.listedBy,
+        listedByValue: property.listedBy,
+        propertyId: property._id,
+        userObject: user
+      })
+    }
+
+    return isOwnerResult
+  }, [property, user, isAuthenticated, property?._id, property?.listedBy, user?.id])
+
+  const handleDelete = async () => {
+    if (!property) return
+    if (!window.confirm(`Are you sure you want to delete "${property.title}"? This action cannot be undone.`)) {
+      return
+    }
+
+    setDeleting(true)
+    try {
+      await api.delete(`/properties/${property._id}`)
+      toast.success('Property deleted successfully')
+      navigate('/dashboard')
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Failed to delete property')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  const handlePause = async () => {
+    if (!property) return
+    setPausing(true)
+    try {
+      await api.put(`/properties/${property._id}/pause`)
+      toast.success('Property paused. It is now hidden from public view.')
+      refetch()
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Failed to pause property')
+    } finally {
+      setPausing(false)
+    }
+  }
+
+  const handleResume = async () => {
+    if (!property) return
+    setPausing(true)
+    try {
+      await api.put(`/properties/${property._id}/resume`)
+      toast.success('Property resumed. It is now visible to the public.')
+      refetch()
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Failed to resume property')
+    } finally {
+      setPausing(false)
+    }
+  }
 
   // Handle property not found
   if (!loading && !property && id) {
@@ -45,9 +150,6 @@ export default function PropertyDetail() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-600 mb-4">Property not found</p>
-          <Link to="/" className="text-primary-600 hover:text-primary-700">
-            Go back to home
-          </Link>
         </div>
       </div>
     )
@@ -58,24 +160,35 @@ export default function PropertyDetail() {
       {/* Navigation */}
       <nav className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
-          <div className="flex items-center h-14 sm:h-16 gap-2">
-            <Logo showText={true} size="md" className="flex-shrink-0" />
-            <div className="hidden sm:block flex-1 min-w-0">
+          <div className="flex justify-between items-center h-14 sm:h-16">
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="lg:hidden p-2 text-gray-600 hover:text-gray-900"
+              aria-label="Open menu"
+            >
+              <Bars3Icon className="w-6 h-6" />
+            </button>
+
+            {/* Logo - Hidden on mobile (shown in menu), visible on desktop */}
+            <Logo showText={true} size="md" className="hidden lg:flex lg:flex-1" />
+            
+            <div className="hidden sm:block flex-1 min-w-0 lg:flex-none lg:max-w-md">
               <HeaderSearchBar />
             </div>
             <div className="hidden lg:flex items-center gap-2 xl:gap-4">
               <HeaderLocation />
               <HeaderIcons />
-              <Link to="/" className="text-gray-700 hover:text-primary-600 text-sm whitespace-nowrap">
-                Back to Home
-              </Link>
             </div>
-            <Link to="/" className="lg:hidden text-gray-700 hover:text-primary-600 text-xs sm:text-sm">
-              Home
-            </Link>
+            <div className="lg:hidden flex items-center">
+              <HeaderIcons />
+            </div>
           </div>
         </div>
       </nav>
+
+      {/* Mobile Menu */}
+      <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -333,6 +446,48 @@ export default function PropertyDetail() {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Owner Actions - Only show if user is the owner */}
+            {isOwner && (
+              <div className="bg-white rounded-lg shadow-sm p-6 sticky top-20">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Manage Property</h3>
+                <div className="space-y-3">
+                  {property.status === 'PAUSED' ? (
+                    <button
+                      onClick={handleResume}
+                      disabled={pausing}
+                      className="w-full px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      <PlayIcon className="w-5 h-5" />
+                      {pausing ? 'Resuming...' : 'Resume Property (Make Public)'}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handlePause}
+                      disabled={pausing}
+                      className="w-full px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      <PauseIcon className="w-5 h-5" />
+                      {pausing ? 'Pausing...' : 'Pause Property (Make Private)'}
+                    </button>
+                  )}
+                  <button
+                    onClick={handleDelete}
+                    disabled={deleting}
+                    className="w-full px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    <TrashIcon className="w-5 h-5" />
+                    {deleting ? 'Deleting...' : 'Delete Property'}
+                  </button>
+                  <Link
+                    to="/dashboard"
+                    className="block w-full px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium text-center"
+                  >
+                    Go to Dashboard
+                  </Link>
+                </div>
+              </div>
+            )}
+
             {/* Contact Card */}
             <div className="bg-white rounded-lg shadow-sm p-6 sticky top-20">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Contact Owner</h3>
@@ -392,4 +547,5 @@ export default function PropertyDetail() {
     </div>
   )
 }
+
 

@@ -169,7 +169,17 @@ router.get('/me', authenticate, async (req: AuthRequest, res) => {
 
     res.json({
       success: true,
-      user,
+      user: {
+        id: user._id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        isVerified: user.isVerified,
+        trustScore: user.trustScore,
+        mobile: user.mobile,
+        profilePicture: user.profilePicture,
+      },
     });
   } catch (error: any) {
     console.error('Error fetching user:', error);

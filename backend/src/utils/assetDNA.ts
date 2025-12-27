@@ -27,7 +27,7 @@ export const calculateAssetDNA = async (
   let trustScore = 0;
 
   // Geo-verification (30 points)
-  if (property.location.coordinates?.coordinates?.length === 2) {
+  if (property.location?.coordinates?.coordinates?.length === 2) {
     verificationScore += 30;
   }
 
@@ -85,23 +85,42 @@ export const createOrUpdateAssetDNA = async (
   property: IProperty,
   assetId: string
 ): Promise<void> => {
+  // Ensure assetId is provided and not null/undefined
+  if (!assetId || assetId.trim() === '') {
+    throw new Error('AssetId is required for AssetDNA creation');
+  }
+
   const dnaMetrics = await calculateAssetDNA(property);
 
-  const assetDNA = await AssetDNA.findOneAndUpdate(
-    { propertyId: property._id },
-    {
-      assetId,
+  // Check if coordinates exist before accessing them
+  const hasCoordinates = property.location?.coordinates?.coordinates?.length === 2;
+  const coordinates = hasCoordinates ? property.location.coordinates.coordinates : null;
+
+  // Build geoVerification object conditionally
+  const geoVerification: any = {
+    verified: hasCoordinates,
+    source: 'MAP_API',
+  };
+
+  if (hasCoordinates && coordinates) {
+    geoVerification.verifiedAt = new Date();
+    geoVerification.coordinates = {
+      latitude: coordinates[1],
+      longitude: coordinates[0],
+    };
+    geoVerification.accuracy = 10; // meters
+  }
+
+  // Query by propertyId first (one property = one AssetDNA record)
+  // This ensures each property has exactly one AssetDNA record
+  let assetDNA = await AssetDNA.findOne({ propertyId: property._id });
+
+  if (assetDNA) {
+    // Update existing AssetDNA record for this property
+    // Keep existing assetId (immutable once set)
+    const updateData: any = {
       propertyId: property._id,
-      geoVerification: {
-        verified: property.location.coordinates?.coordinates?.length === 2,
-        verifiedAt: new Date(),
-        coordinates: {
-          latitude: property.location.coordinates.coordinates[1],
-          longitude: property.location.coordinates.coordinates[0],
-        },
-        accuracy: 10, // meters
-        source: 'MAP_API',
-      },
+      geoVerification,
       legalStatus: {
         riskLevel: dnaMetrics.legalRisk,
         titleClear: property.legal.titleClear,
@@ -116,9 +135,78 @@ export const createOrUpdateAssetDNA = async (
         investmentScore: 50, // Placeholder
         overallScore: (dnaMetrics.verificationScore + dnaMetrics.assetTrustScore) / 2,
       },
-    },
-    { upsert: true, new: true }
-  );
+    };
+
+    // Only update assetId if it's missing (shouldn't happen, but safety check)
+    if (!assetDNA.assetId || assetDNA.assetId.trim() === '') {
+      updateData.assetId = assetId;
+    }
+
+    assetDNA = await AssetDNA.findOneAndUpdate(
+      { propertyId: property._id },
+      { $set: updateData },
+      { new: true }
+    );
+  } else {
+    // Create new AssetDNA record for this property
+    // Use propertyId as the primary query to ensure one record per property
+    // assetId is set as unique identifier
+    try {
+      assetDNA = await AssetDNA.create({
+        assetId: assetId,
+        propertyId: property._id,
+        geoVerification,
+        legalStatus: {
+          riskLevel: dnaMetrics.legalRisk,
+          titleClear: property.legal.titleClear,
+          encumbranceFree: property.legal.encumbranceFree,
+          litigationCount: property.legal.litigationStatus === 'PENDING' ? 1 : 0,
+          complianceScore: dnaMetrics.assetTrustScore,
+          lastVerified: new Date(),
+        },
+        scores: {
+          verificationScore: dnaMetrics.verificationScore,
+          trustScore: dnaMetrics.assetTrustScore,
+          investmentScore: 50, // Placeholder
+          overallScore: (dnaMetrics.verificationScore + dnaMetrics.assetTrustScore) / 2,
+        },
+      });
+    } catch (error: any) {
+      // If assetId already exists (very rare), try to find and update by propertyId
+      if (error.code === 11000 && error.keyPattern?.assetId) {
+        // AssetId collision - this shouldn't happen, but handle gracefully
+        // Try to find by propertyId again (in case it was created between checks)
+        assetDNA = await AssetDNA.findOne({ propertyId: property._id });
+        if (!assetDNA) {
+          // Generate a new assetId and try again
+          const newAssetId = generateAssetId();
+          assetDNA = await AssetDNA.create({
+            assetId: newAssetId,
+            propertyId: property._id,
+            geoVerification,
+            legalStatus: {
+              riskLevel: dnaMetrics.legalRisk,
+              titleClear: property.legal.titleClear,
+              encumbranceFree: property.legal.encumbranceFree,
+              litigationCount: property.legal.litigationStatus === 'PENDING' ? 1 : 0,
+              complianceScore: dnaMetrics.assetTrustScore,
+              lastVerified: new Date(),
+            },
+            scores: {
+              verificationScore: dnaMetrics.verificationScore,
+              trustScore: dnaMetrics.assetTrustScore,
+              investmentScore: 50,
+              overallScore: (dnaMetrics.verificationScore + dnaMetrics.assetTrustScore) / 2,
+            },
+          });
+          // Update property with the new assetId
+          property.assetId = newAssetId;
+        }
+      } else {
+        throw error;
+      }
+    }
+  }
 
   // Update property with Asset DNA data
   property.assetId = assetId;

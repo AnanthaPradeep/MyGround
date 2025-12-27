@@ -10,7 +10,8 @@ import {
   UserIcon,
   Cog6ToothIcon,
   MapPinIcon,
-  ChevronDownIcon
+  ChevronDownIcon,
+  Squares2X2Icon
 } from '@heroicons/react/24/outline'
 import { useAuthStore } from '../store/authStore'
 import { useLocationStore } from '../store/locationStore'
@@ -114,7 +115,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     onClick={onClose}
                     className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                   >
-                    <HomeIcon className="w-5 h-5" />
+                    <Squares2X2Icon className="w-5 h-5" />
                     <span>Dashboard</span>
                   </Link>
 

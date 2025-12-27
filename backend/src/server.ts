@@ -5,6 +5,7 @@ import { connectDatabase } from './config/database';
 import authRoutes from './routes/auth';
 import propertyRoutes from './routes/properties';
 import notificationRoutes from './routes/notifications';
+import publicNotificationRoutes from './routes/publicNotifications';
 
 // Load environment variables
 dotenv.config();
@@ -27,6 +28,7 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/properties', propertyRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/public-notifications', publicNotificationRoutes);
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

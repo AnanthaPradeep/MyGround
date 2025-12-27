@@ -8,7 +8,8 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "test": "jest",
-    "fix-index": "tsx scripts/fix-geospatial-index.ts"
+    "fix-index": "tsx scripts/fix-geospatial-index.ts",
+    "fix-assetdna": "tsx scripts/fix-assetdna-index.ts"
   },
   "keywords": [
     "real-estate",

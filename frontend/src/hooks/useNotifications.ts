@@ -37,8 +37,13 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
         if (userId) params.append('userId', userId)
         const response = await api.get(`/notifications?${params.toString()}`)
         const apiData = (response.data.notifications || []).map((notif: any) => ({
-          ...notif,
+          id: notif._id || notif.id, // Use _id from MongoDB or id if present
+          title: notif.title,
+          message: notif.message,
+          type: notif.type || 'info',
+          read: notif.read || false,
           timestamp: new Date(notif.createdAt || notif.timestamp),
+          link: notif.link,
         })) as Notification[]
         setNotifications(apiData)
       }

@@ -6,7 +6,17 @@ import { validatePropertyListing, validateResidentialProperty, validateLandPrope
 import { generateAssetId, createOrUpdateAssetDNA } from '../utils/assetDNA';
 import { checkDuplicateListing, checkPriceAnomaly, checkListingRateLimit } from '../utils/fraudDetection';
 import { validationResult } from 'express-validator';
-import { notifyPropertySubmitted, notifyPropertyApproved, notifyPropertyRejected } from '../utils/notifications';
+import { 
+  notifyPropertySubmitted, 
+  notifyPropertyApproved, 
+  notifyPropertyRejected,
+  notifyPropertyDeleted,
+  notifyPropertyPaused,
+  notifyPropertyResumed,
+  notifyNewPropertyAdded,
+  notifyPublicPropertyDeleted,
+  notifyPropertySoldOrRented
+} from '../utils/notifications';
 
 const router: Router = express.Router();
 
@@ -271,6 +281,7 @@ router.put(
         }
       }
 
+      const oldStatus = property.status;
       Object.assign(property, updateData);
       await property.save();
 
@@ -278,6 +289,23 @@ router.put(
       if (updateData.location || updateData.legal) {
         await createOrUpdateAssetDNA(property, property.assetId);
         await property.save();
+      }
+
+      // Check if property status changed to SOLD or RENTED - create public notification
+      if (updateData.status && oldStatus !== updateData.status) {
+        if (updateData.status === 'SOLD' || updateData.status === 'RENTED') {
+          await notifyPropertySoldOrRented(
+            property._id,
+            property.title,
+            property.propertyCategory,
+            property.transactionType,
+            {
+              city: property.location?.city,
+              area: property.location?.area,
+              state: property.location?.state,
+            }
+          );
+        }
       }
 
       res.json({
@@ -341,11 +369,24 @@ router.post(
       property.publishedAt = new Date();
       await property.save();
 
-      // Create notification for property owner
+      // Create notification for property owner (ONLY to owner)
       await notifyPropertyApproved(
         property.listedBy,
         property._id.toString(),
         property.title
+      );
+
+      // Create public notification for all users (property added)
+      await notifyNewPropertyAdded(
+        property._id,
+        property.title,
+        property.propertyCategory,
+        property.transactionType,
+        {
+          city: property.location?.city,
+          area: property.location?.area,
+          state: property.location?.state,
+        }
       );
 
       res.json({
@@ -426,11 +467,25 @@ router.get('/', async (req, res) => {
     if (propertyCategory) query.propertyCategory = propertyCategory;
     if (city) query['location.city'] = new RegExp(city as string, 'i');
     if (state) query['location.state'] = new RegExp(state as string, 'i');
+    
+    // Filter by listedBy if provided (for user's own properties in dashboard)
+    if (req.query.listedBy) {
+      query.listedBy = req.query.listedBy;
+    }
+    
     if (status) {
       query.status = status;
     } else {
-      // Default: show APPROVED, PENDING, and DRAFT (for testing - in production, might want to hide DRAFT)
-      query.status = { $in: ['APPROVED', 'PENDING', 'DRAFT'] };
+      // Default: show APPROVED, PENDING, and DRAFT (exclude PAUSED - paused properties are private)
+      // PAUSED properties are hidden from public view
+      // If listedBy filter is present, show all statuses including PAUSED (for owner's dashboard)
+      if (req.query.listedBy) {
+        // Owner viewing their own properties - show all including PAUSED
+        query.status = { $in: ['APPROVED', 'PENDING', 'DRAFT', 'PAUSED'] };
+      } else {
+        // Public view - exclude PAUSED properties
+        query.status = { $in: ['APPROVED', 'PENDING', 'DRAFT'] };
+      }
     }
 
     // Price filters
@@ -453,7 +508,7 @@ router.get('/', async (req, res) => {
 
     const properties = await Property.find(query)
       .populate('listedBy', 'firstName lastName role trustScore')
-      .sort({ createdAt: -1 })
+      .sort({ createdAt: -1, publishedAt: -1 }) // Sort by newest first (createdAt, then publishedAt)
       .skip(skip)
       .limit(Number(limit))
       .select('-__v');
@@ -595,9 +650,115 @@ router.post(
 );
 
 /**
+ * @route   PUT /api/properties/:id/pause
+ * @desc    Pause/Private a property (only owner can do this)
+ * @access  Private (Owner only - strict ownership check)
+ */
+router.put('/:id/pause', authenticate, async (req: AuthRequest, res) => {
+  try {
+    const property = await Property.findById(req.params.id);
+
+    if (!property) {
+      return res.status(404).json({ error: 'Property not found' });
+    }
+
+    // STRICT OWNERSHIP CHECK - Only the person who created/uploaded the property can pause it
+    // No admin override - only the creator can pause their own property
+    if (property.listedBy.toString() !== req.user!.userId) {
+      return res.status(403).json({ 
+        error: 'Not authorized',
+        message: 'Only the property owner can pause this property'
+      });
+    }
+
+    // Change status to PAUSED (makes it private/hidden)
+    property.status = 'PAUSED';
+    await property.save();
+
+    // Create notification for property owner (ONLY to owner)
+    await notifyPropertyPaused(
+      property.listedBy,
+      property._id.toString(),
+      property.title
+    );
+
+    res.json({
+      success: true,
+      message: 'Property paused successfully. It is now hidden from public view.',
+      property: {
+        id: property._id,
+        status: property.status,
+      },
+    });
+  } catch (error: any) {
+    console.error('Error pausing property:', error);
+    res.status(500).json({
+      error: 'Failed to pause property',
+      message: error.message,
+    });
+  }
+});
+
+/**
+ * @route   PUT /api/properties/:id/resume
+ * @desc    Resume/Unpause a property (only owner can do this)
+ * @access  Private (Owner only - strict ownership check)
+ */
+router.put('/:id/resume', authenticate, async (req: AuthRequest, res) => {
+  try {
+    const property = await Property.findById(req.params.id);
+
+    if (!property) {
+      return res.status(404).json({ error: 'Property not found' });
+    }
+
+    // STRICT OWNERSHIP CHECK - Only the person who created/uploaded the property can resume it
+    if (property.listedBy.toString() !== req.user!.userId) {
+      return res.status(403).json({ 
+        error: 'Not authorized',
+        message: 'Only the property owner can resume this property'
+      });
+    }
+
+    if (property.status !== 'PAUSED') {
+      return res.status(400).json({
+        error: 'Property is not paused',
+        currentStatus: property.status,
+      });
+    }
+
+    // Change status back to APPROVED
+    property.status = 'APPROVED';
+    await property.save();
+
+    // Create notification for property owner (ONLY to owner)
+    await notifyPropertyResumed(
+      property.listedBy,
+      property._id.toString(),
+      property.title
+    );
+
+    res.json({
+      success: true,
+      message: 'Property resumed successfully. It is now visible to the public.',
+      property: {
+        id: property._id,
+        status: property.status,
+      },
+    });
+  } catch (error: any) {
+    console.error('Error resuming property:', error);
+    res.status(500).json({
+      error: 'Failed to resume property',
+      message: error.message,
+    });
+  }
+});
+
+/**
  * @route   DELETE /api/properties/:id
- * @desc    Delete a property listing
- * @access  Private (Owner, Admin)
+ * @desc    Delete a property listing (only owner can do this)
+ * @access  Private (Owner only - strict ownership check)
  */
 router.delete('/:id', authenticate, async (req: AuthRequest, res) => {
   try {
@@ -607,8 +768,13 @@ router.delete('/:id', authenticate, async (req: AuthRequest, res) => {
       return res.status(404).json({ error: 'Property not found' });
     }
 
-    if (property.listedBy.toString() !== req.user!.userId && req.user!.role !== 'ADMIN') {
-      return res.status(403).json({ error: 'Not authorized' });
+    // STRICT OWNERSHIP CHECK - Only the person who created/uploaded the property can delete it
+    // No admin override - only the creator can delete their own property
+    if (property.listedBy.toString() !== req.user!.userId) {
+      return res.status(403).json({ 
+        error: 'Not authorized',
+        message: 'Only the property owner can delete this property'
+      });
     }
 
     await Property.findByIdAndDelete(req.params.id);

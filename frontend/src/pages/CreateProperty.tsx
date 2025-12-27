@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate, Link } from 'react-router-dom'
 import { CheckIcon } from '@heroicons/react/24/solid'
+import { Bars3Icon } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 import api from '../services/api'
 import { PropertyFormData } from '../types/property'
@@ -17,6 +18,7 @@ import Logo from '../components/Logo'
 import HeaderSearchBar from '../components/HeaderSearchBar'
 import HeaderIcons from '../components/HeaderIcons'
 import HeaderLocation from '../components/HeaderLocation'
+import MobileMenu from '../components/MobileMenu'
 
 const STEPS = [
   { id: 1, name: 'Category', component: Step1Category },
@@ -32,6 +34,7 @@ export default function CreateProperty() {
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [propertyId, setPropertyId] = useState<string | null>(null)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const navigate = useNavigate()
 
   const form = useForm<PropertyFormData>({
@@ -127,17 +130,25 @@ export default function CreateProperty() {
       {/* Navigation */}
       <nav className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
-          <div className="flex items-center h-14 sm:h-16 gap-2">
-            <Logo showText={true} size="md" className="flex-shrink-0" />
-            <div className="hidden sm:block flex-1 min-w-0">
+          <div className="flex justify-between items-center h-14 sm:h-16">
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="lg:hidden p-2 text-gray-600 hover:text-gray-900"
+              aria-label="Open menu"
+            >
+              <Bars3Icon className="w-6 h-6" />
+            </button>
+
+            {/* Logo - Hidden on mobile (shown in menu), visible on desktop */}
+            <Logo showText={true} size="md" className="hidden lg:flex lg:flex-1" />
+            
+            <div className="hidden sm:block flex-1 min-w-0 lg:flex-none lg:max-w-md">
               <HeaderSearchBar />
             </div>
             <div className="hidden lg:flex items-center gap-2 xl:gap-4">
               <HeaderLocation />
               <HeaderIcons />
-              <Link to="/" className="text-gray-700 hover:text-primary-600 text-sm whitespace-nowrap">
-                Back to Home
-              </Link>
               <UserDropdown />
             </div>
             <div className="lg:hidden flex items-center">
@@ -146,6 +157,9 @@ export default function CreateProperty() {
           </div>
         </div>
       </nav>
+
+      {/* Mobile Menu */}
+      <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}

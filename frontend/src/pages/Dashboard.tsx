@@ -1,38 +1,99 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { useProperties } from '../hooks/useProperties'
 import { Property } from '../types/property'
-import { HomeIcon, MagnifyingGlassIcon, UserIcon, EyeIcon, HeartIcon, ChatBubbleLeftIcon } from '@heroicons/react/24/outline'
+import { HomeIcon, MagnifyingGlassIcon, UserIcon, EyeIcon, HeartIcon, ChatBubbleLeftIcon, TrashIcon, PauseIcon, PlayIcon, Bars3Icon } from '@heroicons/react/24/outline'
 import ProtectedRoute from '../components/ProtectedRoute'
 import UserDropdown from '../components/UserDropdown'
 import Logo from '../components/Logo'
 import HeaderSearchBar from '../components/HeaderSearchBar'
 import HeaderIcons from '../components/HeaderIcons'
 import HeaderLocation from '../components/HeaderLocation'
+import MobileMenu from '../components/MobileMenu'
+import api from '../services/api'
+import toast from 'react-hot-toast'
 
 export default function Dashboard() {
   const { user } = useAuthStore()
-  const { properties, loading } = useProperties({ useSampleData: true })
+  const navigate = useNavigate()
+  const { properties, loading, refetch } = useProperties({ 
+    useSampleData: false, // Fetch from API to get user's own properties
+    filters: { listedBy: user?.id } // Filter to show only user's properties
+  })
   const [activeTab, setActiveTab] = useState<'properties' | 'saved' | 'profile'>('properties')
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [pausingId, setPausingId] = useState<string | null>(null)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+  const handleDelete = async (propertyId: string, propertyTitle: string) => {
+    if (!window.confirm(`Are you sure you want to delete "${propertyTitle}"? This action cannot be undone.`)) {
+      return
+    }
+
+    setDeletingId(propertyId)
+    try {
+      await api.delete(`/properties/${propertyId}`)
+      toast.success('Property deleted successfully')
+      refetch() // Refresh the list
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Failed to delete property')
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
+  const handlePause = async (propertyId: string) => {
+    setPausingId(propertyId)
+    try {
+      await api.put(`/properties/${propertyId}/pause`)
+      toast.success('Property paused. It is now hidden from public view.')
+      refetch() // Refresh the list
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Failed to pause property')
+    } finally {
+      setPausingId(null)
+    }
+  }
+
+  const handleResume = async (propertyId: string) => {
+    setPausingId(propertyId)
+    try {
+      await api.put(`/properties/${propertyId}/resume`)
+      toast.success('Property resumed. It is now visible to the public.')
+      refetch() // Refresh the list
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Failed to resume property')
+    } finally {
+      setPausingId(null)
+    }
+  }
 
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
         {/* Navigation */}
-        <nav className="bg-white shadow-sm">
+        <nav className="bg-white shadow-sm sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
-            <div className="flex items-center h-14 sm:h-16 gap-2">
-              <Logo showText={true} size="md" className="flex-shrink-0" />
-              <div className="hidden sm:block flex-1 min-w-0">
+            <div className="flex justify-between items-center h-14 sm:h-16">
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="lg:hidden p-2 text-gray-600 hover:text-gray-900"
+                aria-label="Open menu"
+              >
+                <Bars3Icon className="w-6 h-6" />
+              </button>
+
+              {/* Logo - Hidden on mobile (shown in menu), visible on desktop */}
+              <Logo showText={true} size="md" className="hidden lg:flex lg:flex-1" />
+              
+              <div className="hidden sm:block flex-1 min-w-0 lg:flex-none lg:max-w-md">
                 <HeaderSearchBar />
               </div>
               <div className="hidden lg:flex items-center gap-2 xl:gap-4">
                 <HeaderLocation />
                 <HeaderIcons />
-                <Link to="/" className="text-gray-700 hover:text-primary-600 text-sm whitespace-nowrap">
-                  Back to Home
-                </Link>
                 <UserDropdown />
               </div>
               <div className="lg:hidden flex items-center">
@@ -41,6 +102,9 @@ export default function Dashboard() {
             </div>
           </div>
         </nav>
+
+        {/* Mobile Menu */}
+        <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
@@ -172,17 +236,49 @@ export default function Dashboard() {
                                     ? 'bg-yellow-100 text-yellow-700'
                                     : property.status === 'DRAFT'
                                     ? 'bg-gray-100 text-gray-700'
+                                    : property.status === 'PAUSED'
+                                    ? 'bg-orange-100 text-orange-700'
                                     : 'bg-red-100 text-red-700'
                                 }`}
                               >
                                 {property.status}
                               </span>
                               <Link
-                                to={`/properties/${property._id}/edit`}
+                                to={`/properties/${property._id}`}
                                 className="px-3 py-1 text-sm text-primary-600 hover:text-primary-700"
                               >
-                                Edit
+                                View
                               </Link>
+                              {property.status === 'PAUSED' ? (
+                                <button
+                                  onClick={() => handleResume(property._id)}
+                                  disabled={pausingId === property._id}
+                                  className="px-3 py-1 text-sm text-green-600 hover:text-green-700 disabled:opacity-50 flex items-center gap-1"
+                                  title="Resume property (make it public)"
+                                >
+                                  <PlayIcon className="w-4 h-4" />
+                                  Resume
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => handlePause(property._id)}
+                                  disabled={pausingId === property._id}
+                                  className="px-3 py-1 text-sm text-orange-600 hover:text-orange-700 disabled:opacity-50 flex items-center gap-1"
+                                  title="Pause property (make it private)"
+                                >
+                                  <PauseIcon className="w-4 h-4" />
+                                  Pause
+                                </button>
+                              )}
+                              <button
+                                onClick={() => handleDelete(property._id, property.title)}
+                                disabled={deletingId === property._id}
+                                className="px-3 py-1 text-sm text-red-600 hover:text-red-700 disabled:opacity-50 flex items-center gap-1"
+                                title="Delete property permanently"
+                              >
+                                <TrashIcon className="w-4 h-4" />
+                                Delete
+                              </button>
                             </div>
                           </div>
                         </div>

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
-import { useState } from 'react'
-import { ShieldCheckIcon, MapPinIcon, ScaleIcon } from '@heroicons/react/24/outline'
+import { useState, useMemo } from 'react'
+import { ShieldCheckIcon, MapPinIcon, ScaleIcon, ClockIcon } from '@heroicons/react/24/outline'
 import { useAuthStore } from '../store/authStore'
 import { useProperties } from '../hooks/useProperties'
 import PropertyCard from '../components/PropertyCard'
@@ -20,8 +20,19 @@ import { CardSkeleton } from '../components/Loader'
 
 export default function Home() {
   const { isAuthenticated } = useAuthStore()
-  const { properties, loading } = useProperties({ useSampleData: true })
+  const { properties, loading } = useProperties({ useSampleData: false }) // Fetch from API to get recent properties
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+  // Get recent properties (sorted by createdAt, newest first)
+  const recentProperties = useMemo(() => {
+    return [...properties]
+      .sort((a, b) => {
+        const dateA = new Date(a.createdAt || 0).getTime()
+        const dateB = new Date(b.createdAt || 0).getTime()
+        return dateB - dateA // Newest first
+      })
+      .slice(0, 8) // Show latest 8 properties
+  }, [properties])
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -130,6 +141,51 @@ export default function Home() {
 
       {/* Trending & Insights */}
       <TrendingSection />
+
+      {/* Recent Properties */}
+      <section className="py-12 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center mb-8">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
+                <ClockIcon className="w-6 h-6 text-primary-600" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">Recent Properties</h2>
+                <p className="text-gray-600">Newly listed properties on MyGround</p>
+              </div>
+            </div>
+            <Link
+              to="/properties"
+              className="text-primary-600 hover:text-primary-700 font-medium"
+            >
+              View All →
+            </Link>
+          </div>
+
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <CardSkeleton count={8} />
+            </div>
+          ) : recentProperties.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-600 mb-4">No recent properties yet. Be the first to list!</p>
+              <Link
+                to="/properties/create"
+                className="inline-block px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+              >
+                List Your Property
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+              {recentProperties.map((property) => (
+                <PropertyCard key={property._id} property={property} />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* Featured Properties */}
       <section className="py-12 bg-gray-50">

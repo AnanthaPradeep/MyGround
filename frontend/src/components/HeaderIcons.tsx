@@ -8,64 +8,57 @@ import {
   ExclamationTriangleIcon,
   InformationCircleIcon,
   XCircleIcon,
+  Squares2X2Icon,
   HomeIcon as PropertyIcon
 } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid'
 import { useState, useRef, useEffect } from 'react'
 import { useAuthStore } from '../store/authStore'
+import { useNotificationStore } from '../store/notificationStore'
+import { useNotifications } from '../hooks/useNotifications'
 import { Notification } from '../types/notification'
+import api from '../services/api'
 
 /**
  * Header Icons Component - Dashboard, Notification, Wishlist, List Property
  */
 export default function HeaderIcons() {
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, user } = useAuthStore()
   const navigate = useNavigate()
   const [wishlistCount, setWishlistCount] = useState(0) // TODO: Get from store/API
   const [isWishlistActive, setIsWishlistActive] = useState(false)
   const [isNotificationOpen, setIsNotificationOpen] = useState(false)
   const notificationRef = useRef<HTMLDivElement>(null)
 
-  // Sample notifications - TODO: Get from store/API
-  const [notifications] = useState<Notification[]>([
-    {
-      id: '1',
-      title: 'Property Inquiry',
-      message: 'You have a new inquiry for your property in Mumbai',
-      type: 'property',
-      read: false,
-      timestamp: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
-      link: '/properties/123'
-    },
-    {
-      id: '2',
-      title: 'Property Approved',
-      message: 'Your property listing has been approved and is now live',
-      type: 'success',
-      read: false,
-      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-      link: '/properties/456'
-    },
-    {
-      id: '3',
-      title: 'New Message',
-      message: 'You have a new message from a potential buyer',
-      type: 'message',
-      read: true,
-      timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
-      link: '/messages'
-    },
-    {
-      id: '4',
-      title: 'Price Update',
-      message: 'Similar properties in your area have updated prices',
-      type: 'info',
-      read: true,
-      timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
-    }
-  ])
+  // Fetch real notifications from API
+  const { notifications, setNotifications, loading: loadingNotifications, refetch: refetchNotifications } = useNotifications({
+    useSampleData: false, // Use real API data
+    userId: user?.id,
+  })
 
+  // Get notification store to listen for updates
+  const { lastUpdate } = useNotificationStore()
+
+  // Calculate unread notification count (only count unread notifications)
   const notificationCount = notifications.filter(n => !n.read).length
+
+  // Refetch notifications when lastUpdate changes (triggered from Notifications page)
+  useEffect(() => {
+    if (!isAuthenticated || !lastUpdate) return
+    refetchNotifications()
+  }, [lastUpdate, isAuthenticated, refetchNotifications])
+
+  // Refetch notifications periodically to get new ones
+  useEffect(() => {
+    if (!isAuthenticated) return
+
+    // Refetch every 30 seconds to get new notifications
+    const interval = setInterval(() => {
+      refetchNotifications()
+    }, 30000) // 30 seconds
+
+    return () => clearInterval(interval)
+  }, [isAuthenticated, refetchNotifications])
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -114,7 +107,22 @@ export default function HeaderIcons() {
     return `${days}d ago`
   }
 
-  const handleNotificationClick = (notification: Notification) => {
+  const { triggerRefetch } = useNotificationStore()
+
+  const handleNotificationClick = async (notification: Notification) => {
+    // Mark as read via API if not already read
+    if (!notification.read) {
+      try {
+        await api.put(`/notifications/${notification.id}/read`)
+        // Refetch to update count
+        await refetchNotifications()
+        // Trigger refetch in other components
+        triggerRefetch()
+      } catch (error: any) {
+        console.error('Error marking notification as read:', error)
+      }
+    }
+
     if (notification.link) {
       navigate(notification.link)
     }
@@ -135,13 +143,22 @@ export default function HeaderIcons() {
 
   return (
     <div className="hidden lg:flex items-center gap-2 xl:gap-3">
+      {/* Home Icon */}
+      <Link
+        to="/"
+        className="relative p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors"
+        title="Home"
+      >
+        <HomeIcon className="w-6 h-6" />
+      </Link>
+
       {/* Dashboard Icon */}
       <Link
         to="/dashboard"
         className="relative p-2 text-gray-600 hover:text-primary-600 hover:bg-gray-100 rounded-lg transition-colors"
         title="Dashboard"
       >
-        <HomeIcon className="w-6 h-6" />
+        <Squares2X2Icon className="w-6 h-6" />
       </Link>
 
       {/* Notification Icon with Dropdown */}

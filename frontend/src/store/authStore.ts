@@ -103,8 +103,13 @@ export const useAuthStore = create<AuthState>()(
 
         try {
           const response = await api.get('/auth/me');
+          // Ensure user object has 'id' field (convert _id to id if needed)
+          const userData = response.data.user;
+          const user = userData.id 
+            ? userData 
+            : { ...userData, id: userData._id || userData.id };
           set({
-            user: response.data.user,
+            user,
             token,
             isAuthenticated: true,
           });
