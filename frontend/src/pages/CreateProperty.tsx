@@ -1,11 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useParams } from 'react-router-dom'
 import { CheckIcon } from '@heroicons/react/24/solid'
 import { Bars3Icon } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 import api from '../services/api'
 import { PropertyFormData } from '../types/property'
+import { useProperty } from '../hooks/useProperties'
 import Step1Category from '../components/property/Step1Category'
 import Step2Location from '../components/property/Step2Location'
 import Step3Details from '../components/property/Step3Details'
@@ -14,6 +15,7 @@ import Step5Media from '../components/property/Step5Media'
 import Step6Legal from '../components/property/Step6Legal'
 import Step7Review from '../components/property/Step7Review'
 import UserDropdown from '../components/UserDropdown'
+import { PageLoader } from '../components/Loader'
 import Logo from '../components/Logo'
 import HeaderSearchBar from '../components/HeaderSearchBar'
 import HeaderIcons from '../components/HeaderIcons'
@@ -31,11 +33,17 @@ const STEPS = [
 ]
 
 export default function CreateProperty() {
+  const { id } = useParams<{ id: string }>()
+  const isEditMode = !!id
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [propertyId, setPropertyId] = useState<string | null>(null)
+  const [propertyId, setPropertyId] = useState<string | null>(id || null)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isLoadingProperty, setIsLoadingProperty] = useState(isEditMode)
   const navigate = useNavigate()
+
+  // Fetch property data if in edit mode
+  const { property, loading: propertyLoading } = useProperty(id || '', !isEditMode)
 
   const form = useForm<PropertyFormData>({
     defaultValues: {
@@ -75,6 +83,36 @@ export default function CreateProperty() {
     mode: 'onChange',
   })
 
+  // Load property data into form when in edit mode
+  useEffect(() => {
+    if (isEditMode && property && !propertyLoading) {
+      setIsLoadingProperty(false)
+      // Populate form with existing property data
+      form.reset({
+        transactionType: property.transactionType,
+        propertyCategory: property.propertyCategory,
+        propertySubType: property.propertySubType || '',
+        location: property.location,
+        title: property.title,
+        description: property.description || '',
+        ownershipType: property.ownershipType,
+        possessionStatus: property.possessionStatus,
+        pricing: property.pricing,
+        residentialDetails: property.residentialDetails,
+        commercialDetails: property.commercialDetails,
+        industrialDetails: property.industrialDetails,
+        landDetails: property.landDetails,
+        specialDetails: property.specialDetails,
+        islandDetails: property.islandDetails,
+        media: property.media,
+        legal: property.legal,
+        availability: property.availability,
+      })
+    } else if (!isEditMode) {
+      setIsLoadingProperty(false)
+    }
+  }, [isEditMode, property, propertyLoading, form])
+
   const nextStep = async () => {
     const isValid = await form.trigger()
     if (isValid && currentStep < STEPS.length) {
@@ -94,25 +132,54 @@ export default function CreateProperty() {
     setIsSubmitting(true)
     try {
       let response
+      let finalPropertyId: string | null = null
       
       if (propertyId) {
         // Update existing property
         response = await api.put(`/properties/${propertyId}`, data)
+        // Use the existing propertyId for updates
+        finalPropertyId = propertyId
       } else {
         // Create new property
         response = await api.post('/properties', data)
-        setPropertyId(response.data.property.id)
+        // Get property ID from response (could be id or _id)
+        finalPropertyId = response.data.property?.id || response.data.property?._id
+        if (finalPropertyId) {
+          setPropertyId(finalPropertyId)
+        }
       }
 
       // Submit property (auto-approved, no admin review needed)
-      if (response.data.property.status === 'DRAFT') {
-        await api.post(`/properties/${response.data.property.id}/submit`)
+      // Only submit if status is DRAFT and we have a valid property ID
+      // For updates, check if property needs submission (might already be APPROVED)
+      const propertyStatus = response.data.property?.status
+      if (propertyStatus === 'DRAFT' && finalPropertyId && finalPropertyId !== 'undefined') {
+        try {
+          await api.post(`/properties/${finalPropertyId}/submit`)
+        } catch (submitError: any) {
+          // If submit fails, log but don't fail the whole operation
+          console.warn('Failed to auto-submit property:', submitError.response?.data?.error || submitError.message)
+          // Property is still created/updated, just not auto-submitted
+        }
       }
 
-      toast.success('Property created successfully! It is now live on MyGround.', {
-        duration: 5000,
-      })
-      navigate('/')
+      toast.success(
+        isEditMode 
+          ? 'Property updated successfully! Changes are now live on MyGround.' 
+          : 'Property created successfully! It is now live on MyGround.',
+        {
+          duration: 5000,
+        }
+      )
+      // Navigate to property detail page if editing, otherwise to home
+      const navPropertyId = finalPropertyId || propertyId
+      if (isEditMode && navPropertyId) {
+        navigate(`/properties/${navPropertyId}`)
+      } else if (navPropertyId) {
+        navigate(`/properties/${navPropertyId}`)
+      } else {
+        navigate('/')
+      }
     } catch (error: any) {
       console.error('Error submitting property:', error)
       toast.error(
@@ -124,6 +191,11 @@ export default function CreateProperty() {
   }
 
   const CurrentStepComponent = STEPS[currentStep - 1].component
+
+  // Show loader while fetching property data in edit mode
+  if (isEditMode && (isLoadingProperty || propertyLoading)) {
+    return <PageLoader text="Loading property details..." />
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -164,8 +236,14 @@ export default function CreateProperty() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">List Your Property</h1>
-          <p className="text-gray-600">Fill in the details to create your property listing</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            {isEditMode ? 'Edit Property' : 'List Your Property'}
+          </h1>
+          <p className="text-gray-600">
+            {isEditMode 
+              ? 'Update your property details below' 
+              : 'Fill in the details to create your property listing'}
+          </p>
         </div>
 
         {/* Progress Steps */}

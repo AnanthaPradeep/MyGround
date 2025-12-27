@@ -310,7 +310,11 @@ router.put(
 
       res.json({
         success: true,
-        property,
+        property: {
+          id: property._id,
+          _id: property._id,
+          ...property.toObject(),
+        },
       });
     } catch (error: any) {
       console.error('Error updating property:', error);
@@ -332,6 +336,11 @@ router.post(
   authenticate,
   async (req: AuthRequest, res) => {
     try {
+      // Validate property ID
+      if (!req.params.id || req.params.id === 'undefined' || req.params.id === 'null') {
+        return res.status(400).json({ error: 'Invalid property ID' });
+      }
+
       const property = await Property.findById(req.params.id);
 
       if (!property) {

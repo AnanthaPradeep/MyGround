@@ -111,102 +111,64 @@ export const createOrUpdateAssetDNA = async (
     geoVerification.accuracy = 10; // meters
   }
 
-  // Query by propertyId first (one property = one AssetDNA record)
-  // This ensures each property has exactly one AssetDNA record
-  let assetDNA = await AssetDNA.findOne({ propertyId: property._id });
+  // Use findOneAndUpdate with upsert to atomically create or update
+  // This prevents race conditions and duplicate key errors
+  // Always query by propertyId to ensure one AssetDNA per property
+  const updateData: any = {
+    propertyId: property._id, // Always set propertyId
+    geoVerification,
+    legalStatus: {
+      riskLevel: dnaMetrics.legalRisk,
+      titleClear: property.legal.titleClear,
+      encumbranceFree: property.legal.encumbranceFree,
+      litigationCount: property.legal.litigationStatus === 'PENDING' ? 1 : 0,
+      complianceScore: dnaMetrics.assetTrustScore,
+      lastVerified: new Date(),
+    },
+    scores: {
+      verificationScore: dnaMetrics.verificationScore,
+      trustScore: dnaMetrics.assetTrustScore,
+      investmentScore: 50, // Placeholder
+      overallScore: (dnaMetrics.verificationScore + dnaMetrics.assetTrustScore) / 2,
+    },
+  };
 
-  if (assetDNA) {
-    // Update existing AssetDNA record for this property
-    // Keep existing assetId (immutable once set)
-    const updateData: any = {
-      propertyId: property._id,
-      geoVerification,
-      legalStatus: {
-        riskLevel: dnaMetrics.legalRisk,
-        titleClear: property.legal.titleClear,
-        encumbranceFree: property.legal.encumbranceFree,
-        litigationCount: property.legal.litigationStatus === 'PENDING' ? 1 : 0,
-        complianceScore: dnaMetrics.assetTrustScore,
-        lastVerified: new Date(),
-      },
-      scores: {
-        verificationScore: dnaMetrics.verificationScore,
-        trustScore: dnaMetrics.assetTrustScore,
-        investmentScore: 50, // Placeholder
-        overallScore: (dnaMetrics.verificationScore + dnaMetrics.assetTrustScore) / 2,
-      },
-    };
-
-    // Only update assetId if it's missing (shouldn't happen, but safety check)
-    if (!assetDNA.assetId || assetDNA.assetId.trim() === '') {
-      updateData.assetId = assetId;
-    }
-
-    assetDNA = await AssetDNA.findOneAndUpdate(
-      { propertyId: property._id },
-      { $set: updateData },
-      { new: true }
-    );
+  // Use findOneAndUpdate with upsert for atomic create/update operation
+  // This prevents race conditions and duplicate key errors
+  // Always query by propertyId (unique) to ensure one AssetDNA per property
+  
+  // Try to find existing AssetDNA by propertyId first to check if assetId exists
+  const existingAssetDNA = await AssetDNA.findOne({ propertyId: property._id });
+  
+  // Prepare update operation
+  // Use $setOnInsert to only set assetId when creating new document
+  // Use $set to update all other fields
+  const updateOperation: any = {
+    $set: updateData
+  };
+  
+  if (!existingAssetDNA) {
+    // New record - set assetId only on insert
+    updateOperation.$setOnInsert = { assetId: assetId };
   } else {
-    // Create new AssetDNA record for this property
-    // Use propertyId as the primary query to ensure one record per property
-    // assetId is set as unique identifier
-    try {
-      assetDNA = await AssetDNA.create({
-        assetId: assetId,
-        propertyId: property._id,
-        geoVerification,
-        legalStatus: {
-          riskLevel: dnaMetrics.legalRisk,
-          titleClear: property.legal.titleClear,
-          encumbranceFree: property.legal.encumbranceFree,
-          litigationCount: property.legal.litigationStatus === 'PENDING' ? 1 : 0,
-          complianceScore: dnaMetrics.assetTrustScore,
-          lastVerified: new Date(),
-        },
-        scores: {
-          verificationScore: dnaMetrics.verificationScore,
-          trustScore: dnaMetrics.assetTrustScore,
-          investmentScore: 50, // Placeholder
-          overallScore: (dnaMetrics.verificationScore + dnaMetrics.assetTrustScore) / 2,
-        },
-      });
-    } catch (error: any) {
-      // If assetId already exists (very rare), try to find and update by propertyId
-      if (error.code === 11000 && error.keyPattern?.assetId) {
-        // AssetId collision - this shouldn't happen, but handle gracefully
-        // Try to find by propertyId again (in case it was created between checks)
-        assetDNA = await AssetDNA.findOne({ propertyId: property._id });
-        if (!assetDNA) {
-          // Generate a new assetId and try again
-          const newAssetId = generateAssetId();
-          assetDNA = await AssetDNA.create({
-            assetId: newAssetId,
-            propertyId: property._id,
-            geoVerification,
-            legalStatus: {
-              riskLevel: dnaMetrics.legalRisk,
-              titleClear: property.legal.titleClear,
-              encumbranceFree: property.legal.encumbranceFree,
-              litigationCount: property.legal.litigationStatus === 'PENDING' ? 1 : 0,
-              complianceScore: dnaMetrics.assetTrustScore,
-              lastVerified: new Date(),
-            },
-            scores: {
-              verificationScore: dnaMetrics.verificationScore,
-              trustScore: dnaMetrics.assetTrustScore,
-              investmentScore: 50,
-              overallScore: (dnaMetrics.verificationScore + dnaMetrics.assetTrustScore) / 2,
-            },
-          });
-          // Update property with the new assetId
-          property.assetId = newAssetId;
-        }
-      } else {
-        throw error;
-      }
+    // Existing record - preserve existing assetId (immutable)
+    // Only update assetId if it's missing (shouldn't happen, but safety check)
+    if (!existingAssetDNA.assetId || existingAssetDNA.assetId.trim() === '') {
+      updateOperation.$set.assetId = assetId;
     }
   }
+  
+  // Atomic upsert operation - prevents duplicate key errors
+  const assetDNA = await AssetDNA.findOneAndUpdate(
+    { propertyId: property._id }, // Query by propertyId (unique index)
+    updateOperation,
+    { 
+      upsert: true, // Create if doesn't exist
+      new: true, // Return updated document
+      runValidators: true, // Run schema validators
+      setDefaultsOnInsert: true // Set default values on insert
+    }
+  );
 
   // Update property with Asset DNA data
   property.assetId = assetId;

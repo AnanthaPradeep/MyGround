@@ -12,7 +12,7 @@ import {
   HomeIcon as PropertyIcon
 } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { useAuthStore } from '../store/authStore'
 import { useNotificationStore } from '../store/notificationStore'
 import { useNotifications } from '../hooks/useNotifications'
@@ -42,23 +42,36 @@ export default function HeaderIcons() {
   // Calculate unread notification count (only count unread notifications)
   const notificationCount = notifications.filter(n => !n.read).length
 
+  // Store refetch function in a ref to avoid dependency issues
+  const refetchRef = useRef(refetchNotifications)
+  useEffect(() => {
+    refetchRef.current = refetchNotifications
+  }, [refetchNotifications])
+
   // Refetch notifications when lastUpdate changes (triggered from Notifications page)
   useEffect(() => {
     if (!isAuthenticated || !lastUpdate) return
-    refetchNotifications()
-  }, [lastUpdate, isAuthenticated, refetchNotifications])
+    // Use a small delay to debounce rapid updates
+    const timeoutId = setTimeout(() => {
+      refetchRef.current()
+    }, 500)
+    return () => clearTimeout(timeoutId)
+  }, [lastUpdate, isAuthenticated])
 
   // Refetch notifications periodically to get new ones
   useEffect(() => {
     if (!isAuthenticated) return
 
-    // Refetch every 30 seconds to get new notifications
+    // Initial fetch
+    refetchRef.current()
+
+    // Refetch every 60 seconds to get new notifications (increased from 30s)
     const interval = setInterval(() => {
-      refetchNotifications()
-    }, 30000) // 30 seconds
+      refetchRef.current()
+    }, 60000) // 60 seconds
 
     return () => clearInterval(interval)
-  }, [isAuthenticated, refetchNotifications])
+  }, [isAuthenticated])
 
   // Close dropdown when clicking outside
   useEffect(() => {

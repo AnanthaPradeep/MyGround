@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import api from '../services/api'
 import { Notification } from '../types/notification'
 import sampleNotificationsData from '../data/sampleNotifications.json'
@@ -13,12 +13,23 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const fetchingRef = useRef(false) // Prevent concurrent fetches
+  const lastFetchRef = useRef(0) // Track last fetch time for throttling
 
-  useEffect(() => {
-    fetchNotifications()
-  }, [useSampleData, userId])
+  const fetchNotifications = useCallback(async () => {
+    // Throttle: Don't fetch if last fetch was less than 2 seconds ago
+    const now = Date.now()
+    if (now - lastFetchRef.current < 2000) {
+      return
+    }
 
-  const fetchNotifications = async () => {
+    // Prevent concurrent fetches
+    if (fetchingRef.current) {
+      return
+    }
+
+    fetchingRef.current = true
+    lastFetchRef.current = now
     setLoading(true)
     setError(null)
 
@@ -48,17 +59,19 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
         setNotifications(apiData)
       }
     } catch (err: any) {
+      console.error('Error fetching notifications:', err)
       setError(err.response?.data?.error || 'Failed to fetch notifications')
-      // Fallback to sample data on error
-      const sampleData = sampleNotificationsData.map((notif: any) => ({
-        ...notif,
-        timestamp: new Date(notif.timestamp),
-      })) as Notification[]
-      setNotifications(sampleData)
+      // Don't fallback to sample data on error - keep existing notifications
+      // This prevents showing fake data when API fails
     } finally {
       setLoading(false)
+      fetchingRef.current = false
     }
-  }
+  }, [useSampleData, userId])
+
+  useEffect(() => {
+    fetchNotifications()
+  }, [fetchNotifications])
 
   return { notifications, loading, error, refetch: fetchNotifications, setNotifications }
 }

@@ -9,7 +9,8 @@
     "start": "node dist/server.js",
     "test": "jest",
     "fix-index": "tsx scripts/fix-geospatial-index.ts",
-    "fix-assetdna": "tsx scripts/fix-assetdna-index.ts"
+    "fix-assetdna": "tsx scripts/fix-assetdna-index.ts",
+    "fix-assetdna-duplicates": "tsx scripts/fix-assetdna-duplicates.ts"
   },
   "keywords": [
     "real-estate",

@@ -93,6 +93,14 @@ function App() {
               }
             />
             <Route
+              path="/properties/:id/edit"
+              element={
+                <ProtectedRoute requiredRole={['USER', 'OWNER', 'BROKER', 'DEVELOPER', 'ADMIN']}>
+                  <CreateProperty />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/dashboard"
               element={
                 <ProtectedRoute>

@@ -7,6 +7,7 @@ import Logo from '../components/Logo'
 import HeaderSearchBar from '../components/HeaderSearchBar'
 import HeaderIcons from '../components/HeaderIcons'
 import HeaderLocation from '../components/HeaderLocation'
+import UserDropdown from '../components/UserDropdown'
 import MobileMenu from '../components/MobileMenu'
 import { Bars3Icon } from '@heroicons/react/24/outline'
 import { CardSkeleton } from '../components/Loader'
@@ -92,9 +93,11 @@ export default function Properties() {
             <div className="hidden lg:flex items-center gap-2 xl:gap-4">
               <HeaderLocation />
               <HeaderIcons />
+              <UserDropdown />
             </div>
             <div className="lg:hidden flex items-center">
               <HeaderIcons />
+              <UserDropdown />
             </div>
           </div>
         </div>

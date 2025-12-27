@@ -2,13 +2,14 @@ import { useState, useMemo } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useProperty } from '../hooks/useProperties'
 import { formatPrice } from '../utils/formatters'
-import { HeartIcon, CheckCircleIcon, XCircleIcon, PhotoIcon, MapPinIcon, TrashIcon, PauseIcon, PlayIcon, Bars3Icon } from '@heroicons/react/24/outline'
+import { HeartIcon, CheckCircleIcon, XCircleIcon, PhotoIcon, MapPinIcon, TrashIcon, PauseIcon, PlayIcon, Bars3Icon, PencilIcon } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid'
 import MapPicker from '../components/MapPicker'
 import Logo from '../components/Logo'
 import HeaderSearchBar from '../components/HeaderSearchBar'
 import HeaderIcons from '../components/HeaderIcons'
 import HeaderLocation from '../components/HeaderLocation'
+import UserDropdown from '../components/UserDropdown'
 import MobileMenu from '../components/MobileMenu'
 import { PageLoader } from '../components/Loader'
 import { useAuthStore } from '../store/authStore'
@@ -179,9 +180,11 @@ export default function PropertyDetail() {
             <div className="hidden lg:flex items-center gap-2 xl:gap-4">
               <HeaderLocation />
               <HeaderIcons />
+              <UserDropdown />
             </div>
             <div className="lg:hidden flex items-center">
               <HeaderIcons />
+              <UserDropdown />
             </div>
           </div>
         </div>
@@ -451,6 +454,13 @@ export default function PropertyDetail() {
               <div className="bg-white rounded-lg shadow-sm p-6 sticky top-20">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Manage Property</h3>
                 <div className="space-y-3">
+                  <Link
+                    to={`/properties/${property._id}/edit`}
+                    className="w-full px-4 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 font-medium flex items-center justify-center gap-2"
+                  >
+                    <PencilIcon className="w-5 h-5" />
+                    Edit Property
+                  </Link>
                   {property.status === 'PAUSED' ? (
                     <button
                       onClick={handleResume}
