@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import LocationAutocomplete from './LocationAutocomplete'
 
 interface Props {
   searchParams: URLSearchParams
@@ -117,23 +118,67 @@ export default function AdvancedFilters({ searchParams, onFilterChange }: Props)
         {expandedSections.includes('location') && (
           <div className="space-y-3">
             <div>
-              <label className="block text-sm text-gray-600 mb-1">City</label>
+              <label className="block text-sm text-gray-600 mb-1">Search Location</label>
+              <LocationAutocomplete
+                value={searchParams.get('city') ? `${searchParams.get('city')}, ${searchParams.get('state') || ''}` : ''}
+                onChange={(location) => {
+                  if (location) {
+                    onFilterChange('city', location.city)
+                    onFilterChange('state', location.state)
+                    if (location.area) {
+                      onFilterChange('area', location.area)
+                    }
+                  } else {
+                    onFilterChange('city', null)
+                    onFilterChange('state', null)
+                    onFilterChange('area', null)
+                  }
+                }}
+                placeholder="Search city, area, or location..."
+                className="w-full"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">City</label>
+                <input
+                  type="text"
+                  value={searchParams.get('city') || ''}
+                  onChange={(e) => onFilterChange('city', e.target.value || null)}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  placeholder="City"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">State</label>
+                <input
+                  type="text"
+                  value={searchParams.get('state') || ''}
+                  onChange={(e) => onFilterChange('state', e.target.value || null)}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                  placeholder="State"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Area / Locality</label>
               <input
                 type="text"
-                value={searchParams.get('city') || ''}
-                onChange={(e) => onFilterChange('city', e.target.value || null)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-                placeholder="Enter city"
+                value={searchParams.get('area') || ''}
+                onChange={(e) => onFilterChange('area', e.target.value || null)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                placeholder="Area or locality"
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-600 mb-1">State</label>
+              <label className="block text-xs text-gray-500 mb-1">Pincode</label>
               <input
                 type="text"
-                value={searchParams.get('state') || ''}
-                onChange={(e) => onFilterChange('state', e.target.value || null)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
-                placeholder="Enter state"
+                value={searchParams.get('pincode') || ''}
+                onChange={(e) => onFilterChange('pincode', e.target.value || null)}
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                placeholder="6-digit pincode"
+                maxLength={6}
               />
             </div>
           </div>

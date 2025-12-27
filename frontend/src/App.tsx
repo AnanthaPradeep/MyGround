@@ -2,7 +2,9 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { useEffect, useState } from 'react'
 import { useAuthStore } from './store/authStore'
+import { useLocationStore } from './store/locationStore'
 import SplashScreen from './components/SplashScreen'
+import LocationSelectorModal from './components/LocationSelectorModal'
 import CreateProperty from './pages/CreateProperty'
 import Home from './pages/Home'
 import Login from './pages/Login'
@@ -13,12 +15,15 @@ import PropertyDetail from './pages/PropertyDetail'
 import Profile from './pages/Profile'
 import Settings from './pages/Settings'
 import Notifications from './pages/Notifications'
+import LocationTest from './pages/LocationTest'
 import ProtectedRoute from './components/ProtectedRoute'
 import ChatWidget from './components/ChatWidget'
 
 function App() {
   const { checkAuth } = useAuthStore()
+  const { isLocationSet } = useLocationStore()
   const [isLoading, setIsLoading] = useState(true)
+  const [showLocationModal, setShowLocationModal] = useState(false)
 
   useEffect(() => {
     // Initialize app: check auth and load resources
@@ -31,6 +36,16 @@ function App() {
         // Small delay to ensure smooth transition
         setTimeout(() => {
           setIsLoading(false)
+          // Show location modal if location is not set
+          // Add a small delay to ensure UI is ready
+          setTimeout(() => {
+            if (!isLocationSet) {
+              console.log('📍 Location not set, showing modal')
+              setShowLocationModal(true)
+            } else {
+              console.log('📍 Location already set:', isLocationSet)
+            }
+          }, 800) // Increased delay to ensure everything is loaded
         }, 500)
       }
     }
@@ -40,11 +55,23 @@ function App() {
 
   const handleSplashComplete = () => {
     setIsLoading(false)
+    // Show location modal if location is not set
+    setTimeout(() => {
+      if (!isLocationSet) {
+        console.log('📍 Location not set after splash, showing modal')
+        setShowLocationModal(true)
+      }
+    }, 800)
+  }
+
+  const handleLocationModalClose = () => {
+    setShowLocationModal(false)
   }
 
   return (
     <Router>
       {isLoading && <SplashScreen onComplete={handleSplashComplete} minDisplayTime={1500} />}
+      <LocationSelectorModal isOpen={showLocationModal} onClose={handleLocationModalClose} />
       <div className={`min-h-screen bg-gray-50 ${isLoading ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -92,6 +119,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/location-test" element={<LocationTest />} />
         </Routes>
         <Toaster position="top-right" />
         <ChatWidget />

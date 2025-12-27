@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useState } from 'react'
 import { ShieldCheckIcon, MapPinIcon, ScaleIcon } from '@heroicons/react/24/outline'
 import { useAuthStore } from '../store/authStore'
 import { useProperties } from '../hooks/useProperties'
@@ -11,21 +12,37 @@ import TrendingSection from '../components/TrendingSection'
 import AssetDNAPreview from '../components/AssetDNAPreview'
 import UserDropdown from '../components/UserDropdown'
 import HeaderIcons from '../components/HeaderIcons'
+import HeaderLocation from '../components/HeaderLocation'
+import MobileMenu from '../components/MobileMenu'
+import { Bars3Icon } from '@heroicons/react/24/outline'
 import Logo from '../components/Logo'
 
 export default function Home() {
   const { isAuthenticated } = useAuthStore()
   const { properties, loading } = useProperties({ useSampleData: true })
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
       <nav className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Logo showText={true} size="md" />
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+          <div className="flex justify-between items-center h-14 sm:h-16">
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="lg:hidden p-2 text-gray-600 hover:text-gray-900"
+              aria-label="Open menu"
+            >
+              <Bars3Icon className="w-6 h-6" />
+            </button>
+
+            {/* Logo - Hidden on mobile (shown in menu), visible on desktop */}
+            <Logo showText={true} size="md" className="hidden lg:flex lg:flex-1" />
             
-            <div className="flex items-center space-x-2 sm:space-x-4">
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center space-x-2 xl:space-x-4">
+              <HeaderLocation />
               {isAuthenticated ? (
                 <>
                   <HeaderIcons />
@@ -41,16 +58,33 @@ export default function Home() {
                   </Link>
                   <Link
                     to="/register"
-                    className="px-3 sm:px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 whitespace-nowrap"
+                    className="px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 whitespace-nowrap"
                   >
                     Sign Up
                   </Link>
                 </>
               )}
             </div>
+
+            {/* Mobile: Show only User Dropdown or Auth buttons */}
+            <div className="lg:hidden flex items-center">
+              {isAuthenticated ? (
+                <UserDropdown />
+              ) : (
+                <Link
+                  to="/login"
+                  className="px-3 py-1.5 bg-primary-600 text-white text-xs rounded-lg hover:bg-primary-700"
+                >
+                  Sign In
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </nav>
+
+      {/* Mobile Menu */}
+      <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
 
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-16">
@@ -125,7 +159,7 @@ export default function Home() {
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {properties.map((property) => (
                 <PropertyCard key={property._id} property={property} />
               ))}

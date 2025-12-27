@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { HeartIcon, PhotoIcon } from '@heroicons/react/24/outline'
+import { HeartIcon, PhotoIcon, MapPinIcon } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid'
 import { Property } from '../types/property'
 import { formatPrice } from '../utils/formatters'
@@ -63,9 +63,16 @@ export default function PropertyCard({ property }: Props) {
           {property.title}
         </h3>
         
-        <p className="text-sm text-gray-600 mb-2">
-          {property.location.locality}, {property.location.area}, {property.location.city}
-        </p>
+        <div className="flex items-start gap-1.5 mb-2">
+          <MapPinIcon className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+          <p className="text-sm text-gray-600 line-clamp-2">
+            {property.location.locality}, {property.location.area}, {property.location.city}, {property.location.state}
+          </p>
+        </div>
+        
+        {property.location.pincode && (
+          <p className="text-xs text-gray-500 mb-2">Pincode: {property.location.pincode}</p>
+        )}
 
         <div className="flex items-center justify-between mb-3">
           <div>

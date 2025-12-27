@@ -15,6 +15,7 @@ import ProtectedRoute from '../components/ProtectedRoute'
 import Logo from '../components/Logo'
 import HeaderSearchBar from '../components/HeaderSearchBar'
 import HeaderIcons from '../components/HeaderIcons'
+import HeaderLocation from '../components/HeaderLocation'
 import UserDropdown from '../components/UserDropdown'
 import { Notification } from '../types/notification'
 
@@ -23,79 +24,11 @@ export default function Notifications() {
   const navigate = useNavigate()
   const [filter, setFilter] = useState<'all' | 'unread'>('all')
 
-  // Sample notifications - TODO: Get from store/API
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: '1',
-      title: 'Property Inquiry',
-      message: 'You have a new inquiry for your property in Mumbai. A potential buyer is interested in viewing the property.',
-      type: 'property',
-      read: false,
-      timestamp: new Date(Date.now() - 5 * 60 * 1000),
-      link: '/properties/123'
-    },
-    {
-      id: '2',
-      title: 'Property Approved',
-      message: 'Your property listing "Luxury Apartment in Bandra" has been approved and is now live on MyGround.',
-      type: 'success',
-      read: false,
-      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
-      link: '/properties/456'
-    },
-    {
-      id: '3',
-      title: 'New Message',
-      message: 'You have a new message from a potential buyer regarding your property listing.',
-      type: 'message',
-      read: true,
-      timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
-      link: '/messages'
-    },
-    {
-      id: '4',
-      title: 'Price Update',
-      message: 'Similar properties in your area have updated prices. Consider reviewing your listing price.',
-      type: 'info',
-      read: true,
-      timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-    },
-    {
-      id: '5',
-      title: 'Property View',
-      message: 'Your property has been viewed 25 times in the last 24 hours.',
-      type: 'info',
-      read: false,
-      timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000),
-      link: '/properties/789'
-    },
-    {
-      id: '6',
-      title: 'Document Required',
-      message: 'Please upload the required documents for property verification.',
-      type: 'warning',
-      read: true,
-      timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-      link: '/properties/456/edit'
-    },
-    {
-      id: '7',
-      title: 'Payment Received',
-      message: 'Payment of ₹50,000 has been received for property listing.',
-      type: 'success',
-      read: true,
-      timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-    },
-    {
-      id: '8',
-      title: 'Property Saved',
-      message: 'Your property has been saved by 10 users to their wishlist.',
-      type: 'info',
-      read: false,
-      timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000),
-      link: '/properties/123'
-    }
-  ])
+  // Fetch notifications from API/JSON
+  const { notifications, setNotifications, loading } = useNotifications({
+    useSampleData: true,
+    userId: user?.id,
+  })
 
   const filteredNotifications = filter === 'unread' 
     ? notifications.filter(n => !n.read)
@@ -164,15 +97,21 @@ export default function Notifications() {
       <div className="min-h-screen bg-gray-50">
         {/* Navigation */}
         <nav className="bg-white shadow-sm sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center h-16 gap-2 sm:gap-4">
-              <Logo showText={true} size="md" />
-              <HeaderSearchBar />
-              <div className="flex items-center gap-2 sm:gap-4">
+          <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+            <div className="flex items-center h-14 sm:h-16 gap-2">
+              <Logo showText={true} size="md" className="flex-shrink-0" />
+              <div className="hidden sm:block flex-1 min-w-0">
+                <HeaderSearchBar />
+              </div>
+              <div className="hidden lg:flex items-center gap-2 xl:gap-4">
+                <HeaderLocation />
                 <HeaderIcons />
                 <Link to="/" className="text-gray-700 hover:text-primary-600 text-sm whitespace-nowrap">
                   Back to Home
                 </Link>
+                <UserDropdown />
+              </div>
+              <div className="lg:hidden flex items-center">
                 <UserDropdown />
               </div>
             </div>

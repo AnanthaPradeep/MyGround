@@ -1,7 +1,9 @@
 import { UseFormReturn } from 'react-hook-form'
 import { PropertyFormData } from '../../types/property'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { INDIAN_STATES } from '../../constants/propertyTypes'
+import LocationAutocomplete from '../LocationAutocomplete'
+import MapPicker from '../MapPicker'
 
 interface Props {
   form: UseFormReturn<PropertyFormData>
@@ -12,42 +14,77 @@ export default function Step2Location({ form }: Props) {
   const [mapLoaded, setMapLoaded] = useState(false)
 
   const coordinates = watch('location.coordinates.coordinates')
+  const latitude = coordinates?.[1] || 19.0760 // Default to Mumbai
+  const longitude = coordinates?.[0] || 72.8777
 
   const handleMapClick = (lat: number, lng: number) => {
     setValue('location.coordinates.coordinates', [lng, lat], { shouldValidate: true })
     setValue('location.coordinates.type', 'Point', { shouldValidate: true })
   }
 
+  const handleLocationSelect = (location: any) => {
+    if (location) {
+      setValue('location.city', location.city, { shouldValidate: true })
+      setValue('location.state', location.state, { shouldValidate: true })
+      setValue('location.country', location.country, { shouldValidate: true })
+      if (location.area) {
+        setValue('location.area', location.area, { shouldValidate: true })
+      }
+      if (location.pincode) {
+        setValue('location.pincode', location.pincode, { shouldValidate: true })
+      }
+      if (location.coordinates) {
+        handleMapClick(location.coordinates.lat, location.coordinates.lng)
+      }
+    }
+  }
+
   return (
-    <div className="space-y-6">
+      <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Location & Geo-Verification</h2>
-        <p className="text-gray-600">Provide the exact location of your property</p>
+        <p className="text-gray-600">Provide the exact location of your property (All fields are optional temporarily)</p>
+      </div>
+
+      {/* Location Search */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Search Location <span className="text-gray-400 text-xs">(Optional - temporarily)</span>
+        </label>
+        <LocationAutocomplete
+          value={watch('location.city') ? `${watch('location.city')}, ${watch('location.state')}` : ''}
+          onChange={handleLocationSelect}
+          placeholder="Search city, area, or landmark..."
+          required={false}
+          error={errors.location?.city?.message}
+          onCoordinatesChange={handleMapClick}
+        />
+        <p className="mt-1 text-xs text-gray-500">
+          Start typing to search for locations. This will auto-fill the location details below. (Optional temporarily)
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Country */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Country <span className="text-red-500">*</span>
+            Country <span className="text-gray-400 text-xs">(Optional)</span>
           </label>
           <input
             type="text"
-            {...register('location.country', { required: 'Country is required' })}
+            {...register('location.country')}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            placeholder="e.g., India"
           />
-          {errors.location?.country && (
-            <p className="mt-1 text-sm text-red-600">{errors.location.country.message}</p>
-          )}
         </div>
 
         {/* State */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            State <span className="text-red-500">*</span>
+            State <span className="text-gray-400 text-xs">(Optional)</span>
           </label>
           <select
-            {...register('location.state', { required: 'State is required' })}
+            {...register('location.state')}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           >
             <option value="">Select state</option>
@@ -57,65 +94,52 @@ export default function Step2Location({ form }: Props) {
               </option>
             ))}
           </select>
-          {errors.location?.state && (
-            <p className="mt-1 text-sm text-red-600">{errors.location.state.message}</p>
-          )}
         </div>
 
         {/* City */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            City <span className="text-red-500">*</span>
+            City <span className="text-gray-400 text-xs">(Optional)</span>
           </label>
           <input
             type="text"
-            {...register('location.city', { required: 'City is required' })}
+            {...register('location.city')}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           />
-          {errors.location?.city && (
-            <p className="mt-1 text-sm text-red-600">{errors.location.city.message}</p>
-          )}
         </div>
 
         {/* Area */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Area / Locality <span className="text-red-500">*</span>
+            Area / Locality <span className="text-gray-400 text-xs">(Optional)</span>
           </label>
           <input
             type="text"
-            {...register('location.area', { required: 'Area is required' })}
+            {...register('location.area')}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           />
-          {errors.location?.area && (
-            <p className="mt-1 text-sm text-red-600">{errors.location.area.message}</p>
-          )}
         </div>
 
         {/* Locality */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Locality <span className="text-red-500">*</span>
+            Locality <span className="text-gray-400 text-xs">(Optional)</span>
           </label>
           <input
             type="text"
-            {...register('location.locality', { required: 'Locality is required' })}
+            {...register('location.locality')}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           />
-          {errors.location?.locality && (
-            <p className="mt-1 text-sm text-red-600">{errors.location.locality.message}</p>
-          )}
         </div>
 
         {/* Pincode */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Pincode / ZIP <span className="text-red-500">*</span>
+            Pincode / ZIP <span className="text-gray-400 text-xs">(Optional)</span>
           </label>
           <input
             type="text"
             {...register('location.pincode', {
-              required: 'Pincode is required',
               pattern: {
                 value: /^[0-9]{6}$/,
                 message: 'Pincode must be 6 digits',
@@ -143,68 +167,42 @@ export default function Step2Location({ form }: Props) {
       {/* Address */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Complete Address <span className="text-red-500">*</span>
+          Complete Address <span className="text-gray-400 text-xs">(Optional)</span>
         </label>
         <textarea
-          {...register('location.address', { required: 'Address is required' })}
+          {...register('location.address')}
           rows={3}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
           placeholder="Enter complete address"
         />
-        {errors.location?.address && (
-          <p className="mt-1 text-sm text-red-600">{errors.location.address.message}</p>
-        )}
       </div>
 
-      {/* Map Integration Placeholder */}
+      {/* Interactive Map */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Select Location on Map <span className="text-red-500">*</span>
+          Select Exact Location on Map <span className="text-gray-400 text-xs">(Optional - temporarily)</span>
         </label>
-        <div className="w-full h-64 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
-          {coordinates && coordinates[0] !== 0 && coordinates[1] !== 0 ? (
-            <div className="text-center">
-              <p className="text-sm text-gray-600 mb-2">Location Selected</p>
-              <p className="text-xs text-gray-500">
-                Lat: {coordinates[1].toFixed(6)}, Lng: {coordinates[0].toFixed(6)}
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  // In production, this would open a map picker
-                  // For now, we'll use a simple prompt
-                  const lat = prompt('Enter Latitude:')
-                  const lng = prompt('Enter Longitude:')
-                  if (lat && lng) {
-                    handleMapClick(parseFloat(lat), parseFloat(lng))
-                  }
-                }}
-                className="mt-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-              >
-                Change Location
-              </button>
-            </div>
-          ) : (
-            <div className="text-center">
-              <p className="text-sm text-gray-600 mb-2">Click to select location on map</p>
-              <button
-                type="button"
-                onClick={() => {
-                  const lat = prompt('Enter Latitude:')
-                  const lng = prompt('Enter Longitude:')
-                  if (lat && lng) {
-                    handleMapClick(parseFloat(lat), parseFloat(lng))
-                  }
-                }}
-                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-              >
-                Select Location
-              </button>
-            </div>
-          )}
+        <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
+          <MapPicker
+            latitude={latitude}
+            longitude={longitude}
+            onLocationChange={(lat, lng) => {
+              console.log('📍 Step2Location: Map location changed to', lat, lng) // Debug
+              handleMapClick(lat, lng)
+            }}
+            height="400px"
+          />
         </div>
         {errors.location?.coordinates && (
           <p className="mt-1 text-sm text-red-600">Location coordinates are required</p>
+        )}
+        <p className="mt-2 text-xs text-gray-500">
+          <strong>Click anywhere on the map</strong> or drag the marker to set the exact property location. This is used for geo-verification and nearby property searches.
+        </p>
+        {coordinates && coordinates[0] !== 0 && coordinates[1] !== 0 && (
+          <p className="mt-1 text-xs text-green-600 font-medium">
+            ✅ Location set: {coordinates[1].toFixed(6)}, {coordinates[0].toFixed(6)}
+          </p>
         )}
       </div>
     </div>

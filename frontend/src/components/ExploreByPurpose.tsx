@@ -1,37 +1,41 @@
 import { Link } from 'react-router-dom'
-import { HomeIcon, BriefcaseIcon, MapIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline'
+import { 
+  HomeIcon, 
+  BriefcaseIcon, 
+  MapIcon, 
+  BuildingOfficeIcon,
+  KeyIcon,
+  CurrencyDollarIcon,
+  GlobeAltIcon,
+  ShoppingBagIcon,
+  Cog6ToothIcon,
+  TruckIcon,
+  BuildingLibraryIcon
+} from '@heroicons/react/24/outline'
+import { useExplorePurposes } from '../hooks/useExplorePurposes'
 
 export default function ExploreByPurpose() {
-  const purposes = [
-    {
-      icon: HomeIcon,
-      title: 'Buy a Home',
-      description: 'Find your dream home',
-      link: '/properties?transactionType=SELL&propertyCategory=RESIDENTIAL',
-      color: 'from-blue-500 to-blue-600',
-    },
-    {
-      icon: BriefcaseIcon,
-      title: 'Invest for Returns',
-      description: 'Commercial & rental properties',
-      link: '/properties?transactionType=RENT',
-      color: 'from-green-500 to-green-600',
-    },
-    {
-      icon: MapIcon,
-      title: 'Buy Land',
-      description: 'Residential & commercial plots',
-      link: '/properties?propertyCategory=LAND',
-      color: 'from-yellow-500 to-yellow-600',
-    },
-    {
-      icon: BuildingOfficeIcon,
-      title: 'Lease Commercial',
-      description: 'Office spaces & retail',
-      link: '/properties?transactionType=LEASE&propertyCategory=COMMERCIAL',
-      color: 'from-purple-500 to-purple-600',
-    },
-  ]
+  const { purposes: purposesData } = useExplorePurposes({ useSampleData: true })
+
+  // Map icon names to components
+  const iconMap: Record<string, any> = {
+    HomeIcon,
+    BriefcaseIcon,
+    MapIcon,
+    BuildingOfficeIcon,
+    KeyIcon,
+    CurrencyDollarIcon,
+    GlobeAltIcon,
+    ShoppingBagIcon,
+    Cog6ToothIcon,
+    TruckIcon,
+    BuildingLibraryIcon,
+  }
+
+  const purposes = purposesData.map((purpose) => ({
+    ...purpose,
+    icon: iconMap[purpose.icon] || HomeIcon,
+  }))
 
   return (
     <section className="py-12 bg-white">
@@ -41,7 +45,7 @@ export default function ExploreByPurpose() {
           <p className="text-gray-600">Find properties that match your needs</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-6">
           {purposes.map((purpose, index) => {
             const Icon = purpose.icon
             return (

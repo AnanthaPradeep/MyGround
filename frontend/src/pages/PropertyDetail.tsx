@@ -2,11 +2,13 @@ import { useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useProperty } from '../hooks/useProperties'
 import { formatPrice } from '../utils/formatters'
-import { HeartIcon, CheckCircleIcon, XCircleIcon, PhotoIcon } from '@heroicons/react/24/outline'
+import { HeartIcon, CheckCircleIcon, XCircleIcon, PhotoIcon, MapPinIcon } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid'
+import MapPicker from '../components/MapPicker'
 import Logo from '../components/Logo'
 import HeaderSearchBar from '../components/HeaderSearchBar'
 import HeaderIcons from '../components/HeaderIcons'
+import HeaderLocation from '../components/HeaderLocation'
 
 export default function PropertyDetail() {
   const { id } = useParams<{ id: string }>()
@@ -61,16 +63,22 @@ export default function PropertyDetail() {
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
       <nav className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center h-16 gap-2 sm:gap-4">
-            <Logo showText={true} size="md" />
-            <HeaderSearchBar />
-            <div className="flex items-center gap-2 sm:gap-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+          <div className="flex items-center h-14 sm:h-16 gap-2">
+            <Logo showText={true} size="md" className="flex-shrink-0" />
+            <div className="hidden sm:block flex-1 min-w-0">
+              <HeaderSearchBar />
+            </div>
+            <div className="hidden lg:flex items-center gap-2 xl:gap-4">
+              <HeaderLocation />
               <HeaderIcons />
               <Link to="/" className="text-gray-700 hover:text-primary-600 text-sm whitespace-nowrap">
                 Back to Home
               </Link>
             </div>
+            <Link to="/" className="lg:hidden text-gray-700 hover:text-primary-600 text-xs sm:text-sm">
+              Home
+            </Link>
           </div>
         </div>
       </nav>
@@ -289,13 +297,43 @@ export default function PropertyDetail() {
             </div>
 
             {/* Location Map */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Location</h2>
-              <p className="text-gray-700 mb-4">{property.location.address}</p>
-              <div className="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center">
-                <p className="text-gray-500">Map integration coming soon</p>
-                {/* In production, integrate Google Maps here */}
+            <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Location on Map</h2>
+              <div className="mb-4 space-y-2">
+                <p className="text-gray-700 font-medium">{property.location.address}</p>
+                <div className="flex flex-wrap gap-2 text-sm text-gray-600">
+                  <span className="flex items-center gap-1">
+                    <MapPinIcon className="w-4 h-4" />
+                    {property.location.locality}
+                  </span>
+                  <span>•</span>
+                  <span>{property.location.area}</span>
+                  <span>•</span>
+                  <span>{property.location.city}</span>
+                  <span>•</span>
+                  <span>{property.location.state}</span>
+                  {property.location.pincode && (
+                    <>
+                      <span>•</span>
+                      <span>Pincode: {property.location.pincode}</span>
+                    </>
+                  )}
+                </div>
+                {property.location.landmark && (
+                  <p className="text-sm text-gray-600">
+                    <span className="font-medium">Landmark:</span> {property.location.landmark}
+                  </p>
+                )}
               </div>
+              {property.location.coordinates && property.location.coordinates.coordinates[0] !== 0 && (
+                <MapPicker
+                  latitude={property.location.coordinates.coordinates[1]}
+                  longitude={property.location.coordinates.coordinates[0]}
+                  onLocationChange={() => {}} // Read-only on detail page
+                  height="400px"
+                  readOnly={true}
+                />
+              )}
             </div>
           </div>
 

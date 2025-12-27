@@ -160,25 +160,25 @@ const PropertySchema = new Schema<IProperty>(
       required: true,
     },
     location: {
-      country: { type: String, required: true },
-      state: { type: String, required: true },
-      city: { type: String, required: true },
-      area: { type: String, required: true },
-      locality: { type: String, required: true },
+      country: { type: String, required: false }, // Temporarily optional
+      state: { type: String, required: false }, // Temporarily optional
+      city: { type: String, required: false }, // Temporarily optional
+      area: { type: String, required: false }, // Temporarily optional
+      locality: { type: String, required: false }, // Temporarily optional
       landmark: String,
-      pincode: { type: String, required: true },
+      pincode: { type: String, required: false }, // Temporarily optional
       coordinates: {
         type: {
           type: String,
           enum: ['Point'],
-          required: true,
+          required: false, // Temporarily optional
         },
         coordinates: {
           type: [Number],
-          required: true,
+          required: false, // Temporarily optional
         },
       },
-      address: { type: String, required: true },
+      address: { type: String, required: false }, // Temporarily optional
     },
     title: {
       type: String,
@@ -225,7 +225,7 @@ const PropertySchema = new Schema<IProperty>(
       freightElevator: Boolean,
     },
     land: {
-      plotArea: { type: Number, required: true },
+      plotArea: { type: Number, required: false }, // Conditionally required via pre-save hook
       areaUnit: {
         type: String,
         enum: ['SQFT', 'SQMT', 'ACRE', 'HECTARE'],
@@ -307,8 +307,20 @@ const PropertySchema = new Schema<IProperty>(
   }
 );
 
-// Geo-spatial index for location-based queries
-PropertySchema.index({ 'location.coordinates': '2dsphere' });
+// Pre-save hook for conditional validation
+PropertySchema.pre('save', function (next) {
+  // Only validate land.plotArea if propertyCategory is LAND
+  if (this.propertyCategory === 'LAND') {
+    if (!this.land || !this.land.plotArea) {
+      return next(new Error('land.plotArea is required for LAND properties'));
+    }
+  }
+  next();
+});
+
+// Geo-spatial index for location-based queries (sparse - only indexes documents with coordinates)
+// Sparse index allows documents without coordinates to be saved without validation errors
+PropertySchema.index({ 'location.coordinates': '2dsphere' }, { sparse: true });
 
 // Text search index
 PropertySchema.index({ title: 'text', description: 'text' });

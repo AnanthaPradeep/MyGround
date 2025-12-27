@@ -13,6 +13,17 @@
   scrollbar-width: none;  /* Firefox */
 }
 
+/* Hide location icon in search bar */
+.search-bar-location div div svg {
+  display: none !important;
+}
+
+.search-bar-location div input {
+  padding-left: 0 !important;
+  padding-right: 2rem !important;
+  color: #111827 !important; /* text-gray-900 */
+}
+
 /* Splash Screen Animations */
 @keyframes bounce-delay {
   0%, 80%, 100% {

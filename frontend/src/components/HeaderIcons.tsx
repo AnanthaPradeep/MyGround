@@ -134,7 +134,7 @@ export default function HeaderIcons() {
   }
 
   return (
-    <div className="flex items-center gap-2 sm:gap-3">
+    <div className="hidden lg:flex items-center gap-2 xl:gap-3">
       {/* Dashboard Icon */}
       <Link
         to="/dashboard"
@@ -171,7 +171,7 @@ export default function HeaderIcons() {
             </div>
 
             {/* Notifications List */}
-            <div className="overflow-y-auto max-h-80">
+            <div className="overflow-y-auto scrollbar-hide max-h-80">
               {recentNotifications.length === 0 ? (
                 <div className="px-4 py-8 text-center text-gray-500">
                   <BellIcon className="w-12 h-12 mx-auto mb-2 text-gray-300" />

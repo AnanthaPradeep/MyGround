@@ -12,12 +12,12 @@ const router: Router = express.Router();
 /**
  * @route   POST /api/properties
  * @desc    Create a new property listing
- * @access  Private (Owner, Broker, Developer)
+ * @access  Private (User, Owner, Broker, Developer, Admin)
  */
 router.post(
   '/',
   authenticate,
-  authorize('OWNER', 'BROKER', 'DEVELOPER', 'ADMIN'),
+  authorize('USER', 'OWNER', 'BROKER', 'DEVELOPER', 'ADMIN'),
   [
     ...validatePropertyListing(),
     body('media.images')
@@ -65,15 +65,87 @@ router.post(
       // Generate Asset DNA ID
       const assetId = generateAssetId();
 
-      // Create property
-      const propertyData = {
+      // Clean and prepare property data
+      const cleanedData: any = {
         ...req.body,
         assetId,
         listedBy: req.user!.userId,
         status: 'DRAFT', // Will be set to PENDING on final submission
       };
 
-      const property = new Property(propertyData);
+      // Remove empty strings from enum fields (convert to undefined)
+      const cleanEnumField = (value: any) => {
+        return value === '' || value === null ? undefined : value;
+      };
+
+      // Clean residential fields
+      if (cleanedData.residential) {
+        if (cleanedData.propertyCategory !== 'RESIDENTIAL') {
+          delete cleanedData.residential;
+        } else {
+          if (cleanedData.residential.furnishing !== undefined) {
+            cleanedData.residential.furnishing = cleanEnumField(cleanedData.residential.furnishing);
+          }
+          if (cleanedData.residential.parking !== undefined) {
+            cleanedData.residential.parking = cleanEnumField(cleanedData.residential.parking);
+          }
+        }
+      }
+
+      // Clean commercial fields
+      if (cleanedData.commercial && cleanedData.propertyCategory !== 'COMMERCIAL') {
+        delete cleanedData.commercial;
+      }
+
+      // Clean land fields
+      if (cleanedData.land) {
+        if (cleanedData.propertyCategory !== 'LAND') {
+          delete cleanedData.land;
+        }
+      }
+
+      // Ensure location.coordinates is properly formatted as GeoJSON Point (if provided)
+      // Temporarily making coordinates optional
+      if (cleanedData.location && cleanedData.location.coordinates) {
+        let coords: [number, number];
+        
+        // Extract coordinates from different possible structures
+        if (cleanedData.location.coordinates.coordinates && Array.isArray(cleanedData.location.coordinates.coordinates)) {
+          coords = cleanedData.location.coordinates.coordinates;
+        } else if (Array.isArray(cleanedData.location.coordinates)) {
+          coords = cleanedData.location.coordinates;
+        } else {
+          // Invalid format, remove coordinates
+          delete cleanedData.location.coordinates;
+        }
+
+        // If we have valid coordinates, validate and format them
+        if (coords && Array.isArray(coords) && coords.length === 2) {
+          const [lng, lat] = coords;
+          // Only validate if coordinates are provided and not [0, 0]
+          if (lng !== 0 || lat !== 0) {
+            if (!isNaN(lng) && !isNaN(lat) && lng !== undefined && lat !== undefined) {
+              // Ensure coordinates are properly formatted as GeoJSON Point
+              cleanedData.location.coordinates = {
+                type: 'Point',
+                coordinates: [Number(lng), Number(lat)], // Ensure numbers, [longitude, latitude]
+              };
+            } else {
+              // Invalid coordinates, remove them
+              delete cleanedData.location.coordinates;
+            }
+          } else {
+            // [0, 0] is invalid, remove coordinates
+            delete cleanedData.location.coordinates;
+          }
+        } else {
+          // Invalid format, remove coordinates
+          delete cleanedData.location.coordinates;
+        }
+      }
+
+      // Create property
+      const property = new Property(cleanedData);
       await property.save();
 
       // Create Asset DNA
@@ -129,6 +201,74 @@ router.put(
 
       // Don't allow changing assetId
       const { assetId, ...updateData } = req.body;
+
+      // Clean and prepare update data
+      const cleanEnumField = (value: any) => {
+        return value === '' || value === null ? undefined : value;
+      };
+
+      // Clean residential fields
+      if (updateData.residential !== undefined) {
+        if (updateData.propertyCategory && updateData.propertyCategory !== 'RESIDENTIAL') {
+          delete updateData.residential;
+        } else if (updateData.residential) {
+          if (updateData.residential.furnishing !== undefined) {
+            updateData.residential.furnishing = cleanEnumField(updateData.residential.furnishing);
+          }
+          if (updateData.residential.parking !== undefined) {
+            updateData.residential.parking = cleanEnumField(updateData.residential.parking);
+          }
+        }
+      }
+
+      // Clean commercial fields
+      if (updateData.commercial !== undefined && updateData.propertyCategory && updateData.propertyCategory !== 'COMMERCIAL') {
+        delete updateData.commercial;
+      }
+
+      // Clean land fields
+      if (updateData.land !== undefined && updateData.propertyCategory && updateData.propertyCategory !== 'LAND') {
+        delete updateData.land;
+      }
+
+      // Clean and format location coordinates if provided
+      if (updateData.location && updateData.location.coordinates) {
+        let coords: [number, number];
+        
+        // Extract coordinates from different possible structures
+        if (updateData.location.coordinates.coordinates && Array.isArray(updateData.location.coordinates.coordinates)) {
+          coords = updateData.location.coordinates.coordinates;
+        } else if (Array.isArray(updateData.location.coordinates)) {
+          coords = updateData.location.coordinates;
+        } else {
+          // Invalid format, remove coordinates
+          delete updateData.location.coordinates;
+        }
+
+        // If we have valid coordinates, validate and format them
+        if (coords && Array.isArray(coords) && coords.length === 2) {
+          const [lng, lat] = coords;
+          // Only validate if coordinates are provided and not [0, 0]
+          if (lng !== 0 || lat !== 0) {
+            if (!isNaN(lng) && !isNaN(lat) && lng !== undefined && lat !== undefined) {
+              // Ensure coordinates are properly formatted as GeoJSON Point
+              updateData.location.coordinates = {
+                type: 'Point',
+                coordinates: [Number(lng), Number(lat)],
+              };
+            } else {
+              // Invalid coordinates, remove them
+              delete updateData.location.coordinates;
+            }
+          } else {
+            // [0, 0] is invalid, remove coordinates
+            delete updateData.location.coordinates;
+          }
+        } else {
+          // Invalid format, remove coordinates
+          delete updateData.location.coordinates;
+        }
+      }
 
       Object.assign(property, updateData);
       await property.save();
@@ -187,11 +327,12 @@ router.post(
         });
       }
 
-      if (!property.location.coordinates?.coordinates) {
-        return res.status(400).json({
-          error: 'Location coordinates are required',
-        });
-      }
+      // Temporarily making coordinates optional
+      // if (!property.location.coordinates?.coordinates) {
+      //   return res.status(400).json({
+      //     error: 'Location coordinates are required',
+      //   });
+      // }
 
       property.status = 'PENDING';
       property.publishedAt = new Date();
@@ -275,8 +416,12 @@ router.get('/', async (req, res) => {
     if (propertyCategory) query.propertyCategory = propertyCategory;
     if (city) query['location.city'] = new RegExp(city as string, 'i');
     if (state) query['location.state'] = new RegExp(state as string, 'i');
-    if (status) query.status = status;
-    else query.status = 'APPROVED'; // Default to approved only
+    if (status) {
+      query.status = status;
+    } else {
+      // Default: show APPROVED, PENDING, and DRAFT (for testing - in production, might want to hide DRAFT)
+      query.status = { $in: ['APPROVED', 'PENDING', 'DRAFT'] };
+    }
 
     // Price filters
     if (minPrice || maxPrice) {

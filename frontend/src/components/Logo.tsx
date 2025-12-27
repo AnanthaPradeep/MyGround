@@ -31,7 +31,7 @@ export default function Logo({
   }
 
   return (
-    <Link to="/" className={`flex items-center gap-2 ${className}`}>
+    <Link to="/" className={`flex items-center gap-1 sm:gap-2 ${className}`}>
       <img 
         src={logoSrc} 
         alt="MyGround Logo" 
@@ -46,7 +46,7 @@ export default function Logo({
       />
       {showText && (
         <div className="flex items-center">
-          <h1 className="text-2xl font-bold text-primary-600">MyGround</h1>
+          <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-primary-600">MyGround</h1>
         </div>
       )}
     </Link>

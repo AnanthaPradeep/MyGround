@@ -7,6 +7,7 @@ import AdvancedFilters from '../components/AdvancedFilters'
 import Logo from '../components/Logo'
 import HeaderSearchBar from '../components/HeaderSearchBar'
 import HeaderIcons from '../components/HeaderIcons'
+import HeaderLocation from '../components/HeaderLocation'
 
 export default function Properties() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -23,7 +24,7 @@ export default function Properties() {
   }, [searchParams])
 
   const { properties: allProperties, loading } = useProperties({ 
-    useSampleData: true,
+    useSampleData: false, // Fetch from API
     filters 
   })
 
@@ -68,16 +69,22 @@ export default function Properties() {
     <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
       <nav className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center h-16 gap-2 sm:gap-4">
-            <Logo showText={true} size="md" />
-            <HeaderSearchBar />
-            <div className="flex items-center gap-2 sm:gap-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+          <div className="flex items-center h-14 sm:h-16 gap-2">
+            <Logo showText={true} size="md" className="flex-shrink-0" />
+            <div className="hidden sm:block flex-1 min-w-0">
+              <HeaderSearchBar />
+            </div>
+            <div className="hidden lg:flex items-center gap-2 xl:gap-4">
+              <HeaderLocation />
               <HeaderIcons />
               <Link to="/" className="text-gray-700 hover:text-primary-600 text-sm whitespace-nowrap">
                 Back to Home
               </Link>
             </div>
+            <Link to="/" className="lg:hidden text-gray-700 hover:text-primary-600 text-xs sm:text-sm">
+              Home
+            </Link>
           </div>
         </div>
       </nav>
@@ -112,7 +119,7 @@ export default function Properties() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
           {/* Filters Sidebar */}
           {showFilters && (
             <div className="lg:col-span-1">
@@ -126,7 +133,7 @@ export default function Properties() {
           {/* Properties Grid */}
           <div className={showFilters ? 'lg:col-span-3' : 'lg:col-span-4'}>
             {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {[...Array(6)].map((_, i) => (
                   <div key={i} className="bg-white rounded-lg shadow-sm animate-pulse">
                     <div className="h-48 bg-gray-200 rounded-t-lg"></div>
@@ -138,20 +145,20 @@ export default function Properties() {
                 ))}
               </div>
             ) : properties.length === 0 ? (
-              <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-                <p className="text-gray-600 mb-4">No properties found matching your criteria</p>
+              <div className="bg-white rounded-lg shadow-sm p-8 sm:p-12 text-center">
+                <p className="text-sm sm:text-base text-gray-600 mb-4">No properties found matching your criteria</p>
                 <button
                   onClick={() => {
                     setSearchParams({})
                     setShowFilters(false)
                   }}
-                  className="text-primary-600 hover:text-primary-700"
+                  className="text-sm sm:text-base text-primary-600 hover:text-primary-700"
                 >
                   Clear all filters
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {properties.map((property) => (
                   <PropertyCard key={property._id} property={property} />
                 ))}

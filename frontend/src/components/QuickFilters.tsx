@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
+import { useTransactionTypes } from '../hooks/useTransactionTypes'
+import { usePropertyTypes } from '../hooks/usePropertyTypes'
 
 export default function QuickFilters() {
   const navigate = useNavigate()
@@ -10,6 +12,14 @@ export default function QuickFilters() {
   const categoryScrollRef = useRef<HTMLDivElement>(null)
   const [transactionOverflows, setTransactionOverflows] = useState(false)
   const [categoryOverflows, setCategoryOverflows] = useState(false)
+
+  // Fetch data from API/JSON
+  const { transactionTypes } = useTransactionTypes({ useSampleData: true })
+  const { propertyTypes } = usePropertyTypes({ useSampleData: true })
+
+  // Filter to show only main transaction types in quick filters
+  const mainTransactionTypes = transactionTypes.filter((t) => ['SELL', 'RENT', 'LEASE', 'BUY'].includes(t.value))
+  const mainPropertyCategories = propertyTypes.filter((p) => ['RESIDENTIAL', 'COMMERCIAL', 'INDUSTRIAL', 'LAND', 'SPECIAL', 'ISLAND'].includes(p.value))
 
   const checkOverflow = (ref: React.RefObject<HTMLDivElement>, setOverflow: (value: boolean) => void) => {
     if (ref.current) {
@@ -73,17 +83,17 @@ export default function QuickFilters() {
             }`}
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {['SELL', 'RENT', 'LEASE', 'BUY'].map((type) => (
+            {mainTransactionTypes.map((type) => (
               <button
-                key={type}
-                onClick={() => handleFilter('transaction', type)}
+                key={type.value}
+                onClick={() => handleFilter('transaction', type.value)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
-                  selectedTransaction === type
+                  selectedTransaction === type.value
                     ? 'bg-white text-primary-600'
                     : 'bg-white/20 text-white hover:bg-white/30'
                 }`}
               >
-                {type}
+                {type.label}
               </button>
             ))}
           </div>
@@ -119,17 +129,17 @@ export default function QuickFilters() {
             }`}
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {['RESIDENTIAL', 'COMMERCIAL', 'INDUSTRIAL', 'LAND', 'SPECIAL', 'ISLAND'].map((category) => (
+            {mainPropertyCategories.map((category) => (
               <button
-                key={category}
-                onClick={() => handleFilter('category', category)}
+                key={category.value}
+                onClick={() => handleFilter('category', category.value)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap flex-shrink-0 ${
-                  selectedCategory === category
+                  selectedCategory === category.value
                     ? 'bg-white text-primary-600'
                     : 'bg-white/20 text-white hover:bg-white/30'
                 }`}
               >
-                {category}
+                {category.label}
               </button>
             ))}
           </div>
