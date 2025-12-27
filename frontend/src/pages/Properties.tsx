@@ -8,6 +8,7 @@ import Logo from '../components/Logo'
 import HeaderSearchBar from '../components/HeaderSearchBar'
 import HeaderIcons from '../components/HeaderIcons'
 import HeaderLocation from '../components/HeaderLocation'
+import { CardSkeleton } from '../components/Loader'
 
 export default function Properties() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -134,15 +135,7 @@ export default function Properties() {
           <div className={showFilters ? 'lg:col-span-3' : 'lg:col-span-4'}>
             {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="bg-white rounded-lg shadow-sm animate-pulse">
-                    <div className="h-48 bg-gray-200 rounded-t-lg"></div>
-                    <div className="p-4 space-y-2">
-                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                    </div>
-                  </div>
-                ))}
+                <CardSkeleton count={6} />
               </div>
             ) : properties.length === 0 ? (
               <div className="bg-white rounded-lg shadow-sm p-8 sm:p-12 text-center">

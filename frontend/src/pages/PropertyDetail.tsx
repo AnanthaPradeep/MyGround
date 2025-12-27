@@ -9,6 +9,7 @@ import Logo from '../components/Logo'
 import HeaderSearchBar from '../components/HeaderSearchBar'
 import HeaderIcons from '../components/HeaderIcons'
 import HeaderLocation from '../components/HeaderLocation'
+import { PageLoader } from '../components/Loader'
 
 export default function PropertyDetail() {
   const { id } = useParams<{ id: string }>()
@@ -36,14 +37,7 @@ export default function PropertyDetail() {
   const listedBy = getListedBy()
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading property details...</p>
-        </div>
-      </div>
-    )
+    return <PageLoader text="Loading property details..." />
   }
 
   if (!property) {
