@@ -12,7 +12,9 @@ import Properties from './pages/Properties'
 import PropertyDetail from './pages/PropertyDetail'
 import Profile from './pages/Profile'
 import Settings from './pages/Settings'
+import Notifications from './pages/Notifications'
 import ProtectedRoute from './components/ProtectedRoute'
+import ChatWidget from './components/ChatWidget'
 
 function App() {
   const { checkAuth } = useAuthStore()
@@ -82,8 +84,17 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/notifications"
+            element={
+              <ProtectedRoute>
+                <Notifications />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
         <Toaster position="top-right" />
+        <ChatWidget />
       </div>
     </Router>
   )

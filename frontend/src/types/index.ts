@@ -2,5 +2,6 @@
 export * from './property'
 export * from './user'
 export * from './common'
+export * from './notification'
 
 

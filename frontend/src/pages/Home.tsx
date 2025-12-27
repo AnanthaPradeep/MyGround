@@ -10,6 +10,7 @@ import ExploreByPurpose from '../components/ExploreByPurpose'
 import TrendingSection from '../components/TrendingSection'
 import AssetDNAPreview from '../components/AssetDNAPreview'
 import UserDropdown from '../components/UserDropdown'
+import HeaderIcons from '../components/HeaderIcons'
 import Logo from '../components/Logo'
 
 export default function Home() {
@@ -24,34 +25,23 @@ export default function Home() {
           <div className="flex justify-between items-center h-16">
             <Logo showText={true} size="md" />
             
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               {isAuthenticated ? (
                 <>
-                  <Link
-                    to="/dashboard"
-                    className="text-gray-700 hover:text-primary-600"
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    to="/properties/create"
-                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-                  >
-                    List Property
-                  </Link>
+                  <HeaderIcons />
                   <UserDropdown />
                 </>
               ) : (
                 <>
                   <Link
                     to="/login"
-                    className="text-gray-700 hover:text-primary-600"
+                    className="text-gray-700 hover:text-primary-600 text-sm"
                   >
                     Sign In
                   </Link>
                   <Link
                     to="/register"
-                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                    className="px-3 sm:px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 whitespace-nowrap"
                   >
                     Sign Up
                   </Link>

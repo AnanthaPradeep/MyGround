@@ -5,6 +5,8 @@ import { formatPrice } from '../utils/formatters'
 import { HeartIcon, CheckCircleIcon, XCircleIcon, PhotoIcon } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid'
 import Logo from '../components/Logo'
+import HeaderSearchBar from '../components/HeaderSearchBar'
+import HeaderIcons from '../components/HeaderIcons'
 
 export default function PropertyDetail() {
   const { id } = useParams<{ id: string }>()
@@ -60,11 +62,15 @@ export default function PropertyDetail() {
       {/* Navigation */}
       <nav className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex items-center h-16 gap-2 sm:gap-4">
             <Logo showText={true} size="md" />
-            <Link to="/" className="text-gray-700 hover:text-primary-600">
-              Back to Home
-            </Link>
+            <HeaderSearchBar />
+            <div className="flex items-center gap-2 sm:gap-4">
+              <HeaderIcons />
+              <Link to="/" className="text-gray-700 hover:text-primary-600 text-sm whitespace-nowrap">
+                Back to Home
+              </Link>
+            </div>
           </div>
         </div>
       </nav>

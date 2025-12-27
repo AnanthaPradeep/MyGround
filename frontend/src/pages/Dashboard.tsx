@@ -7,6 +7,8 @@ import { HomeIcon, MagnifyingGlassIcon, UserIcon, EyeIcon, HeartIcon, ChatBubble
 import ProtectedRoute from '../components/ProtectedRoute'
 import UserDropdown from '../components/UserDropdown'
 import Logo from '../components/Logo'
+import HeaderSearchBar from '../components/HeaderSearchBar'
+import HeaderIcons from '../components/HeaderIcons'
 
 export default function Dashboard() {
   const { user } = useAuthStore()
@@ -19,10 +21,12 @@ export default function Dashboard() {
         {/* Navigation */}
         <nav className="bg-white shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-16">
+            <div className="flex items-center h-16 gap-2 sm:gap-4">
               <Logo showText={true} size="md" />
-              <div className="flex items-center space-x-4">
-                <Link to="/" className="text-gray-700 hover:text-primary-600">
+              <HeaderSearchBar />
+              <div className="flex items-center gap-2 sm:gap-4">
+                <HeaderIcons />
+                <Link to="/" className="text-gray-700 hover:text-primary-600 text-sm whitespace-nowrap">
                   Back to Home
                 </Link>
                 <UserDropdown />

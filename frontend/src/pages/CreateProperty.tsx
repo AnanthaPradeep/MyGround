@@ -14,6 +14,8 @@ import Step6Legal from '../components/property/Step6Legal'
 import Step7Review from '../components/property/Step7Review'
 import UserDropdown from '../components/UserDropdown'
 import Logo from '../components/Logo'
+import HeaderSearchBar from '../components/HeaderSearchBar'
+import HeaderIcons from '../components/HeaderIcons'
 
 const STEPS = [
   { id: 1, name: 'Category', component: Step1Category },
@@ -122,10 +124,12 @@ export default function CreateProperty() {
       {/* Navigation */}
       <nav className="bg-white shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex items-center h-16 gap-2 sm:gap-4">
             <Logo showText={true} size="md" />
-            <div className="flex items-center space-x-4">
-              <Link to="/" className="text-gray-700 hover:text-primary-600">
+            <HeaderSearchBar />
+            <div className="flex items-center gap-2 sm:gap-4">
+              <HeaderIcons />
+              <Link to="/" className="text-gray-700 hover:text-primary-600 text-sm whitespace-nowrap">
                 Back to Home
               </Link>
               <UserDropdown />
