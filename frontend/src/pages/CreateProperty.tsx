@@ -101,12 +101,14 @@ export default function CreateProperty() {
         setPropertyId(response.data.property.id)
       }
 
-      // Submit for review
+      // Submit property (auto-approved, no admin review needed)
       if (response.data.property.status === 'DRAFT') {
         await api.post(`/properties/${response.data.property.id}/submit`)
       }
 
-      toast.success('Property listed successfully!')
+      toast.success('Property created successfully! It is now live on MyGround.', {
+        duration: 5000,
+      })
       navigate('/')
     } catch (error: any) {
       console.error('Error submitting property:', error)

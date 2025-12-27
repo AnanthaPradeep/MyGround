@@ -11,6 +11,7 @@ import {
   CheckIcon
 } from '@heroicons/react/24/outline'
 import { useAuthStore } from '../store/authStore'
+import { useNotifications } from '../hooks/useNotifications'
 import ProtectedRoute from '../components/ProtectedRoute'
 import Logo from '../components/Logo'
 import HeaderSearchBar from '../components/HeaderSearchBar'

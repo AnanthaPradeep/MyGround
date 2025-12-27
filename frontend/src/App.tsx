@@ -5,6 +5,8 @@ import { useAuthStore } from './store/authStore'
 import { useLocationStore } from './store/locationStore'
 import SplashScreen from './components/SplashScreen'
 import LocationSelectorModal from './components/LocationSelectorModal'
+import { ErrorBoundary } from './components/ErrorBoundary'
+import { OfflineIndicator } from './components/NetworkError'
 import CreateProperty from './pages/CreateProperty'
 import Home from './pages/Home'
 import Login from './pages/Login'
@@ -18,6 +20,7 @@ import Notifications from './pages/Notifications'
 import LocationTest from './pages/LocationTest'
 import ProtectedRoute from './components/ProtectedRoute'
 import ChatWidget from './components/ChatWidget'
+import { NotFoundPage, ErrorPage } from './pages/ErrorPages'
 
 function App() {
   const { checkAuth } = useAuthStore()
@@ -69,62 +72,66 @@ function App() {
   }
 
   return (
-    <Router>
-      {isLoading && <SplashScreen onComplete={handleSplashComplete} minDisplayTime={1500} />}
-      <LocationSelectorModal isOpen={showLocationModal} onClose={handleLocationModalClose} />
-      <div className={`min-h-screen bg-gray-50 ${isLoading ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/properties" element={<Properties />} />
-          <Route path="/properties/:id" element={<PropertyDetail />} />
-          <Route
-            path="/properties/create"
-            element={
-              <ProtectedRoute requiredRole={['USER', 'OWNER', 'BROKER', 'DEVELOPER', 'ADMIN']}>
-                <CreateProperty />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              <ProtectedRoute>
-                <Settings />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/notifications"
-            element={
-              <ProtectedRoute>
-                <Notifications />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/location-test" element={<LocationTest />} />
-        </Routes>
-        <Toaster position="top-right" />
-        <ChatWidget />
-      </div>
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        {isLoading && <SplashScreen onComplete={handleSplashComplete} minDisplayTime={1500} />}
+        <OfflineIndicator />
+        <LocationSelectorModal isOpen={showLocationModal} onClose={handleLocationModalClose} />
+        <div className={`min-h-screen bg-gray-50 ${isLoading ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/properties" element={<Properties />} />
+            <Route path="/properties/:id" element={<PropertyDetail />} />
+            <Route
+              path="/properties/create"
+              element={
+                <ProtectedRoute requiredRole={['USER', 'OWNER', 'BROKER', 'DEVELOPER', 'ADMIN']}>
+                  <CreateProperty />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/settings"
+              element={
+                <ProtectedRoute>
+                  <Settings />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/notifications"
+              element={
+                <ProtectedRoute>
+                  <Notifications />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/location-test" element={<LocationTest />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+          <Toaster position="top-right" />
+          <ChatWidget />
+        </div>
+      </Router>
+    </ErrorBoundary>
   )
 }
 

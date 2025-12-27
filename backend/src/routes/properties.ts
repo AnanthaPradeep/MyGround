@@ -6,6 +6,7 @@ import { validatePropertyListing, validateResidentialProperty, validateLandPrope
 import { generateAssetId, createOrUpdateAssetDNA } from '../utils/assetDNA';
 import { checkDuplicateListing, checkPriceAnomaly, checkListingRateLimit } from '../utils/fraudDetection';
 import { validationResult } from 'express-validator';
+import { notifyPropertySubmitted, notifyPropertyApproved, notifyPropertyRejected } from '../utils/notifications';
 
 const router: Router = express.Router();
 
@@ -70,7 +71,7 @@ router.post(
         ...req.body,
         assetId,
         listedBy: req.user!.userId,
-        status: 'DRAFT', // Will be set to PENDING on final submission
+        status: 'DRAFT', // Will be set to APPROVED on final submission (auto-approved, no admin review)
       };
 
       // Remove empty strings from enum fields (convert to undefined)
@@ -295,7 +296,7 @@ router.put(
 
 /**
  * @route   POST /api/properties/:id/submit
- * @desc    Submit property for review (change status from DRAFT to PENDING)
+ * @desc    Submit property (auto-approve, change status from DRAFT to APPROVED)
  * @access  Private (Owner of listing)
  */
 router.post(
@@ -334,13 +335,22 @@ router.post(
       //   });
       // }
 
-      property.status = 'PENDING';
+      // Auto-approve property (no admin approval needed)
+      property.status = 'APPROVED';
+      property.isVerified = true;
       property.publishedAt = new Date();
       await property.save();
 
+      // Create notification for property owner
+      await notifyPropertyApproved(
+        property.listedBy,
+        property._id.toString(),
+        property.title
+      );
+
       res.json({
         success: true,
-        message: 'Property submitted for review',
+        message: 'Property created successfully and is now live',
         property: {
           id: property._id,
           status: property.status,
@@ -468,6 +478,121 @@ router.get('/', async (req, res) => {
     });
   }
 });
+
+/**
+ * @route   POST /api/properties/:id/approve
+ * @desc    Approve a property (Admin only)
+ * @access  Private (Admin)
+ */
+router.post(
+  '/:id/approve',
+  authenticate,
+  authorize('ADMIN'),
+  async (req: AuthRequest, res) => {
+    try {
+      const property = await Property.findById(req.params.id);
+
+      if (!property) {
+        return res.status(404).json({ error: 'Property not found' });
+      }
+
+      if (property.status !== 'PENDING') {
+        return res.status(400).json({
+          error: 'Property is not pending approval',
+          currentStatus: property.status,
+        });
+      }
+
+      property.status = 'APPROVED';
+      property.isVerified = true;
+      await property.save();
+
+      // Create notification for property owner
+      await notifyPropertyApproved(
+        property.listedBy,
+        property._id.toString(),
+        property.title
+      );
+
+      res.json({
+        success: true,
+        message: 'Property approved successfully',
+        property: {
+          id: property._id,
+          status: property.status,
+          isVerified: property.isVerified,
+        },
+      });
+    } catch (error: any) {
+      console.error('Error approving property:', error);
+      res.status(500).json({
+        error: 'Failed to approve property',
+        message: error.message,
+      });
+    }
+  }
+);
+
+/**
+ * @route   POST /api/properties/:id/reject
+ * @desc    Reject a property (Admin only)
+ * @access  Private (Admin)
+ */
+router.post(
+  '/:id/reject',
+  authenticate,
+  authorize('ADMIN'),
+  [
+    body('reason').optional().isString().trim(),
+  ],
+  async (req: AuthRequest, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const property = await Property.findById(req.params.id);
+
+      if (!property) {
+        return res.status(404).json({ error: 'Property not found' });
+      }
+
+      if (property.status !== 'PENDING') {
+        return res.status(400).json({
+          error: 'Property is not pending approval',
+          currentStatus: property.status,
+        });
+      }
+
+      property.status = 'REJECTED';
+      await property.save();
+
+      // Create notification for property owner
+      await notifyPropertyRejected(
+        property.listedBy,
+        property._id.toString(),
+        property.title,
+        req.body.reason
+      );
+
+      res.json({
+        success: true,
+        message: 'Property rejected',
+        property: {
+          id: property._id,
+          status: property.status,
+        },
+      });
+    } catch (error: any) {
+      console.error('Error rejecting property:', error);
+      res.status(500).json({
+        error: 'Failed to reject property',
+        message: error.message,
+      });
+    }
+  }
+);
 
 /**
  * @route   DELETE /api/properties/:id

@@ -33,11 +33,12 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
         setNotifications(sampleData)
       } else {
         // Fetch from API
-        const params = userId ? `?userId=${userId}` : ''
-        const response = await api.get(`/notifications${params}`)
-        const apiData = response.data.notifications.map((notif: any) => ({
+        const params = new URLSearchParams()
+        if (userId) params.append('userId', userId)
+        const response = await api.get(`/notifications?${params.toString()}`)
+        const apiData = (response.data.notifications || []).map((notif: any) => ({
           ...notif,
-          timestamp: new Date(notif.timestamp),
+          timestamp: new Date(notif.createdAt || notif.timestamp),
         })) as Notification[]
         setNotifications(apiData)
       }
