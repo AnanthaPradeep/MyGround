@@ -10,8 +10,8 @@
  * 2. Add: VITE_GOOGLE_MAPS_API_KEY=your_api_key_here
  * 3. Restart the development server
  */
-export const GOOGLE_MAPS_API_KEY = (import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string) || 'AIzaSyB_U9aPPZs8WZWj4_VoZ2XiHLhRA9dqskU'
-export const GOOGLE_GEOLOCATION_API_KEY = (import.meta.env.VITE_GOOGLE_GEOLOCATION_API_KEY as string) || 'AIzaSyAbcXRfyKCBwuCUG3wpJZ8tXBPqNrkp3hw'
+export const GOOGLE_MAPS_API_KEY = (import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string) || ''
+export const GOOGLE_GEOLOCATION_API_KEY = (import.meta.env.VITE_GOOGLE_GEOLOCATION_API_KEY as string) || ''
 
 export const GOOGLE_MAPS_CONFIG = {
   apiKey: GOOGLE_MAPS_API_KEY,

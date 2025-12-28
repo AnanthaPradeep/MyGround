@@ -6,6 +6,7 @@ import authRoutes from './routes/auth';
 import propertyRoutes from './routes/properties';
 import notificationRoutes from './routes/notifications';
 import publicNotificationRoutes from './routes/publicNotifications';
+import wishlistRoutes from './routes/wishlist';
 
 // Load environment variables
 dotenv.config();
@@ -80,6 +81,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/properties', propertyRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/public-notifications', publicNotificationRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

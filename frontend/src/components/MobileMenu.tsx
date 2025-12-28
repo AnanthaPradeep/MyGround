@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { 
   XMarkIcon, 
@@ -9,10 +9,13 @@ import {
   Cog6ToothIcon,
   MapPinIcon,
   ChevronDownIcon,
-  Squares2X2Icon
+  Squares2X2Icon,
+  HeartIcon
 } from '@heroicons/react/24/outline'
 import { useAuthStore } from '../store/authStore'
 import { useLocationStore } from '../store/locationStore'
+import { useWishlistStore } from '../store/wishlistStore'
+import { useWishlist } from '../hooks/useWishlist'
 import Logo from './Logo'
 import HeaderLocation from './HeaderLocation'
 import ThemeToggle from './ThemeToggle'
@@ -25,8 +28,21 @@ interface MobileMenuProps {
 export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const { isAuthenticated, user, logout } = useAuthStore()
   const { userLocation } = useLocationStore()
+  const { lastUpdate: wishlistLastUpdate } = useWishlistStore()
+  const { getWishlistCount } = useWishlist({
+    useSampleData: false,
+    userId: user?.id,
+  })
   const navigate = useNavigate()
   const menuRef = useRef<HTMLDivElement>(null)
+  const [wishlistCount, setWishlistCount] = useState(0)
+
+  // Fetch wishlist count
+  useEffect(() => {
+    if (isAuthenticated) {
+      getWishlistCount().then(setWishlistCount)
+    }
+  }, [isAuthenticated, getWishlistCount, wishlistLastUpdate])
 
   const handleLogout = () => {
     logout()
@@ -166,12 +182,17 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   </Link>
 
                   <Link
-                    to="/profile"
+                    to="/wishlist"
                     onClick={onClose}
-                    className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    className="relative flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                   >
-                    <UserIcon className="w-5 h-5" />
-                    <span>Profile</span>
+                    <HeartIcon className="w-5 h-5" />
+                    <span>Wishlist</span>
+                    {wishlistCount > 0 && (
+                      <span className="ml-auto flex items-center justify-center min-w-[20px] h-5 px-1.5 bg-primary-600 dark:bg-primary-500 text-white text-xs font-bold rounded-full">
+                        {wishlistCount > 9 ? '9+' : wishlistCount}
+                      </span>
+                    )}
                   </Link>
 
                   <Link

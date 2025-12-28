@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useProperty } from '../hooks/useProperties'
 import { formatPrice } from '../utils/formatters'
@@ -13,6 +13,8 @@ import UserDropdown from '../components/UserDropdown'
 import MobileMenu from '../components/MobileMenu'
 import { PageLoader } from '../components/Loader'
 import { useAuthStore } from '../store/authStore'
+import { useWishlistStore } from '../store/wishlistStore'
+import { useWishlist } from '../hooks/useWishlist'
 import api from '../services/api'
 import toast from 'react-hot-toast'
 
@@ -21,11 +23,28 @@ export default function PropertyDetail() {
   const navigate = useNavigate()
   const { user, isAuthenticated } = useAuthStore()
   const { property, loading, refetch } = useProperty(id || '', false) // Fetch from API
+  const { triggerRefetch } = useWishlistStore()
+  const { checkInWishlist, addToWishlist, removeFromWishlist } = useWishlist({
+    useSampleData: false,
+    userId: user?.id,
+  })
   const [isSaved, setIsSaved] = useState(false)
+  const [isCheckingWishlist, setIsCheckingWishlist] = useState(false)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
   const [deleting, setDeleting] = useState(false)
   const [pausing, setPausing] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+  // Check if property is in wishlist
+  useEffect(() => {
+    if (isAuthenticated && property?._id) {
+      setIsCheckingWishlist(true)
+      checkInWishlist(property._id)
+        .then(setIsSaved)
+        .catch(() => setIsSaved(false))
+        .finally(() => setIsCheckingWishlist(false))
+    }
+  }, [isAuthenticated, property?._id, checkInWishlist])
 
   // Check if current user is the property owner
   // Handle both string (ObjectId) and object (populated) formats
@@ -225,16 +244,38 @@ export default function PropertyDetail() {
                     {property.location.locality}, {property.location.area}, {property.location.city}
                   </p>
                 </div>
-                <button
-                  onClick={() => setIsSaved(!isSaved)}
-                  className="p-2 hover:bg-gray-100 rounded-full"
-                >
-                  {isSaved ? (
-                    <HeartSolidIcon className="w-6 h-6 text-red-500" />
-                  ) : (
-                    <HeartIcon className="w-6 h-6 text-gray-600 dark:text-gray-400" />
-                  )}
-                </button>
+                {isAuthenticated && (
+                  <button
+                    onClick={async () => {
+                      if (isCheckingWishlist) return
+                      
+                      try {
+                        if (isSaved) {
+                          await removeFromWishlist(property._id)
+                          setIsSaved(false)
+                          toast.success('Removed from wishlist')
+                        } else {
+                          await addToWishlist(property._id)
+                          setIsSaved(true)
+                          toast.success('Added to wishlist')
+                        }
+                        // Trigger refetch in HeaderIcons and other components
+                        triggerRefetch()
+                      } catch (error: any) {
+                        toast.error(error.message || 'Failed to update wishlist')
+                      }
+                    }}
+                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+                    title={isSaved ? 'Remove from wishlist' : 'Add to wishlist'}
+                    disabled={isCheckingWishlist}
+                  >
+                    {isSaved ? (
+                      <HeartSolidIcon className="w-6 h-6 text-red-500 dark:text-red-400" />
+                    ) : (
+                      <HeartIcon className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                    )}
+                  </button>
+                )}
               </div>
 
               {/* Price */}

@@ -1,16 +1,38 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { HeartIcon, PhotoIcon, MapPinIcon } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid'
 import { Property } from '../types/property'
 import { formatPrice } from '../utils/formatters'
+import { useAuthStore } from '../store/authStore'
+import { useWishlistStore } from '../store/wishlistStore'
+import { useWishlist } from '../hooks/useWishlist'
+import toast from 'react-hot-toast'
 
 interface Props {
   property: Property
 }
 
 export default function PropertyCard({ property }: Props) {
+  const { isAuthenticated, user } = useAuthStore()
+  const { lastUpdate, triggerRefetch } = useWishlistStore()
+  const { checkInWishlist, addToWishlist, removeFromWishlist } = useWishlist({
+    useSampleData: false,
+    userId: user?.id,
+  })
   const [isSaved, setIsSaved] = useState(false)
+  const [isChecking, setIsChecking] = useState(false)
+
+  // Check if property is in wishlist
+  useEffect(() => {
+    if (isAuthenticated && property._id) {
+      setIsChecking(true)
+      checkInWishlist(property._id)
+        .then(setIsSaved)
+        .catch(() => setIsSaved(false))
+        .finally(() => setIsChecking(false))
+    }
+  }, [isAuthenticated, property._id, checkInWishlist, lastUpdate])
 
   const price = property.pricing.expectedPrice || property.pricing.rentAmount
   const priceLabel = property.transactionType === 'RENT' ? 'Rent' : 'Price'
@@ -35,19 +57,41 @@ export default function PropertyCard({ property }: Props) {
         )}
 
         {/* Save Button */}
-        <button
-          onClick={(e) => {
-            e.preventDefault()
-            setIsSaved(!isSaved)
-          }}
-          className="absolute top-2 right-2 p-2 bg-white dark:bg-gray-800 rounded-full shadow-md dark:shadow-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700"
-        >
-          {isSaved ? (
-            <HeartSolidIcon className="w-5 h-5 text-red-500 dark:text-red-400" />
-          ) : (
-            <HeartIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-          )}
-        </button>
+        {isAuthenticated && (
+          <button
+            onClick={async (e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              
+              if (isChecking) return
+
+              try {
+                if (isSaved) {
+                  await removeFromWishlist(property._id)
+                  setIsSaved(false)
+                  toast.success('Removed from wishlist')
+                } else {
+                  await addToWishlist(property._id)
+                  setIsSaved(true)
+                  toast.success('Added to wishlist')
+                }
+                // Trigger refetch in HeaderIcons and other components
+                triggerRefetch()
+              } catch (error: any) {
+                toast.error(error.message || 'Failed to update wishlist')
+              }
+            }}
+            className="absolute top-2 right-2 p-2 bg-white dark:bg-gray-800 rounded-full shadow-md dark:shadow-gray-900 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors z-10"
+            title={isSaved ? 'Remove from wishlist' : 'Add to wishlist'}
+            disabled={isChecking}
+          >
+            {isSaved ? (
+              <HeartSolidIcon className="w-5 h-5 text-red-500 dark:text-red-400" />
+            ) : (
+              <HeartIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+            )}
+          </button>
+        )}
 
         {/* Asset DNA Badge */}
         {property.assetDNA && property.assetDNA.verificationScore > 70 && (
