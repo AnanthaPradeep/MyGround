@@ -121,27 +121,6 @@ export default function Home() {
       {/* Trust Bar */}
       <TrustBar />
 
-      {/* Explore by Purpose */}
-      <ExploreByPurpose />
-
-      {/* MG Asset DNA Preview Section */}
-      <section className="py-12 bg-white dark:bg-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-heading font-bold text-gray-900 dark:text-gray-100 mb-2">
-              Know the Truth Before You Visit
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              Every property on MyGround comes with MG Asset DNA™ - a unique verification system
-            </p>
-          </div>
-          <AssetDNAPreview properties={properties.slice(0, 4)} />
-        </div>
-      </section>
-
-      {/* Trending & Insights */}
-      <TrendingSection />
-
       {/* Recent Properties */}
       <section className="py-12 bg-white dark:bg-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -228,6 +207,27 @@ export default function Home() {
           )}
         </div>
       </section>
+
+      {/* Explore by Purpose */}
+      <ExploreByPurpose />
+
+      {/* MG Asset DNA Preview Section */}
+      <section className="py-12 bg-white dark:bg-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-heading font-bold text-gray-900 dark:text-gray-100 mb-2">
+              Know the Truth Before You Visit
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              Every property on MyGround comes with MG Asset DNA™ - a unique verification system
+            </p>
+          </div>
+          <AssetDNAPreview properties={properties.slice(0, 4)} />
+        </div>
+      </section>
+
+      {/* Trending & Insights */}
+      <TrendingSection />
 
       {/* Why Choose MyGround */}
       <section className="py-12 bg-white dark:bg-gray-800">
