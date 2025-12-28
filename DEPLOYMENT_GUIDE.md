@@ -104,13 +104,29 @@ Netlify is primarily for frontend hosting. Your backend needs to be deployed sep
 1. **Sign up:** Go to [render.com](https://render.com)
 2. **Create New Web Service:**
    - Connect your GitHub repository
-   - Set root directory to `backend`
-   - Build command: `npm install && npm run build`
-   - Start command: `npm start`
-   - Environment: Node
+   - **Root Directory:** `backend` (IMPORTANT!)
+   - **Build Command:** `npm install && npm run build`
+   - **Start Command:** `npm start` (NOT `npm run dev` - this is critical!)
+   - **Environment:** Node
+   - **Node Version:** 18 or 20 (recommended)
 
-3. **Configure Environment Variables:**
-   - Add all your `.env` variables
+3. **Configure Environment Variables (CRITICAL):**
+   - Go to your Web Service → "Environment" tab
+   - **MUST SET:** `MONGODB_URI` - Your MongoDB Atlas connection string
+   - Add all other variables from `backend/.env.example`:
+     ```
+     PORT=5000
+     NODE_ENV=production
+     MONGODB_URI=your-mongodb-atlas-connection-string (REQUIRED!)
+     JWT_SECRET=your-secure-jwt-secret-key
+     JWT_EXPIRE=7d
+     CORS_ORIGIN=https://myground.in,https://www.myground.in
+     SMTP_HOST=smtp.gmail.com
+     SMTP_PORT=587
+     SMTP_USER=your-email@gmail.com
+     SMTP_PASS=your-app-password
+     ```
+   - **⚠️ Without MONGODB_URI, the app will try to connect to localhost and fail!**
 
 4. **Deploy:**
    - Render will build and deploy

@@ -4,6 +4,10 @@ export const connectDatabase = async (): Promise<void> => {
   try {
     const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/myground';
     
+    if (!process.env.MONGODB_URI) {
+      console.warn('⚠️  WARNING: MONGODB_URI not set, using default localhost (will fail in production)');
+    }
+    
     await mongoose.connect(mongoUri);
     
     console.log('✅ MongoDB connected successfully');

@@ -11,7 +11,7 @@ import publicNotificationRoutes from './routes/publicNotifications';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = parseInt(process.env.PORT || '5000', 10);
 
 // CORS Configuration
 const corsOptions = {
@@ -57,7 +57,7 @@ const startServer = async () => {
   try {
     await connectDatabase();
     
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
     });
