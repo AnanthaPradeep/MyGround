@@ -102,11 +102,11 @@ export default function Register() {
   }
 
   const handleGoogleSignup = () => {
-    toast.info('Google signup coming soon!')
+    toast('Google signup coming soon!', { icon: 'ℹ️' })
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-blue-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 dark:from-gray-900 via-white dark:via-gray-900 to-blue-50 dark:to-gray-800 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl w-full space-y-8">
         {/* Header */}
         <div className="text-center">
@@ -114,18 +114,18 @@ export default function Register() {
             <Logo showText={true} size="lg" />
           </div>
           <h2 className="text-2xl font-heading font-semibold text-gray-900 dark:text-gray-100">Create Your Account</h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             Join thousands of property owners and buyers
           </p>
         </div>
 
         {/* Registration Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl dark:shadow-gray-900/50 p-8">
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             {/* Role Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                I am a <span className="text-red-500">*</span>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                I am a <span className="text-red-500 dark:text-red-400">*</span>
               </label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {(['USER', 'OWNER', 'BROKER', 'DEVELOPER'] as const).map((role) => (
@@ -133,8 +133,8 @@ export default function Register() {
                     key={role}
                     className={`cursor-pointer p-3 border-2 rounded-lg text-center transition-colors ${
                       watch('role') === role
-                        ? 'border-primary-600 bg-primary-50'
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? 'border-primary-600 dark:border-primary-400 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
+                        : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                     }`}
                   >
                     <input
@@ -152,42 +152,42 @@ export default function Register() {
             {/* Name Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
-                  First Name <span className="text-red-500">*</span>
+                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  First Name <span className="text-red-500 dark:text-red-400">*</span>
                 </label>
                 <input
                   id="firstName"
                   type="text"
                   {...register('firstName', { required: 'First name is required' })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400"
                   placeholder="John"
                 />
                 {errors.firstName && (
-                  <p className="mt-1 text-sm text-red-600">{errors.firstName.message}</p>
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.firstName.message}</p>
                 )}
               </div>
 
               <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
-                  Last Name <span className="text-red-500">*</span>
+                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Last Name <span className="text-red-500 dark:text-red-400">*</span>
                 </label>
                 <input
                   id="lastName"
                   type="text"
                   {...register('lastName', { required: 'Last name is required' })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400"
                   placeholder="Doe"
                 />
                 {errors.lastName && (
-                  <p className="mt-1 text-sm text-red-600">{errors.lastName.message}</p>
+                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.lastName.message}</p>
                 )}
               </div>
             </div>
 
             {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address <span className="text-red-500">*</span>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Email Address <span className="text-red-500 dark:text-red-400">*</span>
               </label>
               <input
                 id="email"
@@ -199,18 +199,18 @@ export default function Register() {
                     message: 'Invalid email address',
                   },
                 })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400"
                 placeholder="you@example.com"
               />
               {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email.message}</p>
               )}
             </div>
 
             {/* Mobile */}
             <div>
-              <label htmlFor="mobile" className="block text-sm font-medium text-gray-700 mb-2">
-                Mobile Number <span className="text-red-500">*</span>
+              <label htmlFor="mobile" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Mobile Number <span className="text-red-500 dark:text-red-400">*</span>
               </label>
               <input
                 id="mobile"
@@ -222,20 +222,20 @@ export default function Register() {
                     message: 'Mobile must be 10 digits',
                   },
                 })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400"
                 placeholder="9876543210"
                 maxLength={10}
               />
               {errors.mobile && (
-                <p className="mt-1 text-sm text-red-600">{errors.mobile.message}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.mobile.message}</p>
               )}
             </div>
 
             {/* OTP Verification (Optional) */}
             {otpSent && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                 <div className="flex justify-between items-center mb-2">
-                  <label htmlFor="otp" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="otp" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Enter OTP (Optional)
                   </label>
                   <button
@@ -244,7 +244,7 @@ export default function Register() {
                       setOtpSent(false)
                       setOtp('')
                     }}
-                    className="text-xs text-gray-600 hover:text-gray-800"
+                    className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
                   >
                     Skip OTP
                   </button>
@@ -255,19 +255,19 @@ export default function Register() {
                     type="text"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
-                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400"
                     placeholder="Enter 6-digit OTP (optional)"
                     maxLength={6}
                   />
                   <button
                     type="button"
                     onClick={() => sendOTP(watch('mobile'), watch('email'))}
-                    className="px-4 py-3 text-sm font-medium text-primary-600 hover:text-primary-700"
+                    className="px-4 py-3 text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
                   >
                     Resend
                   </button>
                 </div>
-                <p className="text-xs text-gray-600 mt-2">
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
                   OTP verification is optional. You can skip and register directly.
                 </p>
               </div>
@@ -275,18 +275,18 @@ export default function Register() {
 
             {/* Optional: Send OTP Button */}
             {!otpSent && (
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+              <div className="bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 rounded-lg p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-700">Verify with OTP (Optional)</p>
-                    <p className="text-xs text-gray-600 mt-1">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Verify with OTP (Optional)</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
                       Get OTP on your mobile and email for extra security
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={() => sendOTP(watch('mobile'), watch('email'))}
-                    className="px-4 py-2 text-sm font-medium text-primary-600 border border-primary-600 rounded-lg hover:bg-primary-50"
+                    className="px-4 py-2 text-sm font-medium text-primary-600 dark:text-primary-400 border border-primary-600 dark:border-primary-400 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/30"
                   >
                     Send OTP
                   </button>
@@ -296,8 +296,8 @@ export default function Register() {
 
             {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Password <span className="text-red-500">*</span>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Password <span className="text-red-500 dark:text-red-400">*</span>
               </label>
               <div className="relative">
                 <input
@@ -310,7 +310,7 @@ export default function Register() {
                       message: 'Password must be at least 6 characters',
                     },
                   })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 pr-12"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400 pr-12"
                   placeholder="Create a password"
                 />
                 <button
@@ -319,21 +319,21 @@ export default function Register() {
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 >
                   {showPassword ? (
-                    <EyeSlashIcon className="h-5 w-5 text-gray-400" />
+                    <EyeSlashIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                   ) : (
-                    <EyeIcon className="h-5 w-5 text-gray-400" />
+                    <EyeIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                   )}
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password.message}</p>
               )}
             </div>
 
             {/* Confirm Password */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                Confirm Password <span className="text-red-500">*</span>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Confirm Password <span className="text-red-500 dark:text-red-400">*</span>
               </label>
               <div className="relative">
                 <input
@@ -344,7 +344,7 @@ export default function Register() {
                     validate: (value) =>
                       value === password || 'Passwords do not match',
                   })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 pr-12"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400 pr-12"
                   placeholder="Confirm password"
                 />
                 <button
@@ -353,14 +353,14 @@ export default function Register() {
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 >
                   {showConfirmPassword ? (
-                    <EyeSlashIcon className="h-5 w-5 text-gray-400" />
+                    <EyeSlashIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                   ) : (
-                    <EyeIcon className="h-5 w-5 text-gray-400" />
+                    <EyeIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                   )}
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.confirmPassword.message}</p>
               )}
             </div>
 
@@ -372,29 +372,29 @@ export default function Register() {
                 {...register('agreeToTerms', {
                   required: 'You must agree to the terms and conditions',
                 })}
-                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded mt-1"
+                className="h-4 w-4 text-primary-600 dark:text-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 border-gray-300 dark:border-gray-600 rounded mt-1 bg-white dark:bg-gray-700"
               />
-              <label htmlFor="agreeToTerms" className="ml-2 block text-sm text-gray-700">
+              <label htmlFor="agreeToTerms" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                 I agree to the{' '}
-                <Link to="/terms" className="text-primary-600 hover:text-primary-500">
+                <Link to="/terms" className="text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300">
                   Terms and Conditions
                 </Link>{' '}
                 and{' '}
-                <Link to="/privacy" className="text-primary-600 hover:text-primary-500">
+                <Link to="/privacy" className="text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300">
                   Privacy Policy
                 </Link>
-                <span className="text-red-500">*</span>
+                <span className="text-red-500 dark:text-red-400">*</span>
               </label>
             </div>
             {errors.agreeToTerms && (
-              <p className="mt-1 text-sm text-red-600">{errors.agreeToTerms.message}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.agreeToTerms.message}</p>
             )}
 
             {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 dark:bg-primary-500 hover:bg-primary-700 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-800 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? 'Creating account...' : 'Create Account'}
             </button>
@@ -404,10 +404,10 @@ export default function Register() {
           <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
+                <div className="w-full border-t border-gray-300 dark:border-gray-700" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Or sign up with</span>
+                <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">Or sign up with</span>
               </div>
             </div>
 
@@ -416,7 +416,7 @@ export default function Register() {
               <button
                 type="button"
                 onClick={handleGoogleSignup}
-                className="w-full inline-flex justify-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="w-full inline-flex justify-center py-3 px-4 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
@@ -440,7 +440,7 @@ export default function Register() {
               </button>
               <button
                 type="button"
-                className="w-full inline-flex justify-center py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="w-full inline-flex justify-center py-3 px-4 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm bg-white dark:bg-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
@@ -451,9 +451,9 @@ export default function Register() {
           </div>
 
           {/* Sign In Link */}
-          <p className="mt-6 text-center text-sm text-gray-600">
+          <p className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
             Already have an account?{' '}
-            <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500">
+            <Link to="/login" className="font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300">
               Sign in
             </Link>
           </p>

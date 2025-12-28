@@ -247,7 +247,7 @@ export default function CreateProperty() {
         </div>
 
         {/* Progress Steps */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between">
             {STEPS.map((step, index) => (
               <div key={step.id} className="flex items-center flex-1">
@@ -255,10 +255,10 @@ export default function CreateProperty() {
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
                       currentStep > step.id
-                        ? 'bg-primary-600 text-white'
+                        ? 'bg-primary-600 dark:bg-primary-500 text-white'
                         : currentStep === step.id
-                        ? 'bg-primary-600 text-white ring-4 ring-primary-100'
-                        : 'bg-gray-200 text-gray-600'
+                        ? 'bg-primary-600 dark:bg-primary-500 text-white ring-4 ring-primary-100 dark:ring-primary-900/50'
+                        : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
                     }`}
                   >
                     {currentStep > step.id ? (
@@ -269,7 +269,7 @@ export default function CreateProperty() {
                   </div>
                   <span
                     className={`mt-2 text-xs font-medium ${
-                      currentStep >= step.id ? 'text-primary-600' : 'text-gray-500'
+                      currentStep >= step.id ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'
                     }`}
                   >
                     {step.name}
@@ -278,7 +278,7 @@ export default function CreateProperty() {
                 {index < STEPS.length - 1 && (
                   <div
                     className={`h-1 flex-1 mx-2 ${
-                      currentStep > step.id ? 'bg-primary-600' : 'bg-gray-200'
+                      currentStep > step.id ? 'bg-primary-600 dark:bg-primary-500' : 'bg-gray-200 dark:bg-gray-700'
                     }`}
                   />
                 )}
@@ -289,17 +289,17 @@ export default function CreateProperty() {
 
         {/* Form */}
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
             <CurrentStepComponent form={form} />
           </div>
 
           {/* Navigation Buttons */}
-          <div className="bg-white rounded-lg shadow-sm p-6 flex justify-between">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 flex justify-between">
             <button
               type="button"
               onClick={prevStep}
               disabled={currentStep === 1}
-              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 bg-white dark:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Previous
             </button>
@@ -308,7 +308,7 @@ export default function CreateProperty() {
               <button
                 type="button"
                 onClick={nextStep}
-                className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                className="px-6 py-2 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600"
               >
                 Next
               </button>
@@ -316,7 +316,7 @@ export default function CreateProperty() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? 'Submitting...' : 'Submit for Review'}
               </button>

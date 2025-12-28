@@ -1,0 +1,10 @@
+[
+  { "value": "SELL", "label": "Sell" },
+  { "value": "RENT", "label": "Rent" },
+  { "value": "LEASE", "label": "Lease" },
+  { "value": "BUY", "label": "Buy" },
+  { "value": "SUB_LEASE", "label": "Sub Lease" },
+  { "value": "FRACTIONAL", "label": "Fractional" }
+]
+
+

@@ -29,7 +29,7 @@ html:not(.dark):not(.light) {
 }
 
 .search-bar-location div input {
-  padding-left: 0 !important;
+  padding-left: 0.5rem !important;
   padding-right: 2rem !important;
   /* Remove hardcoded color to allow dark mode */
 }

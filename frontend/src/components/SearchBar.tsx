@@ -118,20 +118,20 @@ export default function SearchBar() {
     <form onSubmit={handleSearch} className="w-full max-w-5xl mx-auto px-2 sm:px-0 relative z-10" style={{ overflow: 'visible' }}>
       <div className="bg-white dark:bg-gray-800 rounded-2xl sm:rounded-full border border-gray-300 dark:border-gray-700 shadow-lg dark:shadow-gray-900/50 flex flex-col sm:flex-row items-stretch" style={{ overflow: 'visible' }}>
         {/* Location Input */}
-        <div className="flex-1 flex items-center px-3 sm:px-4 md:px-6 py-3 sm:py-3.5 md:py-4 border-b sm:border-b-0 sm:border-r border-gray-200 dark:border-gray-700 min-w-0">
-          <MapPinIcon className="w-5 h-5 text-primary-600 dark:text-primary-400 flex-shrink-0 mr-2 sm:mr-3" />
+        <div className="flex-1 flex items-center px-4 sm:px-5 md:px-7 py-3.5 sm:py-4 md:py-5 border-b sm:border-b-0 sm:border-r border-gray-200 dark:border-gray-700 min-w-0">
+          <MapPinIcon className="w-5 h-5 text-primary-600 dark:text-primary-400 flex-shrink-0 mr-2.5 sm:mr-3.5" />
           <div className="flex-1 min-w-0 relative search-bar-location">
             <LocationAutocomplete
               value={selectedLocation?.displayName || ''}
               onChange={setSelectedLocation}
               placeholder="Enter City, Locality, Project"
-              className="[&>div>div>svg]:!hidden [&>div>input]:!border-0 [&>div>input]:!focus:ring-0 [&>div>input]:!p-0 [&>div>input]:!pl-0 [&>div>input]:!pr-8 [&>div>input]:text-sm [&>div>input]:sm:text-base [&>div>input]:text-gray-900 [&>div>input]:placeholder:text-gray-400 [&>div>input]:w-full [&>div>input]:bg-transparent"
+              className="[&>div>div>svg]:!hidden [&>div>input]:!border-0 [&>div>input]:!focus:ring-0 [&>div>input]:!p-0 [&>div>input]:!pl-2 [&>div>input]:!pr-8 [&>div>input]:!py-2.5 [&>div>input]:text-sm [&>div>input]:sm:text-base [&>div>input]:text-gray-900 [&>div>input]:placeholder:text-gray-400 [&>div>input]:w-full [&>div>input]:bg-transparent"
             />
           </div>
         </div>
 
         {/* Property Type Dropdown */}
-        <div className="relative flex-1 flex items-center px-3 sm:px-4 md:px-6 py-3 sm:py-3.5 md:py-4 border-b sm:border-b-0 sm:border-r border-gray-200 dark:border-gray-700 min-w-0 z-10" ref={propertyTypeRef}>
+        <div className="relative flex-1 flex items-center px-4 sm:px-5 md:px-7 py-3.5 sm:py-4 md:py-5 border-b sm:border-b-0 sm:border-r border-gray-200 dark:border-gray-700 min-w-0 z-10" ref={propertyTypeRef}>
           <HomeIcon className="w-5 h-5 text-primary-600 dark:text-primary-400 flex-shrink-0 mr-2 sm:mr-3" />
           <button
             type="button"
@@ -181,7 +181,7 @@ export default function SearchBar() {
         </div>
 
         {/* Budget Dropdown */}
-        <div className="relative flex-1 flex items-center px-3 sm:px-4 md:px-6 py-3 sm:py-3.5 md:py-4 border-b sm:border-b-0 border-gray-200 dark:border-gray-700 min-w-0 z-10" ref={budgetRef}>
+        <div className="relative flex-1 flex items-center px-4 sm:px-5 md:px-7 py-3.5 sm:py-4 md:py-5 border-b sm:border-b-0 border-gray-200 dark:border-gray-700 min-w-0 z-10" ref={budgetRef}>
           <div className="flex-shrink-0 mr-2 sm:mr-3">
             <CurrencySelector compact={true} />
           </div>

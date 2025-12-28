@@ -1,0 +1,422 @@
+[
+  {
+    "_id": "1",
+    "assetId": "MG-1234567890-ABC123",
+    "title": "Spacious 3BHK Apartment in Prime Location",
+    "description": "Beautiful 3BHK apartment with modern amenities, located in the heart of the city. Close to metro station, schools, and shopping malls. Fully furnished with premium fixtures.",
+    "transactionType": "SELL",
+    "propertyCategory": "RESIDENTIAL",
+    "propertySubType": "Apartment / Flat",
+    "location": {
+      "country": "India",
+      "state": "Karnataka",
+      "city": "Bangalore",
+      "area": "Koramangala",
+      "locality": "5th Block",
+      "pincode": "560095",
+      "address": "123, Main Street, Koramangala 5th Block, Bangalore",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [77.6273, 12.9352]
+      }
+    },
+    "pricing": {
+      "expectedPrice": 8500000,
+      "currency": "INR",
+      "priceNegotiable": true,
+      "maintenanceCharges": 5000
+    },
+    "ownershipType": "FREEHOLD",
+    "possessionStatus": "READY",
+    "propertyAge": 5,
+    "residential": {
+      "bhk": 3,
+      "bathrooms": 2,
+      "balconies": 2,
+      "furnishing": "FULLY_FURNISHED",
+      "floor": 5,
+      "totalFloors": 10,
+      "parking": "COVERED"
+    },
+    "media": {
+      "images": [
+        "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800",
+        "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800",
+        "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800"
+      ]
+    },
+    "legal": {
+      "titleClear": true,
+      "encumbranceFree": true,
+      "litigationStatus": "NONE",
+      "reraNumber": "PRM/KA/RERA/1251/308/AG/171218/000123"
+    },
+    "assetDNA": {
+      "verificationScore": 85,
+      "geoVerified": true,
+      "legalRisk": "LOW",
+      "assetTrustScore": 90,
+      "priceVsLocalAverage": 5
+    },
+    "listedBy": {
+      "firstName": "Raj",
+      "lastName": "Kumar",
+      "role": "OWNER",
+      "trustScore": 75
+    },
+    "status": "APPROVED",
+    "isVerified": true,
+    "views": 245,
+    "saves": 18,
+    "inquiries": 12,
+    "createdAt": "2024-01-15T10:30:00Z"
+  },
+  {
+    "_id": "2",
+    "assetId": "MG-1234567891-DEF456",
+    "title": "Modern 2BHK Flat for Rent in Whitefield",
+    "description": "Well-maintained 2BHK flat available for rent. Semi-furnished with all modern amenities. Gated community with 24/7 security, swimming pool, gym, and clubhouse.",
+    "transactionType": "RENT",
+    "propertyCategory": "RESIDENTIAL",
+    "propertySubType": "Apartment / Flat",
+    "location": {
+      "country": "India",
+      "state": "Karnataka",
+      "city": "Bangalore",
+      "area": "Whitefield",
+      "locality": "ITPL Road",
+      "pincode": "560066",
+      "address": "456, Tech Park Road, Whitefield, Bangalore",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [77.7498, 12.9698]
+      }
+    },
+    "pricing": {
+      "rentAmount": 35000,
+      "currency": "INR",
+      "securityDeposit": 100000,
+      "maintenanceCharges": 4000,
+      "priceNegotiable": true
+    },
+    "ownershipType": "FREEHOLD",
+    "possessionStatus": "READY",
+    "propertyAge": 3,
+    "residential": {
+      "bhk": 2,
+      "bathrooms": 2,
+      "balconies": 1,
+      "furnishing": "SEMI_FURNISHED",
+      "floor": 8,
+      "totalFloors": 15,
+      "parking": "COVERED"
+    },
+    "media": {
+      "images": [
+        "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800",
+        "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800"
+      ]
+    },
+    "legal": {
+      "titleClear": true,
+      "encumbranceFree": true,
+      "litigationStatus": "NONE"
+    },
+    "assetDNA": {
+      "verificationScore": 78,
+      "geoVerified": true,
+      "legalRisk": "LOW",
+      "assetTrustScore": 82,
+      "priceVsLocalAverage": -2
+    },
+    "listedBy": {
+      "firstName": "Priya",
+      "lastName": "Sharma",
+      "role": "OWNER",
+      "trustScore": 80
+    },
+    "status": "APPROVED",
+    "isVerified": true,
+    "views": 189,
+    "saves": 25,
+    "inquiries": 8,
+    "createdAt": "2024-01-20T14:15:00Z"
+  },
+  {
+    "_id": "3",
+    "assetId": "MG-1234567892-GHI789",
+    "title": "Commercial Office Space in Business District",
+    "description": "Premium commercial office space available for lease. Ideal for IT companies, startups, or corporate offices. High-speed internet, power backup, and modern infrastructure.",
+    "transactionType": "LEASE",
+    "propertyCategory": "COMMERCIAL",
+    "propertySubType": "Office (IT)",
+    "location": {
+      "country": "India",
+      "state": "Karnataka",
+      "city": "Bangalore",
+      "area": "Electronic City",
+      "locality": "Phase 1",
+      "pincode": "560100",
+      "address": "789, IT Park, Electronic City Phase 1, Bangalore",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [77.6726, 12.8452]
+      }
+    },
+    "pricing": {
+      "leaseValue": 500000,
+      "currency": "INR",
+      "priceNegotiable": false
+    },
+    "ownershipType": "LEASEHOLD",
+    "possessionStatus": "READY",
+    "propertyAge": 8,
+    "commercial": {
+      "builtUpArea": 5000,
+      "carpetArea": 4200,
+      "powerLoad": 100,
+      "ceilingHeight": 12,
+      "dockAvailable": true,
+      "freightElevator": true
+    },
+    "media": {
+      "images": [
+        "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800",
+        "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=800"
+      ]
+    },
+    "legal": {
+      "titleClear": true,
+      "encumbranceFree": true,
+      "litigationStatus": "NONE"
+    },
+    "assetDNA": {
+      "verificationScore": 92,
+      "geoVerified": true,
+      "legalRisk": "LOW",
+      "assetTrustScore": 95,
+      "priceVsLocalAverage": 8
+    },
+    "listedBy": {
+      "firstName": "Amit",
+      "lastName": "Patel",
+      "role": "BROKER",
+      "trustScore": 88
+    },
+    "status": "APPROVED",
+    "isVerified": true,
+    "views": 312,
+    "saves": 45,
+    "inquiries": 22,
+    "createdAt": "2024-01-18T09:20:00Z"
+  },
+  {
+    "_id": "4",
+    "assetId": "MG-1234567893-JKL012",
+    "title": "Residential Plot in Upcoming Area",
+    "description": "Prime residential plot in developing area with excellent connectivity. Approved layout, clear title, and ready for construction. Near upcoming metro station.",
+    "transactionType": "SELL",
+    "propertyCategory": "LAND",
+    "propertySubType": "Residential Plot",
+    "location": {
+      "country": "India",
+      "state": "Karnataka",
+      "city": "Bangalore",
+      "area": "Hebbal",
+      "locality": "Near Metro Station",
+      "pincode": "560024",
+      "address": "Plot No. 234, Sector A, Hebbal, Bangalore",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [77.5983, 13.0350]
+      }
+    },
+    "pricing": {
+      "expectedPrice": 4500000,
+      "currency": "INR",
+      "priceNegotiable": true
+    },
+    "ownershipType": "FREEHOLD",
+    "possessionStatus": "READY",
+    "land": {
+      "plotArea": 2400,
+      "areaUnit": "SQFT",
+      "frontage": 40,
+      "depth": 60,
+      "roadAccessWidth": 30,
+      "zoningType": "Residential",
+      "waterAvailable": true,
+      "electricityAvailable": true,
+      "fsi": 2.5
+    },
+    "media": {
+      "images": [
+        "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800",
+        "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800"
+      ]
+    },
+    "legal": {
+      "titleClear": true,
+      "encumbranceFree": true,
+      "litigationStatus": "NONE",
+      "landUseCertificate": "Available"
+    },
+    "assetDNA": {
+      "verificationScore": 75,
+      "geoVerified": true,
+      "legalRisk": "MEDIUM",
+      "assetTrustScore": 78,
+      "priceVsLocalAverage": 12
+    },
+    "listedBy": {
+      "firstName": "Suresh",
+      "lastName": "Reddy",
+      "role": "OWNER",
+      "trustScore": 70
+    },
+    "status": "APPROVED",
+    "isVerified": true,
+    "views": 156,
+    "saves": 32,
+    "inquiries": 15,
+    "createdAt": "2024-01-22T11:45:00Z"
+  },
+  {
+    "_id": "5",
+    "assetId": "MG-1234567894-MNO345",
+    "title": "Luxury Villa with Private Garden",
+    "description": "Stunning 4BHK independent villa with private garden, swimming pool, and modern amenities. Located in gated community with 24/7 security.",
+    "transactionType": "SELL",
+    "propertyCategory": "RESIDENTIAL",
+    "propertySubType": "Independent House / Villa",
+    "location": {
+      "country": "India",
+      "state": "Karnataka",
+      "city": "Bangalore",
+      "area": "Indiranagar",
+      "locality": "100 Feet Road",
+      "pincode": "560038",
+      "address": "Villa No. 12, Palm Grove, Indiranagar, Bangalore",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [77.6408, 12.9784]
+      }
+    },
+    "pricing": {
+      "expectedPrice": 25000000,
+      "currency": "INR",
+      "priceNegotiable": false,
+      "maintenanceCharges": 15000
+    },
+    "ownershipType": "FREEHOLD",
+    "possessionStatus": "READY",
+    "propertyAge": 2,
+    "residential": {
+      "bhk": 4,
+      "bathrooms": 4,
+      "balconies": 3,
+      "furnishing": "FULLY_FURNISHED",
+      "parking": "COVERED"
+    },
+    "media": {
+      "images": [
+        "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=800",
+        "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800",
+        "https://images.unsplash.com/photo-1600585154340-be6161a56e6?w=800"
+      ]
+    },
+    "legal": {
+      "titleClear": true,
+      "encumbranceFree": true,
+      "litigationStatus": "NONE",
+      "reraNumber": "PRM/KA/RERA/1251/308/AG/171218/000456"
+    },
+    "assetDNA": {
+      "verificationScore": 95,
+      "geoVerified": true,
+      "legalRisk": "LOW",
+      "assetTrustScore": 98,
+      "priceVsLocalAverage": 3
+    },
+    "listedBy": {
+      "firstName": "Vikram",
+      "lastName": "Singh",
+      "role": "DEVELOPER",
+      "trustScore": 95
+    },
+    "status": "APPROVED",
+    "isVerified": true,
+    "views": 567,
+    "saves": 89,
+    "inquiries": 34,
+    "createdAt": "2024-01-10T08:00:00Z"
+  },
+  {
+    "_id": "6",
+    "assetId": "MG-1234567895-PQR678",
+    "title": "Warehouse Space for Lease",
+    "description": "Large warehouse space available for lease. Ideal for storage, logistics, or manufacturing. Dock levelers, high ceiling, and excellent connectivity.",
+    "transactionType": "LEASE",
+    "propertyCategory": "INDUSTRIAL",
+    "propertySubType": "Warehouse",
+    "location": {
+      "country": "India",
+      "state": "Karnataka",
+      "city": "Bangalore",
+      "area": "Peenya",
+      "locality": "Industrial Area",
+      "pincode": "560058",
+      "address": "Warehouse No. 45, Peenya Industrial Area, Bangalore",
+      "coordinates": {
+        "type": "Point",
+        "coordinates": [77.5118, 13.0249]
+      }
+    },
+    "pricing": {
+      "leaseValue": 300000,
+      "currency": "INR",
+      "priceNegotiable": true
+    },
+    "ownershipType": "FREEHOLD",
+    "possessionStatus": "READY",
+    "propertyAge": 12,
+    "commercial": {
+      "builtUpArea": 10000,
+      "ceilingHeight": 20,
+      "dockAvailable": true,
+      "freightElevator": true
+    },
+    "media": {
+      "images": [
+        "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800"
+      ]
+    },
+    "legal": {
+      "titleClear": true,
+      "encumbranceFree": true,
+      "litigationStatus": "NONE"
+    },
+    "assetDNA": {
+      "verificationScore": 70,
+      "geoVerified": true,
+      "legalRisk": "MEDIUM",
+      "assetTrustScore": 72,
+      "priceVsLocalAverage": -5
+    },
+    "listedBy": {
+      "firstName": "Ramesh",
+      "lastName": "Kumar",
+      "role": "BROKER",
+      "trustScore": 65
+    },
+    "status": "APPROVED",
+    "isVerified": true,
+    "views": 98,
+    "saves": 12,
+    "inquiries": 5,
+    "createdAt": "2024-01-25T16:30:00Z"
+  }
+]
+
+
+

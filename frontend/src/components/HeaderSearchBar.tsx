@@ -26,9 +26,9 @@ export default function HeaderSearchBar() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search properties..."
-          className="w-full px-4 py-2 pl-10 pr-12 sm:pr-20 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-transparent"
+          className="w-full px-5 py-2.5 pl-11 pr-14 sm:pr-24 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-transparent"
         />
-        <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
+        <MagnifyingGlassIcon className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
         <button
           type="submit"
           className="absolute right-2 top-1/2 transform -translate-y-1/2 px-2 sm:px-3 py-1 bg-primary-600 dark:bg-primary-500 text-white text-xs sm:text-sm rounded-md hover:bg-primary-700 dark:hover:bg-primary-600 font-medium"

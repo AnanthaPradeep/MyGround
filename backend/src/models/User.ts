@@ -120,8 +120,8 @@ UserSchema.methods.comparePassword = async function (candidatePassword: string):
 };
 
 // Indexes
-UserSchema.index({ email: 1 });
-UserSchema.index({ mobile: 1 });
+UserSchema.index({ email: 1 }, { unique: true });
+UserSchema.index({ mobile: 1 }, { unique: true, sparse: true }); // Sparse index allows multiple null values
 UserSchema.index({ role: 1 });
 
 export default mongoose.model<IUser>('User', UserSchema);

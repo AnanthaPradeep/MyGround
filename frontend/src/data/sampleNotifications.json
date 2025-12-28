@@ -1,0 +1,74 @@
+[
+  {
+    "id": "1",
+    "title": "Property Inquiry",
+    "message": "You have a new inquiry for your property in Mumbai. A potential buyer is interested in viewing the property.",
+    "type": "property",
+    "read": false,
+    "timestamp": "2024-01-15T10:30:00Z",
+    "link": "/properties/123"
+  },
+  {
+    "id": "2",
+    "title": "Property Approved",
+    "message": "Your property listing \"Luxury Apartment in Bandra\" has been approved and is now live on MyGround.",
+    "type": "success",
+    "read": false,
+    "timestamp": "2024-01-15T08:00:00Z",
+    "link": "/properties/456"
+  },
+  {
+    "id": "3",
+    "title": "New Message",
+    "message": "You have a new message from a potential buyer regarding your property listing.",
+    "type": "message",
+    "read": true,
+    "timestamp": "2024-01-14T10:30:00Z",
+    "link": "/messages"
+  },
+  {
+    "id": "4",
+    "title": "Price Update",
+    "message": "Similar properties in your area have updated prices. Consider reviewing your listing price.",
+    "type": "info",
+    "read": true,
+    "timestamp": "2024-01-13T10:30:00Z"
+  },
+  {
+    "id": "5",
+    "title": "Property View",
+    "message": "Your property has been viewed 25 times in the last 24 hours.",
+    "type": "info",
+    "read": false,
+    "timestamp": "2024-01-15T07:30:00Z",
+    "link": "/properties/789"
+  },
+  {
+    "id": "6",
+    "title": "Document Required",
+    "message": "Please upload the required documents for property verification.",
+    "type": "warning",
+    "read": true,
+    "timestamp": "2024-01-12T10:30:00Z",
+    "link": "/properties/456/edit"
+  },
+  {
+    "id": "7",
+    "title": "Payment Received",
+    "message": "Payment of ₹50,000 has been received for property listing.",
+    "type": "success",
+    "read": true,
+    "timestamp": "2024-01-10T10:30:00Z"
+  },
+  {
+    "id": "8",
+    "title": "Property Saved",
+    "message": "Your property has been saved by 10 users to their wishlist.",
+    "type": "info",
+    "read": false,
+    "timestamp": "2024-01-15T04:30:00Z",
+    "link": "/properties/123"
+  }
+]
+
+

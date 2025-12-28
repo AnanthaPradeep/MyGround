@@ -1,0 +1,88 @@
+[
+  {
+    "icon": "HomeIcon",
+    "title": "Buy a Home",
+    "description": "Find your dream home",
+    "link": "/properties?transactionType=SELL&propertyCategory=RESIDENTIAL",
+    "color": "from-blue-500 to-blue-600"
+  },
+  {
+    "icon": "KeyIcon",
+    "title": "Rent a Home",
+    "description": "Residential rentals",
+    "link": "/properties?transactionType=RENT&propertyCategory=RESIDENTIAL",
+    "color": "from-green-500 to-green-600"
+  },
+  {
+    "icon": "CurrencyDollarIcon",
+    "title": "Sell Property",
+    "description": "List your property for sale",
+    "link": "/properties?transactionType=SELL",
+    "color": "from-orange-500 to-orange-600"
+  },
+  {
+    "icon": "BriefcaseIcon",
+    "title": "Rent Commercial",
+    "description": "Office spaces & retail",
+    "link": "/properties?transactionType=RENT&propertyCategory=COMMERCIAL",
+    "color": "from-purple-500 to-purple-600"
+  },
+  {
+    "icon": "BuildingOfficeIcon",
+    "title": "Lease Commercial",
+    "description": "Long-term commercial leases",
+    "link": "/properties?transactionType=LEASE&propertyCategory=COMMERCIAL",
+    "color": "from-indigo-500 to-indigo-600"
+  },
+  {
+    "icon": "MapIcon",
+    "title": "Buy Land",
+    "description": "Residential & commercial plots",
+    "link": "/properties?transactionType=SELL&propertyCategory=LAND",
+    "color": "from-yellow-500 to-yellow-600"
+  },
+  {
+    "icon": "GlobeAltIcon",
+    "title": "Buy Island",
+    "description": "Private islands for sale",
+    "link": "/properties?transactionType=SELL&propertyCategory=ISLAND",
+    "color": "from-cyan-500 to-cyan-600"
+  },
+  {
+    "icon": "GlobeAltIcon",
+    "title": "Rent Island",
+    "description": "Island rentals & leases",
+    "link": "/properties?transactionType=RENT&propertyCategory=ISLAND",
+    "color": "from-teal-500 to-teal-600"
+  },
+  {
+    "icon": "Cog6ToothIcon",
+    "title": "Industrial Property",
+    "description": "Warehouses & factories",
+    "link": "/properties?propertyCategory=INDUSTRIAL",
+    "color": "from-gray-600 to-gray-700"
+  },
+  {
+    "icon": "MapIcon",
+    "title": "Agricultural Land",
+    "description": "Farmland & agricultural plots",
+    "link": "/properties?propertyCategory=AGRICULTURAL",
+    "color": "from-emerald-500 to-emerald-600"
+  },
+  {
+    "icon": "ShoppingBagIcon",
+    "title": "Buy Commercial",
+    "description": "Commercial properties for sale",
+    "link": "/properties?transactionType=SELL&propertyCategory=COMMERCIAL",
+    "color": "from-pink-500 to-pink-600"
+  },
+  {
+    "icon": "BuildingLibraryIcon",
+    "title": "Fractional Ownership",
+    "description": "Co-own premium properties",
+    "link": "/properties?transactionType=FRACTIONAL",
+    "color": "from-violet-500 to-violet-600"
+  }
+]
+
+

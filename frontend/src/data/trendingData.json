@@ -1,0 +1,199 @@
+{
+  "tabs": [
+    {
+      "id": "trending",
+      "label": "Trending Localities",
+      "count": 12
+    },
+    {
+      "id": "drops",
+      "label": "Price Drops",
+      "count": 8
+    },
+    {
+      "id": "verified",
+      "label": "Newly Verified",
+      "count": 15
+    },
+    {
+      "id": "yield",
+      "label": "High Yield",
+      "count": 10
+    }
+  ],
+  "trendingLocalities": [
+    {
+      "id": "1",
+      "name": "Bandra West",
+      "value": "₹2.5Cr",
+      "change": 12.5,
+      "changeType": "up",
+      "badge": "🔥 Hot",
+      "badgeText": "Hot",
+      "badgeIcon": "FireIcon"
+    },
+    {
+      "id": "2",
+      "name": "Powai",
+      "value": "₹1.8Cr",
+      "change": 8.3,
+      "changeType": "up",
+      "badge": "📈 Rising",
+      "badgeText": "Rising",
+      "badgeIcon": "ArrowTrendingUpIcon"
+    },
+    {
+      "id": "3",
+      "name": "Andheri East",
+      "value": "₹1.2Cr",
+      "change": 15.2,
+      "changeType": "up",
+      "badge": "🚀 Fast",
+      "badgeText": "Fast",
+      "badgeIcon": "BoltIcon"
+    },
+    {
+      "id": "4",
+      "name": "Worli",
+      "value": "₹4.2Cr",
+      "change": 6.7,
+      "changeType": "up",
+      "badge": "⭐ Premium",
+      "badgeText": "Premium",
+      "badgeIcon": "StarIcon"
+    }
+  ],
+  "priceDrops": [
+    {
+      "id": "1",
+      "name": "3BHK in Goregaon",
+      "value": "₹1.5Cr",
+      "change": -8.5,
+      "changeType": "down",
+      "badge": "💰 Save ₹12L",
+      "badgeText": "Save ₹12L",
+      "badgeIcon": "CurrencyDollarIcon"
+    },
+    {
+      "id": "2",
+      "name": "2BHK in Malad",
+      "value": "₹85L",
+      "change": -12.3,
+      "changeType": "down",
+      "badge": "💸 Save ₹10L",
+      "badgeText": "Save ₹10L",
+      "badgeIcon": "BanknotesIcon"
+    },
+    {
+      "id": "3",
+      "name": "4BHK in Thane",
+      "value": "₹2.1Cr",
+      "change": -5.2,
+      "changeType": "down",
+      "badge": "🎯 Save ₹11L",
+      "badgeText": "Save ₹11L",
+      "badgeIcon": "CursorArrowRaysIcon"
+    },
+    {
+      "id": "4",
+      "name": "Penthouse in Bandra",
+      "value": "₹5.8Cr",
+      "change": -15.8,
+      "changeType": "down",
+      "badge": "🏆 Save ₹1.1Cr",
+      "badgeText": "Save ₹1.1Cr",
+      "badgeIcon": "TrophyIcon"
+    }
+  ],
+  "newlyVerified": [
+    {
+      "id": "1",
+      "name": "MG Verified Villa",
+      "value": "95%",
+      "change": 0,
+      "changeType": "up",
+      "badge": "✅ Verified",
+      "badgeText": "Verified",
+      "badgeIcon": "CheckCircleIcon"
+    },
+    {
+      "id": "2",
+      "name": "DNA Complete",
+      "value": "98%",
+      "change": 0,
+      "changeType": "up",
+      "badge": "🧬 Complete",
+      "badgeText": "Complete",
+      "badgeIcon": "BeakerIcon"
+    },
+    {
+      "id": "3",
+      "name": "Legal Clear",
+      "value": "100%",
+      "change": 0,
+      "changeType": "up",
+      "badge": "⚖️ Clear",
+      "badgeText": "Clear",
+      "badgeIcon": "ScaleIcon"
+    },
+    {
+      "id": "4",
+      "name": "Geo-Verified",
+      "value": "97%",
+      "change": 0,
+      "changeType": "up",
+      "badge": "📍 Verified",
+      "badgeText": "Verified",
+      "badgeIcon": "MapPinIcon"
+    }
+  ],
+  "highYield": [
+    {
+      "id": "1",
+      "name": "Commercial Space",
+      "value": "8.5%",
+      "change": 2.3,
+      "changeType": "up",
+      "badge": "💼 ROI",
+      "badgeText": "ROI",
+      "badgeIcon": "BriefcaseIcon"
+    },
+    {
+      "id": "2",
+      "name": "Rental Property",
+      "value": "7.2%",
+      "change": 1.8,
+      "changeType": "up",
+      "badge": "🏠 Yield",
+      "badgeText": "Yield",
+      "badgeIcon": "HomeIcon"
+    },
+    {
+      "id": "3",
+      "name": "Warehouse",
+      "value": "9.1%",
+      "change": 3.1,
+      "changeType": "up",
+      "badge": "📦 High",
+      "badgeText": "High",
+      "badgeIcon": "CubeIcon"
+    },
+    {
+      "id": "4",
+      "name": "Retail Space",
+      "value": "6.8%",
+      "change": 1.2,
+      "changeType": "up",
+      "badge": "🛍️ Stable",
+      "badgeText": "Stable",
+      "badgeIcon": "ShoppingBagIcon"
+    }
+  ],
+  "descriptions": {
+    "trending": "AI-powered insights on top searched areas in major cities",
+    "drops": "Real-time price reductions with smart savings calculator",
+    "verified": "Properties with complete MG Asset DNA™ verification",
+    "yield": "High rental yield investment opportunities with ROI analysis"
+  }
+}
+
