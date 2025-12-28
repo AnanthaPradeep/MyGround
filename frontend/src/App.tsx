@@ -44,10 +44,7 @@ function App() {
           // Add a small delay to ensure UI is ready
           setTimeout(() => {
             if (!isLocationSet) {
-              console.log('📍 Location not set, showing modal')
               setShowLocationModal(true)
-            } else {
-              console.log('📍 Location already set:', isLocationSet)
             }
           }, 800) // Increased delay to ensure everything is loaded
         }, 500)
@@ -62,7 +59,6 @@ function App() {
     // Show location modal if location is not set
     setTimeout(() => {
       if (!isLocationSet) {
-        console.log('📍 Location not set after splash, showing modal')
         setShowLocationModal(true)
       }
     }, 800)

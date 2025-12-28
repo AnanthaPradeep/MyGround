@@ -24,15 +24,8 @@ export const sendOTPEmail = async (email: string, otp: string): Promise<boolean>
       },
     });
 
-    // If no SMTP credentials, log to console (for development)
+    // If no SMTP credentials, return true for development (no email sent)
     if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-      console.log('\n📧 ============================================');
-      console.log('📧 OTP Email (Development Mode)');
-      console.log('📧 ============================================');
-      console.log(`📧 To: ${email}`);
-      console.log(`📧 OTP: ${otp}`);
-      console.log('📧 ⚠️  Configure SMTP credentials in .env to send real emails');
-      console.log('📧 ============================================\n');
       return true; // Return true for development
     }
 
@@ -55,7 +48,6 @@ export const sendOTPEmail = async (email: string, otp: string): Promise<boolean>
     };
 
     await transporter.sendMail(mailOptions);
-    console.log(`✅ OTP email sent to ${email}`);
     return true;
   } catch (error) {
     console.error('Error sending OTP email:', error);
@@ -72,15 +64,8 @@ export const sendOTPEmail = async (email: string, otp: string): Promise<boolean>
  */
 export const sendOTPSMS = async (mobile: string, otp: string): Promise<boolean> => {
   try {
-    // For development, log to console
+    // For development, return true (no SMS sent)
     if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) {
-      console.log('\n📱 ============================================');
-      console.log('📱 OTP SMS (Development Mode)');
-      console.log('📱 ============================================');
-      console.log(`📱 To: +91${mobile}`);
-      console.log(`📱 OTP: ${otp}`);
-      console.log('📱 ⚠️  Configure Twilio credentials in .env to send real SMS');
-      console.log('📱 ============================================\n');
       return true; // Return true for development
     }
 
@@ -99,7 +84,6 @@ export const sendOTPSMS = async (mobile: string, otp: string): Promise<boolean> 
         to: `+91${mobile}`, // Assuming Indian numbers
       });
 
-      console.log(`✅ OTP SMS sent to +91${mobile}`);
       return true;
     } catch (twilioError) {
       console.error('Twilio error:', twilioError);

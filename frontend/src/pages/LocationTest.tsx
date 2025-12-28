@@ -16,13 +16,11 @@ export default function LocationTest() {
   const [selectedLocation, setSelectedLocation] = useState<LocationSuggestion | null>(null)
 
   const handleMapChange = (lat: number, lng: number) => {
-    console.log('📍 TEST: Map location changed to', lat, lng)
     setTestLat(lat)
     setTestLng(lng)
   }
 
   const handleLocationSelect = (location: LocationSuggestion | null) => {
-    console.log('📍 TEST: Location selected', location)
     setSelectedLocation(location)
     if (location?.coordinates) {
       setTestLat(location.coordinates.lat)
@@ -131,7 +129,6 @@ export default function LocationTest() {
               </button>
               <button
                 onClick={() => {
-                  console.log('📍 Current test state:', { testLat, testLng, selectedLocation, userLocation })
                 }}
                 className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-medium"
               >

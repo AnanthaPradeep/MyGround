@@ -20,8 +20,6 @@ export const reverseGeocode = async (lat: number, lng: number): Promise<{
     
     const data = await response.json()
     
-    console.log('📍 Reverse geocoding response:', data.status, data.results?.length || 0, 'results')
-    
     if (data.status === 'OK' && data.results.length > 0) {
       const result = data.results[0]
       const addressComponents = result.address_components
@@ -98,8 +96,6 @@ export const reverseGeocode = async (lat: number, lng: number): Promise<{
       const finalArea = area || locality || city
       const finalLocality = locality || area || city
       
-      console.log('📍 Extracted address components:', {
-        area: finalArea,
         locality: finalLocality,
         city,
         state,

@@ -270,7 +270,6 @@ export default function HeaderIcons() {
         onClick={() => {
           // TODO: Navigate to wishlist or toggle
           setIsWishlistActive(!isWishlistActive)
-          console.log('Toggle wishlist')
         }}
       >
         {isWishlistActive ? (

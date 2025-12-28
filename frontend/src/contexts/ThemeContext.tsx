@@ -44,16 +44,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       root.classList.add(theme)
       // Save to localStorage
       localStorage.setItem('theme', theme)
-      
-      // Debug log (remove in production)
-      console.log('Theme changed to:', theme)
     }
   }, [theme])
 
   const toggleTheme = () => {
     setThemeState((prevTheme) => {
       const newTheme = prevTheme === 'light' ? 'dark' : 'light'
-      console.log('Theme toggle:', prevTheme, '->', newTheme)
       return newTheme
     })
   }

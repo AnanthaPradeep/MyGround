@@ -185,7 +185,6 @@ export default function Step2Location({ form }: Props) {
             latitude={latitude}
             longitude={longitude}
             onLocationChange={(lat, lng) => {
-              console.log('📍 Step2Location: Map location changed to', lat, lng) // Debug
               handleMapClick(lat, lng)
             }}
             height="400px"

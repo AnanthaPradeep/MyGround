@@ -117,7 +117,6 @@ export default function HeaderLocation() {
             coordinates: { lat, lng },
           }
           setSelectedLocation(location)
-          console.log('📍 Map location with address:', location)
         }
       } catch (error) {
         console.error('Error reverse geocoding:', error)
@@ -167,7 +166,6 @@ export default function HeaderLocation() {
           },
           displayName: finalLocation.displayName,
         }
-        console.log('📍 Confirming location:', newLocation)
         setLocation(newLocation)
         setIsOpen(false)
         setStep('select')
@@ -217,8 +215,6 @@ export default function HeaderLocation() {
           coordinates: { lat: latitude, lng: longitude },
         }
         setSelectedLocation(location)
-        console.log('📍 Current location with address:', location)
-        console.log('📍 Area name:', location.area, '| City:', location.city, '| Locality:', location.locality)
       } else {
         // Fallback if reverse geocoding fails - use coordinates as location name
         const defaultLocation: LocationSuggestion = {

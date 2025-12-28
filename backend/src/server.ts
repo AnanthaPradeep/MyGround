@@ -100,8 +100,7 @@ const startServer = async () => {
     await connectDatabase();
     
     app.listen(PORT, '0.0.0.0', () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
+      // Server started successfully
     });
   } catch (error) {
     console.error('Failed to start server:', error);

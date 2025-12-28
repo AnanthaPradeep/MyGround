@@ -44,7 +44,6 @@ export default function LocationSelectorModal({ onClose, isOpen }: LocationSelec
           setIsLoading(false)
         },
         (error) => {
-          console.log('Geolocation not available or denied:', error)
           setIsLoading(false)
           // Don't show error, just use default location
         },
@@ -94,7 +93,6 @@ export default function LocationSelectorModal({ onClose, isOpen }: LocationSelec
             coordinates: { lat, lng },
           }
           setSelectedLocation(location)
-          console.log('📍 Map location with address:', location)
         } else {
           // Fallback if reverse geocoding fails
           const location: LocationSuggestion = {
@@ -165,7 +163,6 @@ export default function LocationSelectorModal({ onClose, isOpen }: LocationSelec
         displayName: finalLocation?.displayName || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
       }
       
-      console.log('📍 Confirming location:', userLocation)
       setLocation(userLocation)
       onClose()
     } else {
@@ -220,8 +217,6 @@ export default function LocationSelectorModal({ onClose, isOpen }: LocationSelec
         }
         setSelectedLocation(location)
         setCanProceed(true)
-        console.log('📍 Current location with address:', location)
-        console.log('📍 Area name:', location.area, '| City:', location.city, '| Locality:', location.locality)
       } else {
         // Fallback if reverse geocoding fails - use coordinates
         const defaultLocation: LocationSuggestion = {
@@ -390,7 +385,6 @@ export default function LocationSelectorModal({ onClose, isOpen }: LocationSelec
                     latitude={latitude}
                     longitude={longitude}
                     onLocationChange={(lat, lng) => {
-                      console.log('📍 LocationSelectorModal: Map location changed to', lat, lng) // Debug
                       handleMapChange(lat, lng)
                     }}
                     height="100%"

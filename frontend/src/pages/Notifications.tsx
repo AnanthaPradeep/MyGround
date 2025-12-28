@@ -169,10 +169,8 @@ export default function Notifications() {
 
   const markAllAsRead = async () => {
     try {
-      console.log('Marking all notifications as read...')
       // Call API to mark all notifications as read
       const response = await api.put('/notifications/read-all')
-      console.log('Mark all as read response:', response.data)
       
       // Refetch notifications to get updated read status
       await refetchUserNotifications()
@@ -182,7 +180,6 @@ export default function Notifications() {
       // Trigger refetch in HeaderIcons component
       triggerRefetch()
       
-      console.log('Notifications refetched, count should be updated')
       toast.success('All notifications marked as read')
     } catch (error: any) {
       console.error('Error marking all as read:', error)

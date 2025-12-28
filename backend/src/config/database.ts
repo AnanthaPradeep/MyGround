@@ -16,16 +16,9 @@ export const connectDatabase = async (): Promise<void> => {
       console.warn('⚠️  WARNING: MONGODB_URI not set, using default localhost (development only)');
       console.warn('⚠️  For production on Render, you MUST set MONGODB_URI to a MongoDB Atlas connection string');
       console.warn('⚠️  Local MongoDB Compass will NOT work on Render - use MongoDB Atlas (cloud)');
-    } else {
-      console.log('📦 Using MongoDB URI from environment variable');
-      // Mask password in logs for security
-      const maskedUri = mongoUri.replace(/:([^:@]+)@/, ':****@');
-      console.log('📦 Connection string:', maskedUri);
     }
     
     await mongoose.connect(mongoUri);
-    
-    console.log('✅ MongoDB connected successfully');
     
     // Handle connection events
     mongoose.connection.on('error', (err) => {
@@ -33,7 +26,7 @@ export const connectDatabase = async (): Promise<void> => {
     });
     
     mongoose.connection.on('disconnected', () => {
-      console.log('⚠️ MongoDB disconnected');
+      // MongoDB disconnected
     });
     
   } catch (error) {

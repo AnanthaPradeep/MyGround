@@ -63,7 +63,6 @@ export default function LocationAutocomplete({
         autocompleteServiceRef.current = new window.google.maps.places.AutocompleteService()
         const div = document.createElement('div')
         placesServiceRef.current = new window.google.maps.places.PlacesService(div)
-        console.log('✅ Google Places API initialized')
       } catch (err) {
         console.error('❌ Error initializing Places API:', err)
       }
@@ -197,8 +196,6 @@ export default function LocationAutocomplete({
             coordinates,
           }
 
-          console.log('📍 Location selected:', updatedLocation) // Debug log
-
           setQuery(updatedLocation.displayName)
           setSelectedLocation(updatedLocation)
           setIsOpen(false)
@@ -218,8 +215,6 @@ export default function LocationAutocomplete({
   }
 
   const handleSelect = (location: LocationSuggestion) => {
-    console.log('📍 Location selected (fallback):', location) // Debug log
-    
     setQuery(location.displayName)
     setSelectedLocation(location)
     setIsOpen(false)

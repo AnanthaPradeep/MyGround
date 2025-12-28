@@ -62,19 +62,6 @@ export default function PropertyDetail() {
     const userId = String(user.id).trim()
     const isOwnerResult = listedById === userId
 
-    // Debug logging (remove in production)
-    if (import.meta.env.DEV) {
-      console.log('Ownership check:', {
-        listedById,
-        userId,
-        isOwner: isOwnerResult,
-        listedByType: typeof property.listedBy,
-        listedByValue: property.listedBy,
-        propertyId: property._id,
-        userObject: user
-      })
-    }
-
     return isOwnerResult
   }, [property, user, isAuthenticated, property?._id, property?.listedBy, user?.id])
 

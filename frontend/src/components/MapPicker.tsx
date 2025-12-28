@@ -130,8 +130,6 @@ export default function MapPicker({
       const lng = e.latLng.lng()
       const newPosition = { lat, lng }
       
-      console.log('📍 Map clicked at:', lat, lng) // Debug log
-      
       setPosition(newPosition)
       setError(null)
       
@@ -152,8 +150,6 @@ export default function MapPicker({
       const lat = e.latLng.lat()
       const lng = e.latLng.lng()
       const newPosition = { lat, lng }
-      
-      console.log('📍 Marker dragged to:', lat, lng) // Debug log
       
       setPosition(newPosition)
       setError(null)
