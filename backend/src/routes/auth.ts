@@ -1,4 +1,4 @@
-import express, { Router } from 'express';
+import express, { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import User from '../models/User';
 import { generateToken } from '../utils/jwt';
@@ -29,7 +29,7 @@ router.post(
       .isIn(['USER', 'OWNER', 'BROKER', 'DEVELOPER'])
       .withMessage('Invalid role'),
   ],
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -101,7 +101,7 @@ router.post(
     body('email').isEmail().withMessage('Please provide a valid email'),
     body('password').notEmpty().withMessage('Password is required'),
   ],
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -201,7 +201,7 @@ router.post(
     body('mobile').optional().matches(/^[0-9]{10}$/).withMessage('Mobile must be 10 digits'),
     body('email').optional().isEmail().withMessage('Please provide a valid email'),
   ],
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -267,7 +267,7 @@ router.post(
     body('email').optional().isEmail().withMessage('Please provide a valid email'),
     body('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits'),
   ],
-  async (req, res) => {
+  async (req: Request, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {

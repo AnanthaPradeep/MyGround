@@ -1,4 +1,4 @@
-import express, { Router } from 'express';
+import express, { Router, Response } from 'express';
 import { body } from 'express-validator';
 import Property from '../models/Property';
 import { authenticate, authorize, AuthRequest } from '../middleware/auth';
@@ -35,7 +35,7 @@ router.post(
       .isArray({ min: 3 })
       .withMessage('At least 3 images are required'),
   ],
-  async (req: AuthRequest, res) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       // Check validation errors
       const errors = validationResult(req);
@@ -118,7 +118,7 @@ router.post(
       // Ensure location.coordinates is properly formatted as GeoJSON Point (if provided)
       // Temporarily making coordinates optional
       if (cleanedData.location && cleanedData.location.coordinates) {
-        let coords: [number, number];
+        let coords: [number, number] | undefined;
         
         // Extract coordinates from different possible structures
         if (cleanedData.location.coordinates.coordinates && Array.isArray(cleanedData.location.coordinates.coordinates)) {
@@ -192,7 +192,7 @@ router.put(
   '/:id',
   authenticate,
   validatePropertyListing(),
-  async (req: AuthRequest, res) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
@@ -244,7 +244,7 @@ router.put(
 
       // Clean and format location coordinates if provided
       if (updateData.location && updateData.location.coordinates) {
-        let coords: [number, number];
+        let coords: [number, number] | undefined;
         
         // Extract coordinates from different possible structures
         if (updateData.location.coordinates.coordinates && Array.isArray(updateData.location.coordinates.coordinates)) {
@@ -312,7 +312,6 @@ router.put(
         success: true,
         property: {
           id: property._id,
-          _id: property._id,
           ...property.toObject(),
         },
       });
@@ -609,7 +608,7 @@ router.post(
   [
     body('reason').optional().isString().trim(),
   ],
-  async (req: AuthRequest, res) => {
+  async (req: AuthRequest, res: Response) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
