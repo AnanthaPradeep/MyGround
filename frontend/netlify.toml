@@ -10,10 +10,12 @@
 
 # Redirect rules for SPA (Single Page Application)
 # This ensures all routes work correctly with React Router
+# IMPORTANT: This must be the FIRST redirect rule
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+  force = false
 
 # Headers for security and performance
 [[headers]]
