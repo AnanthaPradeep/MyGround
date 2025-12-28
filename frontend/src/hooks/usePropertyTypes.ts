@@ -60,3 +60,4 @@ export const usePropertyTypes = (options: UsePropertyTypesOptions = {}) => {
   return { propertyTypes, loading, error, refetch: fetchPropertyTypes }
 }
 
+

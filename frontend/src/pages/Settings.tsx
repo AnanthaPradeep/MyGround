@@ -28,15 +28,15 @@ export default function Settings() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         {/* Navigation */}
-        <nav className="bg-white shadow-sm sticky top-0 z-50">
+        <nav className="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
             <div className="flex justify-between items-center h-14 sm:h-16">
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="lg:hidden p-2 text-gray-600 hover:text-gray-900"
+                className="lg:hidden p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100"
                 aria-label="Open menu"
               >
                 <Bars3Icon className="w-6 h-6" />
@@ -65,15 +65,15 @@ export default function Settings() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Settings</h1>
-            <p className="text-gray-600">Manage your account settings and preferences</p>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
+            <h1 className="text-3xl font-heading font-bold text-gray-900 dark:text-gray-100 mb-2">Settings</h1>
+            <p className="text-gray-600 dark:text-gray-400">Manage your account settings and preferences</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Sidebar */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-sm p-4">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
                 <nav className="space-y-2">
                   {[
                     { id: 'account', label: 'Account', icon: UserIcon },
@@ -103,17 +103,17 @@ export default function Settings() {
 
             {/* Content */}
             <div className="lg:col-span-3">
-              <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
                 {/* Account Settings */}
                 {activeTab === 'account' && (
                   <div className="space-y-6">
-                    <h2 className="text-xl font-semibold text-gray-900">Account Settings</h2>
+                    <h2 className="text-xl font-heading font-semibold text-gray-900 dark:text-gray-100">Account Settings</h2>
                     
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Language Preference
                       </label>
-                      <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500">
+                      <select className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                         <option>English</option>
                         <option>Hindi</option>
                         <option>Tamil</option>
@@ -125,7 +125,7 @@ export default function Settings() {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Currency
                       </label>
-                      <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500">
+                      <select className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                         <option>INR (₹)</option>
                         <option>USD ($)</option>
                         <option>EUR (€)</option>
@@ -136,7 +136,7 @@ export default function Settings() {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Time Zone
                       </label>
-                      <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500">
+                      <select className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                         <option>IST (UTC+5:30)</option>
                         <option>UTC</option>
                       </select>
@@ -147,7 +147,7 @@ export default function Settings() {
                 {/* Notifications */}
                 {activeTab === 'notifications' && (
                   <div className="space-y-6">
-                    <h2 className="text-xl font-semibold text-gray-900">Notification Preferences</h2>
+                    <h2 className="text-xl font-heading font-semibold text-gray-900 dark:text-gray-100">Notification Preferences</h2>
                     
                     {[
                       { label: 'Email Notifications', description: 'Receive updates via email' },
@@ -156,7 +156,7 @@ export default function Settings() {
                       { label: 'Inquiry Updates', description: 'Get notified when someone inquires about your property' },
                       { label: 'Price Drops', description: 'Get notified when prices drop for saved properties' },
                     ].map((item, index) => (
-                      <div key={index} className="flex items-center justify-between py-3 border-b border-gray-200">
+                      <div key={index} className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700">
                         <div>
                           <p className="font-medium text-gray-900">{item.label}</p>
                           <p className="text-sm text-gray-600">{item.description}</p>
@@ -173,13 +173,13 @@ export default function Settings() {
                 {/* Privacy */}
                 {activeTab === 'privacy' && (
                   <div className="space-y-6">
-                    <h2 className="text-xl font-semibold text-gray-900">Privacy Settings</h2>
+                    <h2 className="text-xl font-heading font-semibold text-gray-900 dark:text-gray-100">Privacy Settings</h2>
                     
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Profile Visibility
                       </label>
-                      <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500">
+                      <select className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                         <option>Public</option>
                         <option>Private</option>
                         <option>Only Verified Users</option>
@@ -190,7 +190,7 @@ export default function Settings() {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Show Contact Information
                       </label>
-                      <select className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500">
+                      <select className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                         <option>Show to All</option>
                         <option>Show to Verified Users Only</option>
                         <option>Hide</option>
@@ -213,7 +213,7 @@ export default function Settings() {
                 {/* Security */}
                 {activeTab === 'security' && (
                   <div className="space-y-6">
-                    <h2 className="text-xl font-semibold text-gray-900">Security Settings</h2>
+                    <h2 className="text-xl font-heading font-semibold text-gray-900 dark:text-gray-100">Security Settings</h2>
                     
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">

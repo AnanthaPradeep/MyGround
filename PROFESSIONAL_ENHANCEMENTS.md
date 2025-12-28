@@ -266,3 +266,4 @@
 7. Add keyboard shortcuts
 8. Improve accessibility labels
 
+

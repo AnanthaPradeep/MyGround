@@ -98,31 +98,31 @@ export default function TrendingSection() {
   const tabData = getDataForTab()
 
   return (
-    <section className="py-16 bg-gradient-to-b from-gray-50 via-white to-gray-50 relative overflow-hidden">
+    <section className="py-16 bg-gradient-to-b from-gray-50 dark:from-gray-900 via-white dark:via-gray-800 to-gray-50 dark:to-gray-900 relative overflow-hidden">
       {/* Animated Background Elements - Reduced opacity to prevent glowing */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 0 }}>
-        <div className="absolute top-20 left-10 w-72 h-72 bg-primary-100 rounded-full filter blur-3xl opacity-5"></div>
-        <div className="absolute top-40 right-10 w-72 h-72 bg-blue-100 rounded-full filter blur-3xl opacity-5"></div>
-        <div className="absolute -bottom-8 left-1/2 w-72 h-72 bg-purple-100 rounded-full filter blur-3xl opacity-5"></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary-100 dark:bg-primary-900/20 rounded-full filter blur-3xl opacity-5 dark:opacity-10"></div>
+        <div className="absolute top-40 right-10 w-72 h-72 bg-blue-100 dark:bg-blue-900/20 rounded-full filter blur-3xl opacity-5 dark:opacity-10"></div>
+        <div className="absolute -bottom-8 left-1/2 w-72 h-72 bg-purple-100 dark:bg-purple-900/20 rounded-full filter blur-3xl opacity-5 dark:opacity-10"></div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8">
           <div className="mb-4 sm:mb-0">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Trending & Insights</h2>
-            <p className="text-gray-600">{getDescription()}</p>
+            <h2 className="text-3xl font-heading font-bold text-gray-900 dark:text-gray-100 mb-2">Trending & Insights</h2>
+            <p className="text-gray-600 dark:text-gray-400">{getDescription()}</p>
           </div>
           <Link 
             to="/properties" 
-            className="text-primary-600 hover:text-primary-700 font-medium"
+            className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
           >
             View All →
           </Link>
         </div>
 
         {/* Futuristic Tabs */}
-        <div className="flex flex-wrap gap-2 bg-white/80 backdrop-blur-sm rounded-xl p-2 mb-8 shadow-lg border border-gray-100">
+        <div className="flex flex-wrap gap-2 sm:gap-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-2 sm:p-3 mb-8 shadow-lg dark:shadow-gray-900/50 border border-gray-100 dark:border-gray-700">
           {trendingTabs.map((tab) => {
             const Icon = tab.icon
             const isActive = activeTab === tab.id
@@ -130,18 +130,18 @@ export default function TrendingSection() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`group relative flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 ${
+                className={`group relative flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg text-sm font-medium transition-all duration-300 whitespace-nowrap ${
                   isActive
-                    ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg shadow-primary-200 scale-105'
-                    : 'text-gray-700 hover:bg-gray-50 hover:scale-102'
+                    ? 'bg-gradient-to-r from-primary-600 dark:from-primary-500 to-primary-700 dark:to-primary-600 text-white shadow-lg shadow-primary-200 dark:shadow-primary-900/50'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-primary-600'}`} />
-                <span>{tab.label}</span>
-                <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-primary-600 dark:text-primary-400'}`} />
+                <span className="flex-shrink-0">{tab.label}</span>
+                <span className={`px-2 py-0.5 rounded-full text-xs font-bold flex-shrink-0 ${
                   isActive 
                     ? 'bg-white/20 text-white' 
-                    : 'bg-primary-100 text-primary-700'
+                    : 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
                 }`}>
                   {tab.count}
                 </span>
@@ -158,16 +158,16 @@ export default function TrendingSection() {
           {tabData.map((item, index) => (
             <div
               key={item.id}
-              className="group relative bg-white/90 backdrop-blur-sm rounded-xl p-5 border border-gray-200 hover:border-primary-300 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
+              className="group relative bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-xl p-5 border border-gray-200 dark:border-gray-700 hover:border-primary-300 dark:hover:border-primary-600 shadow-md dark:shadow-gray-900/50 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden"
               style={{ animationDelay: `${index * 100}ms` }}
             >
               {/* Animated Background Gradient */}
-              <div className="absolute inset-0 bg-gradient-to-br from-primary-50/50 via-transparent to-blue-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-primary-50/50 dark:from-primary-900/20 via-transparent to-blue-50/50 dark:to-blue-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               
               {/* Badge */}
               {item.badge && (
                 <div className="absolute top-3 right-3">
-                  <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full shadow-sm">
+                  <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold bg-gradient-to-r from-primary-500 to-primary-600 dark:from-primary-400 dark:to-primary-500 text-white rounded-full shadow-sm">
                     {item.badgeIcon && badgeIconMap[item.badgeIcon] ? (
                       <>
                         {(() => {
@@ -187,10 +187,10 @@ export default function TrendingSection() {
               <div className="relative z-10">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-semibold text-gray-900 truncate mb-1">
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate mb-1">
                       {item.name}
                     </h3>
-                    <p className="text-2xl font-bold text-gray-900">
+                    <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                       {item.value}
                     </p>
                   </div>
@@ -199,7 +199,7 @@ export default function TrendingSection() {
                 {/* Change Indicator */}
                 {item.change !== 0 && (
                   <div className={`flex items-center gap-1 mt-3 ${
-                    item.changeType === 'up' ? 'text-green-600' : 'text-red-600'
+                    item.changeType === 'up' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
                   }`}>
                     {item.changeType === 'up' ? (
                       <ArrowTrendingUpIcon className="w-4 h-4" />
@@ -215,12 +215,12 @@ export default function TrendingSection() {
                 {/* Progress Bar for Verified/Yield */}
                 {(activeTab === 'verified' || activeTab === 'yield') && (
                   <div className="mt-3">
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                       <div 
                         className={`h-full rounded-full transition-all duration-1000 ${
                           activeTab === 'verified' 
-                            ? 'bg-gradient-to-r from-green-400 to-green-600' 
-                            : 'bg-gradient-to-r from-primary-400 to-primary-600'
+                            ? 'bg-gradient-to-r from-green-400 to-green-600 dark:from-green-500 dark:to-green-600' 
+                            : 'bg-gradient-to-r from-primary-400 to-primary-600 dark:from-primary-500 dark:to-primary-600'
                         }`}
                         style={{ width: `${parseFloat(String(item.value).replace('%', ''))}%` }}
                       ></div>
@@ -248,7 +248,7 @@ export default function TrendingSection() {
                 <BoltIcon className="w-6 h-6 text-yellow-300" />
               </div>
               <div className="flex-1">
-                <h3 className="text-xl font-bold mb-2 flex items-center gap-2">
+                <h3 className="text-xl font-heading font-bold mb-2 flex items-center gap-2">
                   <BoltIcon className="w-5 h-5 text-yellow-300" />
                   AI-Powered Market Insights
                 </h3>
@@ -285,7 +285,7 @@ export default function TrendingSection() {
         <div className="mt-6 text-center">
           <Link
             to={`/properties?filter=${activeTab}`}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-white border-2 border-primary-300 text-primary-700 font-semibold rounded-xl hover:bg-primary-50 hover:border-primary-400 transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white dark:bg-gray-800 border-2 border-primary-300 dark:border-primary-600 text-primary-700 dark:text-primary-300 font-semibold rounded-xl hover:bg-primary-50 dark:hover:bg-primary-900/30 hover:border-primary-400 dark:hover:border-primary-500 transition-all duration-300 shadow-md dark:shadow-gray-900/50 hover:shadow-lg transform hover:scale-105"
           >
             <MapPinIcon className="w-5 h-5" />
             <span>Explore {trendingTabs.find(t => t.id === activeTab)?.label}</span>

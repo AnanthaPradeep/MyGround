@@ -248,7 +248,7 @@ export default function LocationAutocomplete({
   return (
     <div ref={containerRef} className={`relative ${className}`}>
       <div className="relative">
-        <MapPinIcon className="absolute left-2.5 sm:left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
+        <MapPinIcon className="absolute left-2.5 sm:left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-gray-400 dark:text-gray-500" />
         <input
           ref={inputRef}
           type="text"
@@ -256,9 +256,9 @@ export default function LocationAutocomplete({
           onChange={handleInputChange}
           placeholder={placeholder}
           required={required}
-          className={`w-full pl-8 sm:pl-10 pr-8 sm:pr-10 py-2 text-sm sm:text-base text-gray-900 border ${
-            error ? 'border-red-300' : 'border-gray-300'
-          } rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500`}
+          className={`w-full pl-8 sm:pl-10 pr-8 sm:pr-10 py-2 text-sm sm:text-base bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 border ${
+            error ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
+          } rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400`}
           onFocus={() => {
             if (suggestions.length > 0) setIsOpen(true)
           }}
@@ -267,7 +267,7 @@ export default function LocationAutocomplete({
           <button
             type="button"
             onClick={handleClear}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
             aria-label="Clear location"
           >
             <XMarkIcon className="h-4 w-4" />
@@ -276,16 +276,16 @@ export default function LocationAutocomplete({
       </div>
 
       {error && (
-        <p className="mt-1 text-sm text-red-600">{error}</p>
+        <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error}</p>
       )}
 
       {loadError && (
-        <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p className="text-sm font-semibold text-yellow-800 mb-1">
+        <div className="mt-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+          <p className="text-sm font-semibold text-yellow-800 dark:text-yellow-300 mb-1">
             ⚠️ Google Places API Error
           </p>
           {loadError.message?.includes('BillingNotEnabled') || loadError.message?.includes('billing') ? (
-            <div className="text-xs text-yellow-700">
+            <div className="text-xs text-yellow-700 dark:text-yellow-400">
               <p className="mb-2">
                 <strong>Billing must be enabled</strong> for Google Maps to work. 
                 Google offers a <strong>$200/month free credit</strong> that covers most apps.
@@ -294,16 +294,16 @@ export default function LocationAutocomplete({
                 href="https://console.cloud.google.com/billing"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 underline font-medium"
+                className="text-blue-600 dark:text-blue-400 underline font-medium"
               >
                 Enable Billing →
               </a>
-              <p className="mt-2 text-gray-600">
+              <p className="mt-2 text-gray-600 dark:text-gray-400">
                 Using fallback locations until billing is enabled.
               </p>
             </div>
           ) : (
-            <p className="text-xs text-yellow-700">
+            <p className="text-xs text-yellow-700 dark:text-yellow-400">
               {loadError.message || 'Google Places API not loaded. Using fallback locations.'}
             </p>
           )}
@@ -312,7 +312,7 @@ export default function LocationAutocomplete({
 
       {/* Suggestions Dropdown */}
       {isOpen && suggestions.length > 0 && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-[200px] sm:max-h-60 overflow-y-auto scrollbar-hide">
+        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg dark:shadow-gray-900/50 max-h-[200px] sm:max-h-60 overflow-y-auto scrollbar-hide">
           {suggestions.map((location) => (
             <button
               key={location.id}
@@ -324,13 +324,13 @@ export default function LocationAutocomplete({
                   getPlaceDetails(location.id, location)
                 }
               }}
-              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0 text-sm sm:text-base"
+              className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-b border-gray-100 dark:border-gray-700 last:border-b-0 text-sm sm:text-base"
             >
               <div className="flex items-start gap-3">
-                <MapPinIcon className="h-5 w-5 text-primary-600 mt-0.5 flex-shrink-0" />
+                <MapPinIcon className="h-5 w-5 text-primary-600 dark:text-primary-400 mt-0.5 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-gray-900">{location.displayName}</p>
-                  <p className="text-sm text-gray-500">{location.state}, {location.country}</p>
+                  <p className="font-medium text-gray-900 dark:text-gray-100">{location.displayName}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{location.state}, {location.country}</p>
                 </div>
               </div>
             </button>
@@ -339,7 +339,7 @@ export default function LocationAutocomplete({
       )}
 
       {isOpen && query.trim().length > 0 && suggestions.length === 0 && (
-        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg p-4 text-center text-gray-500">
+        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg dark:shadow-gray-900/50 p-4 text-center text-gray-500 dark:text-gray-400">
           <p className="text-sm">No locations found. Try a different search term.</p>
         </div>
       )}

@@ -36,3 +36,4 @@ export const useLocationStore = create<LocationState>()(
   )
 )
 
+

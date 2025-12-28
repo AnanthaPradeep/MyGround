@@ -16,7 +16,7 @@ export function NotFoundPage() {
       <div className="max-w-md w-full text-center">
         <div className="mb-8">
           <div className="text-9xl font-bold text-primary-200">404</div>
-          <h1 className="text-3xl font-bold text-gray-900 mt-4 mb-2">Page Not Found</h1>
+          <h1 className="text-3xl font-heading font-bold text-gray-900 dark:text-gray-100 mt-4 mb-2">Page Not Found</h1>
           <p className="text-gray-600 mb-8">
             The page you're looking for doesn't exist or has been moved.
           </p>
@@ -57,7 +57,7 @@ export function ServerErrorPage() {
             </div>
           </div>
           <div className="text-9xl font-bold text-red-200">500</div>
-          <h1 className="text-3xl font-bold text-gray-900 mt-4 mb-2">Server Error</h1>
+          <h1 className="text-3xl font-heading font-bold text-gray-900 dark:text-gray-100 mt-4 mb-2">Server Error</h1>
           <p className="text-gray-600 mb-8">
             Something went wrong on our end. We're working to fix it.
           </p>
@@ -97,7 +97,7 @@ export function NetworkErrorPage() {
               <WifiIcon className="w-10 h-10 text-yellow-600" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mt-4 mb-2">No Internet Connection</h1>
+          <h1 className="text-3xl font-heading font-bold text-gray-900 dark:text-gray-100 mt-4 mb-2">No Internet Connection</h1>
           <p className="text-gray-600 mb-8">
             Please check your internet connection and try again.
           </p>
@@ -149,7 +149,7 @@ export function ErrorPage() {
               <ExclamationTriangleIcon className="w-10 h-10 text-red-600" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mt-4 mb-2">{errorTitle}</h1>
+          <h1 className="text-3xl font-heading font-bold text-gray-900 dark:text-gray-100 mt-4 mb-2">{errorTitle}</h1>
           <p className="text-gray-600 mb-8">{errorMessage}</p>
         </div>
 
@@ -173,4 +173,5 @@ export function ErrorPage() {
     </div>
   )
 }
+
 

@@ -58,3 +58,4 @@ body {
 - Compress images before adding
 - Follow naming conventions: `kebab-case` for file names
 
+

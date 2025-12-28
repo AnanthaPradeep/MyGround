@@ -10,3 +10,4 @@ export const useNotificationStore = create<NotificationStore>((set) => ({
   triggerRefetch: () => set({ lastUpdate: Date.now() }),
 }))
 
+

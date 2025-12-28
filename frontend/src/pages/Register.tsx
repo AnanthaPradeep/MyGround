@@ -113,7 +113,7 @@ export default function Register() {
           <div className="flex justify-center mb-4">
             <Logo showText={true} size="lg" />
           </div>
-          <h2 className="text-2xl font-semibold text-gray-900">Create Your Account</h2>
+          <h2 className="text-2xl font-heading font-semibold text-gray-900 dark:text-gray-100">Create Your Account</h2>
           <p className="mt-2 text-sm text-gray-600">
             Join thousands of property owners and buyers
           </p>

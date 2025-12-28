@@ -43,3 +43,4 @@ export const usePopularLocations = (options: UsePopularLocationsOptions = {}) =>
   return { popularLocations, loading, error, refetch: fetchPopularLocations }
 }
 
+

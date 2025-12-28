@@ -153,3 +153,4 @@ import { formatPrice, formatDate } from '../utils/formatters'
 5. **Scalability** - Easy to extend with new types/constants
 
 
+

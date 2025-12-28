@@ -46,7 +46,7 @@ export default function Logo({
       />
       {showText && (
         <div className="flex items-center">
-          <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-primary-600">MyGround</h1>
+          <h1 className="text-lg sm:text-xl lg:text-2xl font-heading font-bold text-primary-600 dark:text-primary-400">MyGround</h1>
         </div>
       )}
     </Link>

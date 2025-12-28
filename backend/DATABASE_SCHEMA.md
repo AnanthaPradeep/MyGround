@@ -108,3 +108,4 @@ The application uses MongoDB with Mongoose ODM for property data storage.
 - Geo-spatial queries are supported via MongoDB 2dsphere index
 - Full-text search is available on title and description fields
 
+

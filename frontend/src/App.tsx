@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast'
 import { useEffect, useState } from 'react'
 import { useAuthStore } from './store/authStore'
 import { useLocationStore } from './store/locationStore'
+import { ThemeProvider } from './contexts/ThemeContext'
 import SplashScreen from './components/SplashScreen'
 import LocationSelectorModal from './components/LocationSelectorModal'
 import { ErrorBoundary } from './components/ErrorBoundary'
@@ -72,12 +73,13 @@ function App() {
   }
 
   return (
-    <ErrorBoundary>
-      <Router>
-        {isLoading && <SplashScreen onComplete={handleSplashComplete} minDisplayTime={1500} />}
-        <OfflineIndicator />
-        <LocationSelectorModal isOpen={showLocationModal} onClose={handleLocationModalClose} />
-        <div className={`min-h-screen bg-gray-50 ${isLoading ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}>
+    <ThemeProvider>
+      <ErrorBoundary>
+        <Router>
+          {isLoading && <SplashScreen onComplete={handleSplashComplete} minDisplayTime={1500} />}
+          <OfflineIndicator />
+          <LocationSelectorModal isOpen={showLocationModal} onClose={handleLocationModalClose} />
+          <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${isLoading ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
@@ -135,11 +137,18 @@ function App() {
             <Route path="/location-test" element={<LocationTest />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
-          <Toaster position="top-right" />
+          <Toaster 
+            position="top-right"
+            toastOptions={{
+              className: 'dark:bg-gray-800 dark:text-gray-100 dark:border-gray-700',
+              style: {},
+            }}
+          />
           <ChatWidget />
-        </div>
-      </Router>
-    </ErrorBoundary>
+          </div>
+        </Router>
+      </ErrorBoundary>
+    </ThemeProvider>
   )
 }
 

@@ -116,10 +116,10 @@ export default function SearchBar() {
 
   return (
     <form onSubmit={handleSearch} className="w-full max-w-5xl mx-auto px-2 sm:px-0 relative z-10" style={{ overflow: 'visible' }}>
-      <div className="bg-white rounded-2xl sm:rounded-full border border-gray-300 shadow-lg flex flex-col sm:flex-row items-stretch" style={{ overflow: 'visible' }}>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl sm:rounded-full border border-gray-300 dark:border-gray-700 shadow-lg dark:shadow-gray-900/50 flex flex-col sm:flex-row items-stretch" style={{ overflow: 'visible' }}>
         {/* Location Input */}
-        <div className="flex-1 flex items-center px-3 sm:px-4 md:px-6 py-3 sm:py-3.5 md:py-4 border-b sm:border-b-0 sm:border-r border-gray-200 min-w-0">
-          <MapPinIcon className="w-5 h-5 text-primary-600 flex-shrink-0 mr-2 sm:mr-3" />
+        <div className="flex-1 flex items-center px-3 sm:px-4 md:px-6 py-3 sm:py-3.5 md:py-4 border-b sm:border-b-0 sm:border-r border-gray-200 dark:border-gray-700 min-w-0">
+          <MapPinIcon className="w-5 h-5 text-primary-600 dark:text-primary-400 flex-shrink-0 mr-2 sm:mr-3" />
           <div className="flex-1 min-w-0 relative search-bar-location">
             <LocationAutocomplete
               value={selectedLocation?.displayName || ''}
@@ -131,8 +131,8 @@ export default function SearchBar() {
         </div>
 
         {/* Property Type Dropdown */}
-        <div className="relative flex-1 flex items-center px-3 sm:px-4 md:px-6 py-3 sm:py-3.5 md:py-4 border-b sm:border-b-0 sm:border-r border-gray-200 min-w-0 z-10" ref={propertyTypeRef}>
-          <HomeIcon className="w-5 h-5 text-primary-600 flex-shrink-0 mr-2 sm:mr-3" />
+        <div className="relative flex-1 flex items-center px-3 sm:px-4 md:px-6 py-3 sm:py-3.5 md:py-4 border-b sm:border-b-0 sm:border-r border-gray-200 dark:border-gray-700 min-w-0 z-10" ref={propertyTypeRef}>
+          <HomeIcon className="w-5 h-5 text-primary-600 dark:text-primary-400 flex-shrink-0 mr-2 sm:mr-3" />
           <button
             type="button"
             onClick={(e) => {
@@ -144,13 +144,13 @@ export default function SearchBar() {
             className="flex-1 text-left flex items-center justify-between min-w-0 h-full"
           >
             <span className={`text-sm sm:text-base truncate ${
-              selectedPropertyType ? 'text-gray-900' : 'text-gray-400'
+              selectedPropertyType ? 'text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-500'
             }`}>
               {selectedPropertyType 
                 ? propertyTypes.find(t => t.value === selectedPropertyType)?.label || 'Select Type'
                 : 'Select Property Type'}
             </span>
-            <ChevronDownIcon className={`w-4 h-4 text-gray-400 flex-shrink-0 ml-2 transition-transform ${
+            <ChevronDownIcon className={`w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0 ml-2 transition-transform ${
               isPropertyTypeOpen ? 'rotate-180' : ''
             }`} />
           </button>
@@ -158,7 +158,7 @@ export default function SearchBar() {
           {/* Property Type Dropdown Menu */}
           {isPropertyTypeOpen && (
             <div 
-              className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-xl z-[100] max-h-60 overflow-y-auto scrollbar-hide min-w-[200px]"
+              className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl dark:shadow-gray-900/50 z-[100] max-h-60 overflow-y-auto scrollbar-hide min-w-[200px]"
               onClick={(e) => e.stopPropagation()}
             >
               {propertyTypes.map((type, index) => (
@@ -169,8 +169,8 @@ export default function SearchBar() {
                     setSelectedPropertyType(type.value)
                     setIsPropertyTypeOpen(false)
                   }}
-                  className={`w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors text-sm sm:text-base border-b border-gray-100 last:border-b-0 ${
-                    selectedPropertyType === type.value ? 'bg-primary-50 text-primary-600 font-medium' : 'text-gray-700'
+                  className={`w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm sm:text-base border-b border-gray-100 dark:border-gray-700 last:border-b-0 ${
+                    selectedPropertyType === type.value ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 font-medium' : 'text-gray-700 dark:text-gray-300'
                   }`}
                 >
                   {type.label}
@@ -181,7 +181,7 @@ export default function SearchBar() {
         </div>
 
         {/* Budget Dropdown */}
-        <div className="relative flex-1 flex items-center px-3 sm:px-4 md:px-6 py-3 sm:py-3.5 md:py-4 border-b sm:border-b-0 border-gray-200 min-w-0 z-10" ref={budgetRef}>
+        <div className="relative flex-1 flex items-center px-3 sm:px-4 md:px-6 py-3 sm:py-3.5 md:py-4 border-b sm:border-b-0 border-gray-200 dark:border-gray-700 min-w-0 z-10" ref={budgetRef}>
           <div className="flex-shrink-0 mr-2 sm:mr-3">
             <CurrencySelector compact={true} />
           </div>
@@ -196,11 +196,11 @@ export default function SearchBar() {
             className="flex-1 text-left flex items-center justify-between min-w-0 h-full"
           >
             <span className={`text-sm sm:text-base truncate ${
-              minBudget || maxBudget ? 'text-gray-900' : 'text-gray-400'
+              minBudget || maxBudget ? 'text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-500'
             }`}>
               {formatBudgetDisplay()}
             </span>
-            <ChevronDownIcon className={`w-4 h-4 text-gray-400 flex-shrink-0 ml-2 transition-transform ${
+            <ChevronDownIcon className={`w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0 ml-2 transition-transform ${
               isBudgetOpen ? 'rotate-180' : ''
             }`} />
           </button>
@@ -208,13 +208,13 @@ export default function SearchBar() {
           {/* Budget Dropdown Menu */}
           {isBudgetOpen && (
             <div 
-              className="absolute top-full left-0 right-0 sm:left-auto sm:right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-xl z-[100] p-4 min-w-[280px] sm:min-w-[320px]"
+              className="absolute top-full left-0 right-0 sm:left-auto sm:right-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl dark:shadow-gray-900/50 z-[100] p-4 min-w-[280px] sm:min-w-[320px]"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-2">
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Min Budget ({selectedCurrency?.symbol || '₹'})
                     </label>
                     <input
@@ -222,11 +222,11 @@ export default function SearchBar() {
                       value={minBudget}
                       onChange={(e) => setMinBudget(e.target.value)}
                       placeholder="e.g., 5000000"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-2">
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Max Budget ({selectedCurrency?.symbol || '₹'})
                     </label>
                     <input
@@ -234,15 +234,15 @@ export default function SearchBar() {
                       value={maxBudget}
                       onChange={(e) => setMaxBudget(e.target.value)}
                       placeholder="e.g., 10000000"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                     />
                   </div>
                 </div>
-                <div className="pt-2 border-t border-gray-200">
-                  <p className="text-xs font-medium text-gray-700 mb-2">Quick Select:</p>
+                <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
+                  <p className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Quick Select:</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {loadingBudgetRanges ? (
-                      <div className="col-span-full text-center text-xs text-gray-500 py-2">Loading ranges...</div>
+                      <div className="col-span-full text-center text-xs text-gray-500 dark:text-gray-400 py-2">Loading ranges...</div>
                     ) : (
                       budgetRanges.map((range, index) => {
                         // Replace currency symbol in label if it exists
@@ -259,7 +259,7 @@ export default function SearchBar() {
                               if (range.max) setMaxBudget(range.max.toString())
                               else setMaxBudget('')
                             }}
-                            className="px-3 py-2 text-xs text-left bg-primary-50 border border-primary-200 text-primary-700 rounded-lg hover:bg-primary-100 hover:border-primary-300 hover:text-primary-800 transition-colors whitespace-nowrap font-medium"
+                            className="px-3 py-2 text-xs text-left bg-primary-50 dark:bg-primary-900/30 border border-primary-200 dark:border-primary-800 text-primary-700 dark:text-primary-300 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/50 hover:border-primary-300 dark:hover:border-primary-700 hover:text-primary-800 dark:hover:text-primary-200 transition-colors whitespace-nowrap font-medium"
                           >
                             {displayLabel}
                           </button>
@@ -275,14 +275,14 @@ export default function SearchBar() {
                       setMinBudget('')
                       setMaxBudget('')
                     }}
-                    className="flex-1 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex-1 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   >
                     Clear
                   </button>
                   <button
                     type="button"
                     onClick={() => setIsBudgetOpen(false)}
-                    className="flex-1 px-3 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                    className="flex-1 px-3 py-2 text-sm bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors"
                   >
                     Apply
                   </button>
@@ -296,7 +296,7 @@ export default function SearchBar() {
         <div className="flex items-center rounded-b-2xl sm:rounded-r-full sm:rounded-l-none overflow-hidden flex-shrink-0">
           <button
             type="submit"
-            className="bg-primary-600 hover:bg-primary-700 text-white px-4 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 flex items-center justify-center gap-2 font-semibold text-sm sm:text-base transition-colors whitespace-nowrap min-w-[100px] sm:min-w-[120px] w-full"
+            className="bg-primary-600 dark:bg-primary-500 hover:bg-primary-700 dark:hover:bg-primary-600 text-white px-4 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 flex items-center justify-center gap-2 font-semibold text-sm sm:text-base transition-colors whitespace-nowrap min-w-[100px] sm:min-w-[120px] w-full"
           >
             <MagnifyingGlassIcon className="w-5 h-5 flex-shrink-0" />
             <span className="hidden sm:inline">Search</span>

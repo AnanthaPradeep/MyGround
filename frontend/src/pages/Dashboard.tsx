@@ -71,15 +71,15 @@ export default function Dashboard() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         {/* Navigation */}
-        <nav className="bg-white shadow-sm sticky top-0 z-50">
+        <nav className="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
             <div className="flex justify-between items-center h-14 sm:h-16">
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="lg:hidden p-2 text-gray-600 hover:text-gray-900"
+                className="lg:hidden p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100"
                 aria-label="Open menu"
               >
                 <Bars3Icon className="w-6 h-6" />
@@ -108,44 +108,44 @@ export default function Dashboard() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
+            <h1 className="text-3xl font-heading font-bold text-gray-900 dark:text-gray-100 mb-2">
               Welcome back, {user?.firstName}!
             </h1>
-            <p className="text-gray-600">Manage your properties, saved searches, and profile</p>
+            <p className="text-gray-600 dark:text-gray-400">Manage your properties, saved searches, and profile</p>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="text-3xl font-bold text-primary-600 mb-2">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+              <div className="text-3xl font-bold text-primary-600 dark:text-primary-400 mb-2">
                 {properties.length}
               </div>
-              <div className="text-gray-600">Total Properties</div>
+              <div className="text-gray-600 dark:text-gray-400">Total Properties</div>
             </div>
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="text-3xl font-bold text-green-600 mb-2">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+              <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-2">
                 {properties.filter(p => p.status === 'APPROVED').length}
               </div>
-              <div className="text-gray-600">Active Listings</div>
+              <div className="text-gray-600 dark:text-gray-400">Active Listings</div>
             </div>
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="text-3xl font-bold text-blue-600 mb-2">
-                {properties.reduce((sum, p) => sum + p.views, 0)}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+              <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+                {properties.reduce((sum, p) => sum + (p.views || 0), 0)}
               </div>
-              <div className="text-gray-600">Total Views</div>
+              <div className="text-gray-600 dark:text-gray-400">Total Views</div>
             </div>
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="text-3xl font-bold text-purple-600 mb-2">
-                {properties.reduce((sum, p) => sum + p.inquiries, 0)}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+              <div className="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2">
+                {properties.reduce((sum, p) => sum + (p.inquiries || 0), 0)}
               </div>
-              <div className="text-gray-600">Total Inquiries</div>
+              <div className="text-gray-600 dark:text-gray-400">Total Inquiries</div>
             </div>
           </div>
 
           {/* Tabs */}
-          <div className="bg-white rounded-lg shadow-sm mb-6">
-            <div className="border-b border-gray-200">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-6">
+            <div className="border-b border-gray-200 dark:border-gray-700">
               <nav className="flex -mb-px">
                 {[
                   { id: 'properties', label: 'My Properties', icon: HomeIcon },
@@ -159,8 +159,8 @@ export default function Dashboard() {
                       onClick={() => setActiveTab(tab.id as any)}
                       className={`px-6 py-4 text-sm font-medium border-b-2 flex items-center ${
                         activeTab === tab.id
-                          ? 'border-primary-600 text-primary-600'
-                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                          ? 'border-primary-600 dark:border-primary-400 text-primary-600 dark:text-primary-400'
+                          : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                       }`}
                     >
                       <Icon className="w-5 h-5 mr-2" />
@@ -176,23 +176,23 @@ export default function Dashboard() {
               {activeTab === 'properties' && (
                 <div>
                   <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold text-gray-900">My Properties</h2>
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">My Properties</h2>
                     <Link
                       to="/properties/create"
-                      className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                      className="px-4 py-2 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600"
                     >
                       + Add New Property
                     </Link>
                   </div>
 
                   {loading ? (
-                    <div className="text-center py-12">Loading...</div>
+                    <div className="text-center py-12 text-gray-600 dark:text-gray-400">Loading...</div>
                   ) : properties.length === 0 ? (
                     <div className="text-center py-12">
-                      <p className="text-gray-600 mb-4">You haven't listed any properties yet</p>
+                      <p className="text-gray-600 dark:text-gray-400 mb-4">You haven't listed any properties yet</p>
                       <Link
                         to="/properties/create"
-                        className="inline-block px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                        className="inline-block px-6 py-3 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600"
                       >
                         List Your First Property
                       </Link>
@@ -202,17 +202,17 @@ export default function Dashboard() {
                       {properties.map((property) => (
                         <div
                           key={property._id}
-                          className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                          className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md dark:hover:shadow-gray-900/50 transition-shadow bg-white dark:bg-gray-700/50"
                         >
                           <div className="flex justify-between items-start">
                             <div className="flex-1">
                               <Link
                                 to={`/properties/${property._id}`}
-                                className="text-lg font-semibold text-gray-900 hover:text-primary-600"
+                                className="text-lg font-semibold text-gray-900 dark:text-gray-100 hover:text-primary-600 dark:hover:text-primary-400"
                               >
                                 {property.title}
                               </Link>
-                              <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600">
+                              <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600 dark:text-gray-400">
                                 <span className="flex items-center space-x-1">
                                   <EyeIcon className="w-4 h-4" />
                                   <span>{property.views} views</span>
@@ -231,21 +231,21 @@ export default function Dashboard() {
                               <span
                                 className={`px-3 py-1 rounded-full text-xs font-medium ${
                                   property.status === 'APPROVED'
-                                    ? 'bg-green-100 text-green-700'
+                                    ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
                                     : property.status === 'PENDING'
-                                    ? 'bg-yellow-100 text-yellow-700'
+                                    ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
                                     : property.status === 'DRAFT'
-                                    ? 'bg-gray-100 text-gray-700'
+                                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                                     : property.status === 'PAUSED'
-                                    ? 'bg-orange-100 text-orange-700'
-                                    : 'bg-red-100 text-red-700'
+                                    ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400'
+                                    : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
                                 }`}
                               >
                                 {property.status}
                               </span>
                               <Link
                                 to={`/properties/${property._id}`}
-                                className="px-3 py-1 text-sm text-primary-600 hover:text-primary-700"
+                                className="px-3 py-1 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
                               >
                                 View
                               </Link>
@@ -253,7 +253,7 @@ export default function Dashboard() {
                                 <button
                                   onClick={() => handleResume(property._id)}
                                   disabled={pausingId === property._id}
-                                  className="px-3 py-1 text-sm text-green-600 hover:text-green-700 disabled:opacity-50 flex items-center gap-1"
+                                  className="px-3 py-1 text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 disabled:opacity-50 flex items-center gap-1"
                                   title="Resume property (make it public)"
                                 >
                                   <PlayIcon className="w-4 h-4" />
@@ -263,7 +263,7 @@ export default function Dashboard() {
                                 <button
                                   onClick={() => handlePause(property._id)}
                                   disabled={pausingId === property._id}
-                                  className="px-3 py-1 text-sm text-orange-600 hover:text-orange-700 disabled:opacity-50 flex items-center gap-1"
+                                  className="px-3 py-1 text-sm text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 disabled:opacity-50 flex items-center gap-1"
                                   title="Pause property (make it private)"
                                 >
                                   <PauseIcon className="w-4 h-4" />
@@ -273,7 +273,7 @@ export default function Dashboard() {
                               <button
                                 onClick={() => handleDelete(property._id, property.title)}
                                 disabled={deletingId === property._id}
-                                className="px-3 py-1 text-sm text-red-600 hover:text-red-700 disabled:opacity-50 flex items-center gap-1"
+                                className="px-3 py-1 text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 disabled:opacity-50 flex items-center gap-1"
                                 title="Delete property permanently"
                               >
                                 <TrashIcon className="w-4 h-4" />
@@ -290,12 +290,12 @@ export default function Dashboard() {
 
               {activeTab === 'saved' && (
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Saved Searches</h2>
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Saved Searches</h2>
                   <div className="text-center py-12">
-                    <p className="text-gray-600 mb-4">No saved searches yet</p>
+                    <p className="text-gray-600 dark:text-gray-400 mb-4">No saved searches yet</p>
                     <Link
                       to="/properties"
-                      className="inline-block px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                      className="inline-block px-6 py-3 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600"
                     >
                       Browse Properties
                     </Link>
@@ -305,20 +305,20 @@ export default function Dashboard() {
 
               {activeTab === 'profile' && (
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Profile Settings</h2>
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Profile Settings</h2>
                   <div className="space-y-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         First Name
                       </label>
                       <input
                         type="text"
                         defaultValue={user?.firstName}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500"
+                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         Last Name
                       </label>
                       <input

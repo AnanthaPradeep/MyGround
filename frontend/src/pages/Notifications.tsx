@@ -215,15 +215,15 @@ export default function Notifications() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         {/* Navigation */}
-        <nav className="bg-white shadow-sm sticky top-0 z-50">
+        <nav className="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
             <div className="flex justify-between items-center h-14 sm:h-16">
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="lg:hidden p-2 text-gray-600 hover:text-gray-900"
+                className="lg:hidden p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100"
                 aria-label="Open menu"
               >
                 <Bars3Icon className="w-6 h-6" />
@@ -252,11 +252,11 @@ export default function Notifications() {
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Notifications</h1>
-                <p className="text-gray-600">
+                <h1 className="text-3xl font-heading font-bold text-gray-900 dark:text-gray-100 mb-2">Notifications</h1>
+                <p className="text-gray-600 dark:text-gray-400">
                   {unreadCount > 0 ? `${unreadCount} unread notification${unreadCount > 1 ? 's' : ''}` : 'All caught up!'}
                 </p>
               </div>
@@ -265,8 +265,8 @@ export default function Notifications() {
                 disabled={unreadCount === 0}
                 className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-2 ${
                   unreadCount > 0
-                    ? 'text-primary-600 hover:bg-primary-50'
-                    : 'text-gray-400 cursor-not-allowed opacity-50'
+                    ? 'text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30'
+                    : 'text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-50'
                 }`}
               >
                 <CheckIcon className="w-4 h-4" />
@@ -275,13 +275,13 @@ export default function Notifications() {
             </div>
 
             {/* Filter Tabs */}
-            <div className="flex gap-2 border-b border-gray-200">
+            <div className="flex gap-2 border-b border-gray-200 dark:border-gray-700">
               <button
                 onClick={() => setFilter('all')}
                 className={`px-4 py-2 text-sm font-medium transition-colors ${
                   filter === 'all'
-                    ? 'text-primary-600 border-b-2 border-primary-600'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'text-primary-600 dark:text-primary-400 border-b-2 border-primary-600 dark:border-primary-400'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                 }`}
               >
                 All ({allNotifications.length})
@@ -290,8 +290,8 @@ export default function Notifications() {
                 onClick={() => setFilter('unread')}
                 className={`px-4 py-2 text-sm font-medium transition-colors ${
                   filter === 'unread'
-                    ? 'text-primary-600 border-b-2 border-primary-600'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'text-primary-600 dark:text-primary-400 border-b-2 border-primary-600 dark:border-primary-400'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                 }`}
               >
                 My Notifications ({unreadCount})
@@ -300,8 +300,8 @@ export default function Notifications() {
                 onClick={() => setFilter('public')}
                 className={`px-4 py-2 text-sm font-medium transition-colors flex items-center gap-1 ${
                   filter === 'public'
-                    ? 'text-primary-600 border-b-2 border-primary-600'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'text-primary-600 dark:text-primary-400 border-b-2 border-primary-600 dark:border-primary-400'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
                 }`}
               >
                 <GlobeAltIcon className="w-4 h-4" />
@@ -315,13 +315,13 @@ export default function Notifications() {
             {(loadingUser || loadingPublic) ? (
               <div className="text-center py-12">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-                <p className="mt-4 text-gray-600">Loading notifications...</p>
+                <p className="mt-4 text-gray-600 dark:text-gray-400">Loading notifications...</p>
               </div>
             ) : notifications.length === 0 ? (
-              <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-                <BellIcon className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No notifications</h3>
-                <p className="text-gray-600">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-12 text-center">
+                <BellIcon className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
+                <h3 className="text-lg font-heading font-semibold text-gray-900 dark:text-gray-100 mb-2">No notifications</h3>
+                <p className="text-gray-600 dark:text-gray-400">
                   {filter === 'unread' 
                     ? "You're all caught up! No unread notifications."
                     : "You don't have any notifications yet."}
@@ -334,11 +334,11 @@ export default function Notifications() {
                   <div
                     key={notification.id}
                     onClick={() => !isPublic && handleNotificationClick(notification)}
-                    className={`bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-all ${
+                    className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 hover:shadow-md dark:hover:shadow-gray-900/50 transition-all ${
                       !isPublic ? 'cursor-pointer' : 'cursor-default'
                     } ${
-                      !notification.read && !isPublic ? 'border-l-4 border-primary-600' : ''
-                    } ${isPublic ? 'border-l-4 border-blue-500' : ''}`}
+                      !notification.read && !isPublic ? 'border-l-4 border-primary-600 dark:border-primary-400' : ''
+                    } ${isPublic ? 'border-l-4 border-blue-500 dark:border-blue-400' : ''}`}
                   >
                     <div className="flex items-start gap-4">
                       <div className="flex-shrink-0">
@@ -352,7 +352,7 @@ export default function Notifications() {
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                              <h3 className={`text-base font-semibold ${!notification.read && !isPublic ? 'text-gray-900' : 'text-gray-700'}`}>
+                              <h3 className={`text-base font-heading font-semibold ${!notification.read && !isPublic ? 'text-gray-900 dark:text-gray-100' : 'text-gray-700 dark:text-gray-300'}`}>
                                 {notification.title}
                               </h3>
                               {!notification.read && !isPublic && (
@@ -364,7 +364,7 @@ export default function Notifications() {
                                 </span>
                               )}
                             </div>
-                            <p className="text-sm text-gray-600 mb-2">
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                               {notification.message}
                             </p>
                             <p className="text-xs text-gray-400">

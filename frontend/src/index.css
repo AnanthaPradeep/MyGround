@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Ensure html element respects theme */
+html {
+  color-scheme: light dark;
+}
+
+/* Default to light mode if no class is set */
+html:not(.dark):not(.light) {
+  color-scheme: light;
+}
+
 /* Hide scrollbar for Chrome, Safari and Opera */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
@@ -21,7 +31,7 @@
 .search-bar-location div input {
   padding-left: 0 !important;
   padding-right: 2rem !important;
-  color: #111827 !important; /* text-gray-900 */
+  /* Remove hardcoded color to allow dark mode */
 }
 
 /* Search bar button alignment */
@@ -59,32 +69,14 @@ form[class*="max-w-5xl"] button[type="submit"] {
   animation-delay: 0s;
 }
 
-/* Custom Fonts - Add your font files to src/assets/fonts/ and import here */
-/* Example:
-@font-face {
-  font-family: 'YourFont';
-  src: url('./assets/fonts/YourFont-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'YourFont';
-  src: url('./assets/fonts/YourFont-Bold.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-*/
-
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 code {

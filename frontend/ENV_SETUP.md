@@ -57,3 +57,4 @@ frontend/.env
 3. Restart your dev server
 4. Check browser console - you should NOT see the API key warning
 
+

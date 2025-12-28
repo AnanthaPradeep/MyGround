@@ -61,3 +61,4 @@ export const usePublicNotifications = (options: UsePublicNotificationsOptions = 
   return { notifications, loading, error, refetch: fetchNotifications }
 }
 
+

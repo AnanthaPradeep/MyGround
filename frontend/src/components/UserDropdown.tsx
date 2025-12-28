@@ -37,49 +37,49 @@ export default function UserDropdown() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+        className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
       >
-        <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center">
+        <div className="w-8 h-8 bg-primary-600 dark:bg-primary-500 rounded-full flex items-center justify-center">
           <span className="text-white text-sm font-semibold">
             {user?.firstName?.[0]}{user?.lastName?.[0]}
           </span>
         </div>
-        <span className="text-sm font-medium text-gray-700">{user?.firstName}</span>
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{user?.firstName}</span>
         <ChevronDownIcon
-          className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-4 h-4 text-gray-500 dark:text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
-          <div className="px-4 py-2 border-b border-gray-200">
-            <p className="text-sm font-semibold text-gray-900">{user?.firstName} {user?.lastName}</p>
-            <p className="text-xs text-gray-500">{user?.email}</p>
+        <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg dark:shadow-gray-900/50 border border-gray-200 dark:border-gray-700 py-1 z-50">
+          <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{user?.firstName} {user?.lastName}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{user?.email}</p>
           </div>
 
           <Link
             to="/profile"
             onClick={handleMenuItemClick}
-            className="flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+            className="flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
-            <UserIcon className="w-5 h-5 text-gray-500" />
+            <UserIcon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
             <span>Profile</span>
           </Link>
 
           <Link
             to="/settings"
             onClick={handleMenuItemClick}
-            className="flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+            className="flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
           >
-            <Cog6ToothIcon className="w-5 h-5 text-gray-500" />
+            <Cog6ToothIcon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
             <span>Settings</span>
           </Link>
 
-          <div className="border-t border-gray-200 my-1"></div>
+          <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
 
           <button
             onClick={handleLogout}
-            className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+            className="w-full flex items-center space-x-3 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
           >
             <ArrowRightOnRectangleIcon className="w-5 h-5" />
             <span>Logout</span>

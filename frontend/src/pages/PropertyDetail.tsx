@@ -150,22 +150,22 @@ export default function PropertyDetail() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600 mb-4">Property not found</p>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">Property not found</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Navigation */}
-      <nav className="bg-white shadow-sm sticky top-0 z-50">
+      <nav className="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
           <div className="flex justify-between items-center h-14 sm:h-16">
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className="lg:hidden p-2 text-gray-600 hover:text-gray-900"
+              className="lg:hidden p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100"
               aria-label="Open menu"
             >
               <Bars3Icon className="w-6 h-6" />
@@ -198,7 +198,7 @@ export default function PropertyDetail() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Image Gallery */}
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
               <div className="relative h-96 bg-gray-200">
                 {property.media.images && property.media.images.length > 0 ? (
                   <img
@@ -207,7 +207,7 @@ export default function PropertyDetail() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
                     <PhotoIcon className="w-24 h-24" />
                   </div>
                 )}
@@ -230,11 +230,11 @@ export default function PropertyDetail() {
             </div>
 
             {/* Title & Basic Info */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900 mb-2">{property.title}</h1>
-                  <p className="text-gray-600">
+                  <h1 className="text-3xl font-heading font-bold text-gray-900 dark:text-gray-100 mb-2">{property.title}</h1>
+                  <p className="text-gray-600 dark:text-gray-400">
                     {property.location.locality}, {property.location.area}, {property.location.city}
                   </p>
                 </div>
@@ -245,13 +245,13 @@ export default function PropertyDetail() {
                   {isSaved ? (
                     <HeartSolidIcon className="w-6 h-6 text-red-500" />
                   ) : (
-                    <HeartIcon className="w-6 h-6 text-gray-600" />
+                    <HeartIcon className="w-6 h-6 text-gray-600 dark:text-gray-400" />
                   )}
                 </button>
               </div>
 
               {/* Price */}
-              <div className="border-t border-b border-gray-200 py-4 my-4">
+              <div className="border-t border-b border-gray-200 dark:border-gray-700 py-4 my-4">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-3xl font-bold text-primary-600">
@@ -261,14 +261,14 @@ export default function PropertyDetail() {
                         ? formatPrice(property.pricing.rentAmount, property.pricing.currency)
                         : formatPrice(property.pricing.leaseValue, property.pricing.currency)}
                     </p>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                       {property.transactionType === 'RENT' ? 'Monthly Rent' : property.transactionType === 'LEASE' ? 'Lease Value' : 'Expected Price'}
                       {property.pricing.priceNegotiable && ' • Negotiable'}
                     </p>
                   </div>
                   {property.assetDNA && (
                     <div className="text-right">
-                      <div className="text-sm text-gray-600 mb-1">Verification Score</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Verification Score</div>
                       <div className="text-2xl font-bold text-primary-600">
                         {property.assetDNA.verificationScore}%
                       </div>
@@ -280,7 +280,7 @@ export default function PropertyDetail() {
               {/* MG Asset DNA */}
               {property.assetDNA && (
                 <div className="bg-gradient-to-r from-primary-50 to-blue-50 border border-primary-200 rounded-lg p-4 mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">MG Asset DNA™</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">MG Asset DNA™</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
                       <div className="text-xs text-gray-600 mb-1">Verification</div>
