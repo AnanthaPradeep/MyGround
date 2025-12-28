@@ -96,14 +96,6 @@ export const reverseGeocode = async (lat: number, lng: number): Promise<{
       const finalArea = area || locality || city
       const finalLocality = locality || area || city
       
-        locality: finalLocality,
-        city,
-        state,
-        country,
-        pincode: pincode || undefined,
-        formatted_address: result.formatted_address
-      })
-      
       return {
         address: result.formatted_address,
         city: city || addressComponents.find((c: any) => c.types.includes('administrative_area_level_2'))?.long_name || '',

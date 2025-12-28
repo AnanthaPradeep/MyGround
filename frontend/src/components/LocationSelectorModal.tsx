@@ -43,7 +43,7 @@ export default function LocationSelectorModal({ onClose, isOpen }: LocationSelec
           setLongitude(longitude)
           setIsLoading(false)
         },
-        (error) => {
+        (_error) => {
           setIsLoading(false)
           // Don't show error, just use default location
         },

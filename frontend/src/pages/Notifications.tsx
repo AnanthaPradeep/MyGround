@@ -170,7 +170,7 @@ export default function Notifications() {
   const markAllAsRead = async () => {
     try {
       // Call API to mark all notifications as read
-      const response = await api.put('/notifications/read-all')
+      await api.put('/notifications/read-all')
       
       // Refetch notifications to get updated read status
       await refetchUserNotifications()
