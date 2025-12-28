@@ -47,13 +47,17 @@ This guide will help you deploy your MyGround application to production.
    - **Build command:** `npm run build` (already configured in `netlify.toml`)
    - **Publish directory:** `dist` (already configured in `netlify.toml`)
 
-4. **Set Environment Variables:**
+4. **Set Environment Variables (CRITICAL - Required for API calls!):**
    - Go to Site settings → Environment variables
-   - Add the following variables:
+   - **⚠️ REQUIRED:** Add this variable:
      ```
-     VITE_API_URL=https://your-backend-url.com/api
+     VITE_API_URL=https://myground-1.onrender.com/api
      ```
-   - Replace `your-backend-url.com` with your actual backend URL (see Backend Deployment section)
+   - Your backend URL is: `https://myground-1.onrender.com`
+   - Always include `/api` at the end
+     ```
+   - **⚠️ Without this, frontend will try to call `http://localhost:5000` and fail with CORS errors!**
+   - **💡 Tip:** You can add this after backend deployment, then trigger a new frontend build
 
 5. **Deploy:**
    - Click "Deploy site"
@@ -120,7 +124,7 @@ Netlify is primarily for frontend hosting. Your backend needs to be deployed sep
      MONGODB_URI=your-mongodb-atlas-connection-string (REQUIRED!)
      JWT_SECRET=your-secure-jwt-secret-key
      JWT_EXPIRE=7d
-     CORS_ORIGIN=https://myground.in,https://www.myground.in
+     CORS_ORIGIN=https://myground.in,https://www.myground.in,http://localhost:5173,http://localhost:3000
      SMTP_HOST=smtp.gmail.com
      SMTP_PORT=587
      SMTP_USER=your-email@gmail.com
@@ -256,13 +260,13 @@ TTL: 3600
 Set these in Netlify → Site settings → Environment variables:
 
 ```env
-VITE_API_URL=https://your-backend-url.com/api
+VITE_API_URL=https://myground-1.onrender.com/api
 ```
 
 **Important:** 
-- Replace `your-backend-url.com` with your actual backend URL
-- Use `https://` (not `http://`)
-- Include `/api` at the end if your backend serves API at that path
+- Your backend URL is: `https://myground-1.onrender.com`
+- Use `https://` (not `http://`) - **Required for production!**
+- Always include `/api` at the end
 
 ### Backend Environment Variables
 

@@ -14,10 +14,40 @@ const app = express();
 const PORT = parseInt(process.env.PORT || '5000', 10);
 
 // CORS Configuration
+const getAllowedOrigins = (): string[] => {
+  if (process.env.CORS_ORIGIN) {
+    return process.env.CORS_ORIGIN.split(',').map(origin => origin.trim());
+  }
+  // Default for development - includes localhost and Render backend for testing
+  return [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://myground-1.onrender.com'
+  ];
+};
+
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN 
-    ? process.env.CORS_ORIGIN.split(',').map(origin => origin.trim())
-    : ['http://localhost:5173', 'http://localhost:3000'], // Default for development
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    // Allow requests with no origin (like mobile apps, Postman, or server-to-server)
+    if (!origin) {
+      return callback(null, true);
+    }
+    
+    const allowedOrigins = getAllowedOrigins();
+    
+    // In development, allow all origins
+    if (process.env.NODE_ENV !== 'production') {
+      return callback(null, true);
+    }
+    
+    // In production, check if origin is in allowed list
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.warn(`⚠️  CORS blocked origin: ${origin}. Allowed origins: ${allowedOrigins.join(', ')}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200
 };
