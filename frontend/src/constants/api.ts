@@ -34,8 +34,9 @@ const getApiBaseUrl = (): string => {
   const isProduction = import.meta.env.PROD || (typeof window !== 'undefined' && (window.location.hostname === 'myground.in' || window.location.hostname === 'www.myground.in'));
   
   if (isProduction) {
-    // Production: Use same domain for API
-    return 'https://myground.in/api';
+    // Production: Use Render backend URL
+    // Backend is deployed on Render at myground-1.onrender.com
+    return 'https://myground-1.onrender.com/api';
   }
   
   // Development: Use localhost

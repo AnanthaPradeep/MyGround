@@ -16,10 +16,9 @@ const getApiBaseUrl = (): string => {
     ));
   
   if (isProduction) {
-    // Production: Use myground.in/api (same domain)
-    // Note: You may need to set up api.myground.in subdomain or proxy
-    // For now, this will call Render backend directly with CORS
-    return 'https://myground.in/api';
+    // Production: Use Render backend URL
+    // Backend is deployed on Render at myground-1.onrender.com
+    return 'https://myground-1.onrender.com/api';
   }
   
   // Development: Use localhost
