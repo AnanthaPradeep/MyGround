@@ -1,6 +1,32 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// Automatically detect API URL based on environment
+const getApiBaseUrl = (): string => {
+  // If VITE_API_URL is explicitly set, use it (for custom configurations)
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  
+  // Check if we're in production (deployed on myground.in)
+  const isProduction = 
+    import.meta.env.PROD || 
+    (typeof window !== 'undefined' && (
+      window.location.hostname === 'myground.in' || 
+      window.location.hostname === 'www.myground.in'
+    ));
+  
+  if (isProduction) {
+    // Production: Use myground.in/api (same domain)
+    // Note: You may need to set up api.myground.in subdomain or proxy
+    // For now, this will call Render backend directly with CORS
+    return 'https://myground.in/api';
+  }
+  
+  // Development: Use localhost
+  return 'http://localhost:5000/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 const api = axios.create({
   baseURL: API_BASE_URL,

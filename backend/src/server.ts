@@ -18,11 +18,23 @@ const getAllowedOrigins = (): string[] => {
   if (process.env.CORS_ORIGIN) {
     return process.env.CORS_ORIGIN.split(',').map(origin => origin.trim());
   }
-  // Default for development - includes localhost and Render backend for testing
+  
+  // Production defaults - include myground.in domain
+  if (process.env.NODE_ENV === 'production') {
+    return [
+      'https://myground.in',
+      'https://www.myground.in',
+      'http://localhost:5173', // Allow localhost for testing
+      'http://localhost:3000'
+    ];
+  }
+  
+  // Development defaults
   return [
     'http://localhost:5173',
     'http://localhost:3000',
-    'https://myground-1.onrender.com'
+    'https://myground.in', // Allow production domain in dev for testing
+    'https://www.myground.in'
   ];
 };
 
