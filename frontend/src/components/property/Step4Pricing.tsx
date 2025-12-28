@@ -8,7 +8,6 @@ interface Props {
 export default function Step4Pricing({ form }: Props) {
   const { register, watch, formState: { errors } } = form
   const transactionType = watch('transactionType')
-  const priceNegotiable = watch('pricing.priceNegotiable')
 
   return (
     <div className="space-y-6">

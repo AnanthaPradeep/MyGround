@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { UserIcon, BellIcon, LockClosedIcon, ShieldCheckIcon, Bars3Icon } from '@heroicons/react/24/outline'
 import ProtectedRoute from '../components/ProtectedRoute'
@@ -12,7 +11,7 @@ import HeaderIcons from '../components/HeaderIcons'
 import HeaderLocation from '../components/HeaderLocation'
 
 export default function Settings() {
-  const { user } = useAuthStore()
+  const { user: _user } = useAuthStore()
   const [activeTab, setActiveTab] = useState<'account' | 'notifications' | 'privacy' | 'security'>('account')
   const [loading, setLoading] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)

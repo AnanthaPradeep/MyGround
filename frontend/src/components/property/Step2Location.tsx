@@ -1,6 +1,5 @@
 import { UseFormReturn } from 'react-hook-form'
 import { PropertyFormData } from '../../types/property'
-import { useState, useEffect } from 'react'
 import { INDIAN_STATES } from '../../constants/propertyTypes'
 import LocationAutocomplete from '../LocationAutocomplete'
 import MapPicker from '../MapPicker'
@@ -11,7 +10,6 @@ interface Props {
 
 export default function Step2Location({ form }: Props) {
   const { register, watch, setValue, formState: { errors } } = form
-  const [mapLoaded, setMapLoaded] = useState(false)
 
   const coordinates = watch('location.coordinates.coordinates')
   const latitude = coordinates?.[1] || 19.0760 // Default to Mumbai

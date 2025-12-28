@@ -17,7 +17,7 @@ export default function AssetDNAPreview({ properties }: Props) {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {properties.map((property) => (
+      {properties.filter(p => p.assetDNA).map((property) => (
         <Link
           key={property._id}
           to={`/properties/${property._id}`}
@@ -34,13 +34,13 @@ export default function AssetDNAPreview({ properties }: Props) {
               <div className="flex justify-between items-center mb-1">
                 <span className="text-xs text-gray-600 dark:text-gray-400">Verification Score</span>
                 <span className="text-sm font-bold text-primary-600 dark:text-primary-400">
-                  {property.assetDNA.verificationScore}/100
+                  {property.assetDNA?.verificationScore || 0}/100
                 </span>
               </div>
               <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-primary-600 dark:bg-primary-500"
-                  style={{ width: `${property.assetDNA.verificationScore}%` }}
+                  style={{ width: `${property.assetDNA?.verificationScore || 0}%` }}
                 />
               </div>
             </div>
@@ -50,14 +50,14 @@ export default function AssetDNAPreview({ properties }: Props) {
               <span className="text-xs text-gray-600 dark:text-gray-400">Legal Risk</span>
               <span
                 className={`text-xs font-semibold px-2 py-1 rounded ${
-                  property.assetDNA.legalRisk === 'LOW'
+                  property.assetDNA?.legalRisk === 'LOW'
                     ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
-                    : property.assetDNA.legalRisk === 'MEDIUM'
+                    : property.assetDNA?.legalRisk === 'MEDIUM'
                     ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
                     : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
                 }`}
               >
-                {property.assetDNA.legalRisk}
+                {property.assetDNA?.legalRisk || 'N/A'}
               </span>
             </div>
 
@@ -65,7 +65,7 @@ export default function AssetDNAPreview({ properties }: Props) {
             <div className="flex items-center justify-between">
               <span className="text-xs text-gray-600 dark:text-gray-400">Trust Score</span>
               <span className="text-sm font-bold text-gray-900 dark:text-gray-100">
-                {property.assetDNA.assetTrustScore}/100
+                {property.assetDNA?.assetTrustScore || 0}/100
               </span>
             </div>
 

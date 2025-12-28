@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { BanknotesIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { BanknotesIcon, ChevronDownIcon, XMarkIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import { useCurrencyStore, Currency } from '../store/currencyStore'
 import { useCurrencies } from '../hooks/useCurrencies'
 
@@ -156,7 +156,7 @@ export default function CurrencySelector({
                 placeholder="Search currency..."
                 className="w-full px-3 py-2 pl-8 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               />
-              <CurrencyIcon className="absolute left-2.5 top-2.5 w-4 h-4 text-gray-400" />
+              <MagnifyingGlassIcon className="absolute left-2.5 top-2.5 w-4 h-4 text-gray-400" />
             </div>
           </div>
           <div className="max-h-60 overflow-y-auto scrollbar-hide">

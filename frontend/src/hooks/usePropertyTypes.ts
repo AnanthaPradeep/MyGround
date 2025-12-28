@@ -15,7 +15,6 @@ const samplePropertyTypes: PropertyTypeOption[] = [
   { value: 'COMMERCIAL', label: 'Commercial', description: 'Offices, shops, retail spaces' },
   { value: 'INDUSTRIAL', label: 'Industrial', description: 'Warehouses, factories, plants' },
   { value: 'LAND', label: 'Land', description: 'Plots, agricultural land' },
-  { value: 'AGRICULTURAL', label: 'Agricultural', description: 'Farming land, plantations' },
   { value: 'SPECIAL', label: 'Special Assets', description: 'Islands, resorts, heritage' },
   { value: 'ISLAND', label: 'Island', description: 'Private islands' },
 ]

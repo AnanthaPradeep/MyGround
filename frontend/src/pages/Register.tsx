@@ -49,7 +49,7 @@ export default function Register() {
       toast.success('OTP sent to your mobile and email')
       
       // In development, show OTP in console/alert for testing
-      if (response.data.otp && process.env.NODE_ENV === 'development') {
+      if (response.data.otp && import.meta.env.DEV) {
         console.log('🔐 OTP (Development):', response.data.otp)
         alert(`Development Mode: Your OTP is ${response.data.otp}`)
       }

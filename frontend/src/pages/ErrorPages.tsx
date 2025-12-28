@@ -3,8 +3,7 @@ import {
   ExclamationTriangleIcon, 
   HomeIcon, 
   ArrowPathIcon,
-  WifiIcon,
-  DocumentTextIcon 
+  WifiIcon
 } from '@heroicons/react/24/outline'
 
 /**

@@ -1,12 +1,10 @@
-import { useState, useRef, useEffect } from 'react'
+import { useRef, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { 
   XMarkIcon, 
-  Bars3Icon,
   HomeIcon,
   PlusCircleIcon,
   BellIcon,
-  HeartIcon,
   UserIcon,
   Cog6ToothIcon,
   MapPinIcon,

@@ -16,6 +16,7 @@ export interface LocationSuggestion {
   }
   pincode?: string
   area?: string
+  locality?: string
 }
 
 interface LocationAutocompleteProps {
@@ -52,7 +53,7 @@ export default function LocationAutocomplete({
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: GOOGLE_MAPS_CONFIG.apiKey,
-    libraries: GOOGLE_MAPS_CONFIG.libraries,
+    libraries: GOOGLE_MAPS_CONFIG.libraries as any,
   })
 
   // Initialize Google Places services

@@ -6,9 +6,7 @@ interface Props {
 }
 
 export default function Step6Legal({ form }: Props) {
-  const { register, watch, formState: { errors } } = form
-  const titleClear = watch('legal.titleClear')
-  const encumbranceFree = watch('legal.encumbranceFree')
+  const { register, formState: { errors } } = form
 
   return (
     <div className="space-y-6">

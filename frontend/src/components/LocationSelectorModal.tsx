@@ -20,7 +20,7 @@ export default function LocationSelectorModal({ onClose, isOpen }: LocationSelec
   const [latitude, setLatitude] = useState(19.0760) // Default to Mumbai
   const [longitude, setLongitude] = useState(72.8777)
   const [step, setStep] = useState<'search' | 'map'>('search')
-  const [canProceed, setCanProceed] = useState(false)
+  const [_canProceed, setCanProceed] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 

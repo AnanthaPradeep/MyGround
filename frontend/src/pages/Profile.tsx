@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { Bars3Icon } from '@heroicons/react/24/outline'
-import api from '../services/api'
 import ProtectedRoute from '../components/ProtectedRoute'
 import UserDropdown from '../components/UserDropdown'
 import MobileMenu from '../components/MobileMenu'
@@ -13,7 +11,7 @@ import HeaderIcons from '../components/HeaderIcons'
 import HeaderLocation from '../components/HeaderLocation'
 
 export default function Profile() {
-  const { user, updateUser } = useAuthStore()
+  const { user } = useAuthStore()
   const [isEditing, setIsEditing] = useState(false)
   const [loading, setLoading] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)

@@ -12,7 +12,7 @@ import {
   HomeIcon as PropertyIcon
 } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid'
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useAuthStore } from '../store/authStore'
 import { useNotificationStore } from '../store/notificationStore'
 import { useNotifications } from '../hooks/useNotifications'
@@ -26,13 +26,13 @@ import ThemeToggle from './ThemeToggle'
 export default function HeaderIcons() {
   const { isAuthenticated, user } = useAuthStore()
   const navigate = useNavigate()
-  const [wishlistCount, setWishlistCount] = useState(0) // TODO: Get from store/API
+  const [wishlistCount] = useState(0) // TODO: Get from store/API
   const [isWishlistActive, setIsWishlistActive] = useState(false)
   const [isNotificationOpen, setIsNotificationOpen] = useState(false)
   const notificationRef = useRef<HTMLDivElement>(null)
 
   // Fetch real notifications from API
-  const { notifications, setNotifications, loading: loadingNotifications, refetch: refetchNotifications } = useNotifications({
+  const { notifications, refetch: refetchNotifications } = useNotifications({
     useSampleData: false, // Use real API data
     userId: user?.id,
   })

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { useNavigate, Link, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { CheckIcon } from '@heroicons/react/24/solid'
 import { Bars3Icon } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
@@ -98,15 +98,11 @@ export default function CreateProperty() {
         ownershipType: property.ownershipType,
         possessionStatus: property.possessionStatus,
         pricing: property.pricing,
-        residentialDetails: property.residentialDetails,
-        commercialDetails: property.commercialDetails,
-        industrialDetails: property.industrialDetails,
-        landDetails: property.landDetails,
-        specialDetails: property.specialDetails,
-        islandDetails: property.islandDetails,
+        residential: property.residential,
+        commercial: property.commercial,
+        land: property.land,
         media: property.media,
         legal: property.legal,
-        availability: property.availability,
       })
     } else if (!isEditMode) {
       setIsLoadingProperty(false)

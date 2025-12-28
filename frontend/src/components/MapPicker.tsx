@@ -2,7 +2,6 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { useLoadScript, GoogleMap, Marker } from '@react-google-maps/api'
 import { MapPinIcon } from '@heroicons/react/24/outline'
 import { GOOGLE_MAPS_CONFIG } from '../config/googleMaps'
-import { getCurrentLocationWithAddress } from '../utils/geolocation'
 
 interface MapPickerProps {
   latitude: number
@@ -24,14 +23,10 @@ const defaultCenter = {
 }
 
 // Custom marker icon - using a simpler approach that works even if Google Maps API has issues
-const getMarkerIcon = (isLoaded: boolean) => {
+const getMarkerIcon = (isLoaded: boolean): google.maps.Icon | string | undefined => {
   if (!isLoaded || typeof google === 'undefined' || !google.maps) {
     // Return a simple URL-based icon if Google Maps API isn't fully loaded
-    return {
-      url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
-      scaledSize: { width: 32, height: 32 },
-      anchor: { x: 16, y: 32 },
-    }
+    return 'https://maps.google.com/mapfiles/ms/icons/red-dot.png'
   }
   
   try {
@@ -68,16 +63,13 @@ export default function MapPicker({
     lat: latitude || defaultCenter.lat,
     lng: longitude || defaultCenter.lng,
   })
-  const [map, setMap] = useState<google.maps.Map | null>(null)
-  const [isLoadingLocation, setIsLoadingLocation] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const mapRef = useRef<google.maps.Map | null>(null)
-  const markerRef = useRef<google.maps.Marker | null>(null)
 
   // Load Google Maps script
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: GOOGLE_MAPS_CONFIG.apiKey,
-    libraries: GOOGLE_MAPS_CONFIG.libraries,
+    libraries: GOOGLE_MAPS_CONFIG.libraries as any,
     id: 'google-map-script', // Add unique ID to prevent multiple loads
   })
 
@@ -116,7 +108,6 @@ export default function MapPicker({
 
   const onMapLoad = useCallback((mapInstance: google.maps.Map) => {
     mapRef.current = mapInstance
-    setMap(mapInstance)
     
     // Set initial center
     if (latitude && longitude) {
@@ -130,7 +121,6 @@ export default function MapPicker({
 
   const onMapUnmount = useCallback(() => {
     mapRef.current = null
-    setMap(null)
   }, [])
 
   // Handle map click - PRIMARY METHOD TO SET LOCATION
@@ -171,81 +161,6 @@ export default function MapPicker({
     }
   }, [readOnly, onLocationChange])
 
-  // Handle "Use My Location" button - Automatically sets location
-  const handleUseCurrentLocation = async () => {
-    setIsLoadingLocation(true)
-    setError(null)
-    
-    if (!navigator.geolocation) {
-      setError('Geolocation is not supported by your browser.')
-      setIsLoadingLocation(false)
-      return
-    }
-
-    try {
-      // Get current position first
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(
-          resolve,
-          reject,
-          {
-            enableHighAccuracy: true,
-            timeout: 15000,
-            maximumAge: 0,
-          }
-        )
-      })
-
-      const { latitude, longitude } = position.coords
-      const newPosition = { lat: latitude, lng: longitude }
-      
-      console.log('📍 Current location detected:', latitude, longitude)
-      
-      // Immediately update position and center map
-      setPosition(newPosition)
-      
-      // Center map on current location with smooth animation
-      if (mapRef.current) {
-        mapRef.current.setCenter(newPosition)
-        mapRef.current.setZoom(16) // Zoom in closer for better accuracy
-      }
-      
-      // Automatically call onLocationChange to set the coordinates
-      onLocationChange(latitude, longitude)
-      
-      // Get address details and update parent if callback supports it
-      try {
-        const locationData = await getCurrentLocationWithAddress(latitude, longitude)
-        if (locationData && locationData.area) {
-          console.log('📍 Location with address:', locationData)
-          // If we have address details, we could update the display
-          // but coordinates are already set, so this is just for logging
-        } else {
-          console.warn('📍 Got coordinates but no address details. Reverse geocoding may have failed.')
-        }
-      } catch (addrError) {
-        console.warn('Could not get address details, but coordinates are set:', addrError)
-        // Coordinates are still set, so location selection works
-      }
-      
-      setError(null)
-    } catch (err: any) {
-      console.error('Error getting location:', err)
-      let errorMessage = 'Failed to get your location. Please select manually on the map.'
-      
-      if (err.code === err.PERMISSION_DENIED) {
-        errorMessage = 'Location access denied. Please enable location permissions in your browser settings.'
-      } else if (err.code === err.POSITION_UNAVAILABLE) {
-        errorMessage = 'Location information unavailable. Please select manually on the map.'
-      } else if (err.code === err.TIMEOUT) {
-        errorMessage = 'Location request timed out. Please try again or select manually.'
-      }
-      
-      setError(errorMessage)
-    } finally {
-      setIsLoadingLocation(false)
-    }
-  }
 
   // Show error if Google Maps fails to load
   if (loadError) {

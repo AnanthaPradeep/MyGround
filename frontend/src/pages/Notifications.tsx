@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { 
   BellIcon, 
   CheckCircleIcon, 
@@ -35,7 +35,7 @@ export default function Notifications() {
   const { triggerRefetch } = useNotificationStore()
 
   // Fetch user-specific notifications (only for property owner)
-  const { notifications: userNotifications, setNotifications, loading: loadingUser, refetch: refetchUserNotifications } = useNotifications({
+  const { notifications: userNotifications, loading: loadingUser, refetch: refetchUserNotifications } = useNotifications({
     useSampleData: false, // Fetch from API
     userId: user?.id,
   })
@@ -45,14 +45,6 @@ export default function Notifications() {
     useSampleData: false, // Fetch from API
     limit: 50,
   })
-
-  // Combined refetch function
-  const fetchNotifications = async () => {
-    await Promise.all([
-      refetchUserNotifications(),
-      refetchPublicNotifications()
-    ])
-  }
 
   // Combine and format notifications
   const allNotifications = [

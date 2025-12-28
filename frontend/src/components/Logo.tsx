@@ -19,7 +19,7 @@ interface LogoProps {
 export default function Logo({ 
   className = '', 
   showText = false, 
-  variant = 'default',
+  variant: _variant = 'default',
   size = 'md'
 }: LogoProps) {
   const logoSrc = logos.main || logos.png

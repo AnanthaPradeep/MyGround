@@ -1,4 +1,3 @@
-import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 
 interface LoaderProps {
   size?: 'sm' | 'md' | 'lg'

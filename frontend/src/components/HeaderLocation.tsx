@@ -9,7 +9,7 @@ import MapPicker from './MapPicker'
  * Displays and allows changing user's selected location
  */
 export default function HeaderLocation() {
-  const { userLocation, setLocation, clearLocation } = useLocationStore()
+  const { userLocation, setLocation } = useLocationStore()
   const [isOpen, setIsOpen] = useState(false)
   const [step, setStep] = useState<'select' | 'map'>('select')
   const [selectedLocation, setSelectedLocation] = useState<LocationSuggestion | null>(null)

@@ -21,7 +21,7 @@ import Notifications from './pages/Notifications'
 import LocationTest from './pages/LocationTest'
 import ProtectedRoute from './components/ProtectedRoute'
 import ChatWidget from './components/ChatWidget'
-import { NotFoundPage, ErrorPage } from './pages/ErrorPages'
+import { NotFoundPage } from './pages/ErrorPages'
 
 function App() {
   const { checkAuth } = useAuthStore()

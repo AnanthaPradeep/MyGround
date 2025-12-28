@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { useProperties } from '../hooks/useProperties'
-import { Property } from '../types/property'
 import { HomeIcon, MagnifyingGlassIcon, UserIcon, EyeIcon, HeartIcon, ChatBubbleLeftIcon, TrashIcon, PauseIcon, PlayIcon, Bars3Icon } from '@heroicons/react/24/outline'
 import ProtectedRoute from '../components/ProtectedRoute'
 import UserDropdown from '../components/UserDropdown'
@@ -16,7 +15,6 @@ import toast from 'react-hot-toast'
 
 export default function Dashboard() {
   const { user } = useAuthStore()
-  const navigate = useNavigate()
   const { properties, loading, refetch } = useProperties({ 
     useSampleData: false, // Fetch from API to get user's own properties
     filters: { listedBy: user?.id } // Filter to show only user's properties

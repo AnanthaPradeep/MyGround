@@ -23,18 +23,8 @@ import {
 } from '@heroicons/react/24/outline'
 import { useTrendingData } from '../hooks/useTrendingData'
 
-interface TrendingData {
-  id: string
-  name: string
-  value: string | number
-  change: number
-  changeType: 'up' | 'down'
-  icon?: React.ReactNode
-  badge?: string
-}
-
 export default function TrendingSection() {
-  const { data, loading } = useTrendingData({ useSampleData: true })
+  const { data } = useTrendingData({ useSampleData: true })
   const [activeTab, setActiveTab] = useState('trending')
 
   // Map icon names to components
