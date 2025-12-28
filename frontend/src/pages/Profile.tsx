@@ -99,7 +99,7 @@ export default function Profile() {
               {!isEditing && (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                  className="px-4 py-2 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600"
                 >
                   Edit Profile
                 </button>
@@ -144,7 +144,7 @@ export default function Profile() {
                       required
                     />
                   ) : (
-                    <p className="px-4 py-2 bg-gray-50 rounded-lg">{user?.firstName}</p>
+                    <p className="px-4 py-2 bg-gray-50 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-gray-100">{user?.firstName}</p>
                   )}
                 </div>
 
@@ -161,14 +161,14 @@ export default function Profile() {
                       required
                     />
                   ) : (
-                    <p className="px-4 py-2 bg-gray-50 rounded-lg">{user?.lastName}</p>
+                    <p className="px-4 py-2 bg-gray-50 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-gray-100">{user?.lastName}</p>
                   )}
                 </div>
               </div>
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Email
                 </label>
                 {isEditing ? (
@@ -176,18 +176,18 @@ export default function Profile() {
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 cursor-not-allowed"
                     disabled
                   />
                 ) : (
-                  <p className="px-4 py-2 bg-gray-50 rounded-lg">{user?.email}</p>
+                  <p className="px-4 py-2 bg-gray-50 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-gray-100">{user?.email}</p>
                 )}
-                <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Email cannot be changed</p>
               </div>
 
               {/* Mobile */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Mobile Number
                 </label>
                 {isEditing ? (
@@ -195,35 +195,35 @@ export default function Profile() {
                     type="tel"
                     value={formData.mobile}
                     onChange={(e) => setFormData({ ...formData, mobile: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     maxLength={10}
                   />
                 ) : (
-                  <p className="px-4 py-2 bg-gray-50 rounded-lg">{user?.mobile || 'Not provided'}</p>
+                  <p className="px-4 py-2 bg-gray-50 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-gray-100">{user?.mobile || 'Not provided'}</p>
                 )}
               </div>
 
               {/* Role */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Account Type
                 </label>
-                <p className="px-4 py-2 bg-gray-50 rounded-lg">{user?.role}</p>
+                <p className="px-4 py-2 bg-gray-50 dark:bg-gray-700 rounded-lg text-gray-900 dark:text-gray-100">{user?.role}</p>
               </div>
 
               {/* Trust Score */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Trust Score
                 </label>
                 <div className="flex items-center space-x-4">
-                  <div className="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="flex-1 h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-primary-600"
+                      className="h-full bg-primary-600 dark:bg-primary-500"
                       style={{ width: `${user?.trustScore || 0}%` }}
                     />
                   </div>
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                     {user?.trustScore || 0}/100
                   </span>
                 </div>
@@ -231,7 +231,7 @@ export default function Profile() {
 
               {/* Action Buttons */}
               {isEditing && (
-                <div className="flex justify-end space-x-4 pt-4 border-t border-gray-200">
+                <div className="flex justify-end space-x-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                   <button
                     type="button"
                     onClick={() => {
@@ -243,14 +243,14 @@ export default function Profile() {
                         mobile: user?.mobile || '',
                       })
                     }}
-                    className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                    className="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 bg-white dark:bg-gray-800"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
+                    className="px-6 py-2 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600 disabled:opacity-50"
                   >
                     {loading ? 'Saving...' : 'Save Changes'}
                   </button>
