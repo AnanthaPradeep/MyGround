@@ -19,7 +19,10 @@ Use this checklist to ensure your deployment succeeds. **Missing any of these wi
 - [ ] **`MONGODB_URI`** ⚠️ **REQUIRED!** 
   - Format: `mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=majority`
   - Get this from MongoDB Atlas → Connect → Connection String
-  - **Without this, deployment WILL FAIL!**
+  - **Without this, deployment WILL FAIL with "connect ECONNREFUSED localhost:27017"!**
+  - **⚠️ Local MongoDB Compass won't work on Render - you MUST use MongoDB Atlas (cloud)**
+  - **📖 See `MONGODB_ATLAS_SETUP.md` for step-by-step setup guide**
+  - **🔗 Sign up:** [https://www.mongodb.com/cloud/atlas/register](https://www.mongodb.com/cloud/atlas/register) (Free tier available!)
 
 - [ ] **`NODE_ENV`** = `production`
 
@@ -87,14 +90,15 @@ After deployment, check:
 ### 📝 Quick Copy-Paste for Render Environment Variables
 
 ```
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/myground?retryWrites=true&w=majority
+MONGODB_URI=mongodb+srv://anandhpradeep909_db_user:vfdveQ3iVryoQSan@cluster0.qzvka35.mongodb.net/myground?retryWrites=true&w=majority
 NODE_ENV=production
 JWT_SECRET=your-generated-secret-key-here
 JWT_EXPIRE=7d
 CORS_ORIGIN=https://myground.in,https://www.myground.in,http://localhost:5173,http://localhost:3000
 ```
 
-**⚠️ Remember:** Replace placeholder values with your actual credentials!
+**✅ MongoDB Atlas connection string is ready!**  
+**⚠️ Remember:** Replace `JWT_SECRET` with your actual secure key (generate with: `openssl rand -base64 32`)
 
 ---
 
