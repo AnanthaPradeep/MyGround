@@ -10,6 +10,7 @@ import HeaderSearchBar from '../components/HeaderSearchBar'
 import HeaderIcons from '../components/HeaderIcons'
 import HeaderLocation from '../components/HeaderLocation'
 import MobileMenu from '../components/MobileMenu'
+import Footer from '../components/Footer'
 import UserDropdown from '../components/UserDropdown'
 import PropertyCard from '../components/PropertyCard'
 import { CardSkeleton } from '../components/Loader'
@@ -146,6 +147,9 @@ export default function Wishlist() {
           )}
         </div>
       </div>
+      
+      {/* Footer */}
+      <Footer />
     </ProtectedRoute>
   )
 }

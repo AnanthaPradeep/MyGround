@@ -23,6 +23,7 @@ import HeaderSearchBar from '../components/HeaderSearchBar'
 import HeaderIcons from '../components/HeaderIcons'
 import HeaderLocation from '../components/HeaderLocation'
 import MobileMenu from '../components/MobileMenu'
+import Footer from '../components/Footer'
 
 const STEPS = [
   { id: 1, name: 'Category', component: Step1Category },
@@ -519,6 +520,9 @@ export default function CreateProperty() {
           </div>
         </form>
       </div>
+      
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }

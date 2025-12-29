@@ -11,6 +11,7 @@ import HeaderSearchBar from '../components/HeaderSearchBar'
 import HeaderIcons from '../components/HeaderIcons'
 import HeaderLocation from '../components/HeaderLocation'
 import MobileMenu from '../components/MobileMenu'
+import Footer from '../components/Footer'
 import api from '../services/api'
 import toast from 'react-hot-toast'
 
@@ -589,6 +590,9 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+      
+      {/* Footer */}
+      <Footer />
     </ProtectedRoute>
   )
 }

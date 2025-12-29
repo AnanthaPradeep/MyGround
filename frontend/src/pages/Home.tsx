@@ -14,6 +14,7 @@ import UserDropdown from '../components/UserDropdown'
 import HeaderIcons from '../components/HeaderIcons'
 import HeaderLocation from '../components/HeaderLocation'
 import MobileMenu from '../components/MobileMenu'
+import Footer from '../components/Footer'
 import { Bars3Icon } from '@heroicons/react/24/outline'
 import Logo from '../components/Logo'
 import { CardSkeleton } from '../components/Loader'
@@ -322,45 +323,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 dark:bg-black text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="text-xl font-heading font-bold mb-4">MyGround</h3>
-              <p className="text-gray-400 dark:text-gray-500">
-                Every Property. One Truth.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">For Buyers</h4>
-              <ul className="space-y-2 text-gray-400 dark:text-gray-500">
-                <li><Link to="/properties" className="hover:text-white dark:hover:text-gray-300">Browse Properties</Link></li>
-                <li><Link to="/search" className="hover:text-white dark:hover:text-gray-300">Advanced Search</Link></li>
-                <li><Link to="/saved" className="hover:text-white dark:hover:text-gray-300">Saved Searches</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">For Sellers</h4>
-              <ul className="space-y-2 text-gray-400 dark:text-gray-500">
-                <li><Link to="/properties/create" className="hover:text-white dark:hover:text-gray-300">List Property</Link></li>
-                <li><Link to="/dashboard" className="hover:text-white dark:hover:text-gray-300">Dashboard</Link></li>
-                <li><Link to="/pricing" className="hover:text-white dark:hover:text-gray-300">Pricing</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Support</h4>
-              <ul className="space-y-2 text-gray-400 dark:text-gray-500">
-                <li><Link to="/help" className="hover:text-white dark:hover:text-gray-300">Help Center</Link></li>
-                <li><Link to="/contact" className="hover:text-white dark:hover:text-gray-300">Contact Us</Link></li>
-                <li><Link to="/about" className="hover:text-white dark:hover:text-gray-300">About Us</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-8 pt-8 border-t border-gray-800 dark:border-gray-900 text-center text-gray-400 dark:text-gray-500">
-            <p>&copy; 2024 MyGround. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

@@ -4,6 +4,7 @@ import { UserIcon, BellIcon, LockClosedIcon, ShieldCheckIcon, Bars3Icon } from '
 import ProtectedRoute from '../components/ProtectedRoute'
 import UserDropdown from '../components/UserDropdown'
 import MobileMenu from '../components/MobileMenu'
+import Footer from '../components/Footer'
 import toast from 'react-hot-toast'
 import Logo from '../components/Logo'
 import HeaderSearchBar from '../components/HeaderSearchBar'
@@ -275,6 +276,9 @@ export default function Settings() {
           </div>
         </div>
       </div>
+      
+      {/* Footer */}
+      <Footer />
     </ProtectedRoute>
   )
 }

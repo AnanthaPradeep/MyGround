@@ -11,6 +11,7 @@ import HeaderIcons from '../components/HeaderIcons'
 import HeaderLocation from '../components/HeaderLocation'
 import UserDropdown from '../components/UserDropdown'
 import MobileMenu from '../components/MobileMenu'
+import Footer from '../components/Footer'
 import { PageLoader } from '../components/Loader'
 import { useAuthStore } from '../store/authStore'
 import { useWishlistStore } from '../store/wishlistStore'
@@ -582,6 +583,9 @@ export default function PropertyDetail() {
           </div>
         </div>
       </div>
+      
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }

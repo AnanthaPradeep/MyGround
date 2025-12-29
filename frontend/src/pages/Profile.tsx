@@ -4,6 +4,7 @@ import { Bars3Icon } from '@heroicons/react/24/outline'
 import ProtectedRoute from '../components/ProtectedRoute'
 import UserDropdown from '../components/UserDropdown'
 import MobileMenu from '../components/MobileMenu'
+import Footer from '../components/Footer'
 import toast from 'react-hot-toast'
 import Logo from '../components/Logo'
 import HeaderSearchBar from '../components/HeaderSearchBar'
@@ -260,6 +261,9 @@ export default function Profile() {
           </div>
         </div>
       </div>
+      
+      {/* Footer */}
+      <Footer />
     </ProtectedRoute>
   )
 }

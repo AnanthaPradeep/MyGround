@@ -9,6 +9,7 @@ import HeaderIcons from '../components/HeaderIcons'
 import HeaderLocation from '../components/HeaderLocation'
 import UserDropdown from '../components/UserDropdown'
 import MobileMenu from '../components/MobileMenu'
+import Footer from '../components/Footer'
 import { Bars3Icon } from '@heroicons/react/24/outline'
 import { CardSkeleton } from '../components/Loader'
 
@@ -176,6 +177,9 @@ export default function Properties() {
           </div>
         </div>
       </div>
+      
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }
