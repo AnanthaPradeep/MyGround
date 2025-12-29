@@ -9,7 +9,8 @@ import {
   InformationCircleIcon,
   XCircleIcon,
   Squares2X2Icon,
-  HomeIcon as PropertyIcon
+  HomeIcon as PropertyIcon,
+  DocumentTextIcon
 } from '@heroicons/react/24/outline'
 import { useState, useRef, useEffect } from 'react'
 import { useAuthStore } from '../store/authStore'
@@ -17,6 +18,7 @@ import { useNotificationStore } from '../store/notificationStore'
 import { useWishlistStore } from '../store/wishlistStore'
 import { useNotifications } from '../hooks/useNotifications'
 import { useWishlist } from '../hooks/useWishlist'
+import { useDrafts } from '../hooks/useDrafts'
 import { Notification } from '../types/notification'
 import api from '../services/api'
 import ThemeToggle from './ThemeToggle'
@@ -29,8 +31,10 @@ export default function HeaderIcons() {
   const navigate = useNavigate()
   const [isWishlistOpen, setIsWishlistOpen] = useState(false)
   const [isNotificationOpen, setIsNotificationOpen] = useState(false)
+  const [isListPropertyOpen, setIsListPropertyOpen] = useState(false)
   const notificationRef = useRef<HTMLDivElement>(null)
   const wishlistRef = useRef<HTMLDivElement>(null)
+  const listPropertyRef = useRef<HTMLDivElement>(null)
 
   // Fetch wishlist from API
   const { wishlist, refetch: refetchWishlist, getWishlistCount } = useWishlist({
@@ -96,6 +100,41 @@ export default function HeaderIcons() {
   // Calculate unread notification count (only count unread notifications)
   const notificationCount = notifications.filter(n => !n.read).length
 
+  // Fetch draft count
+  const { getDraftCount } = useDrafts({ userId: user?.id })
+  const [draftCount, setDraftCount] = useState(0)
+
+  useEffect(() => {
+    if (isAuthenticated && user?.id) {
+      getDraftCount().then(setDraftCount)
+    }
+  }, [isAuthenticated, user?.id, getDraftCount])
+
+  // Listen for draft saved events to refresh count immediately
+  useEffect(() => {
+    if (!isAuthenticated) return
+
+    const handleDraftSaved = () => {
+      getDraftCount().then(setDraftCount)
+    }
+
+    window.addEventListener('draftSaved', handleDraftSaved)
+    return () => {
+      window.removeEventListener('draftSaved', handleDraftSaved)
+    }
+  }, [isAuthenticated, getDraftCount])
+
+  // Also refetch periodically to keep count updated
+  useEffect(() => {
+    if (!isAuthenticated) return
+    
+    const interval = setInterval(() => {
+      getDraftCount().then(setDraftCount)
+    }, 30000) // Refetch every 30 seconds
+    
+    return () => clearInterval(interval)
+  }, [isAuthenticated, getDraftCount])
+
   // Store refetch function in a ref to avoid dependency issues
   const refetchRef = useRef(refetchNotifications)
   useEffect(() => {
@@ -136,16 +175,19 @@ export default function HeaderIcons() {
       if (wishlistRef.current && !wishlistRef.current.contains(event.target as Node)) {
         setIsWishlistOpen(false)
       }
+      if (listPropertyRef.current && !listPropertyRef.current.contains(event.target as Node)) {
+        setIsListPropertyOpen(false)
+      }
     }
 
-    if (isNotificationOpen || isWishlistOpen) {
+    if (isNotificationOpen || isWishlistOpen || isListPropertyOpen) {
       document.addEventListener('mousedown', handleClickOutside)
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [isNotificationOpen, isWishlistOpen])
+  }, [isNotificationOpen, isWishlistOpen, isListPropertyOpen])
 
   const getNotificationIcon = (type: Notification['type']) => {
     switch (type) {
@@ -423,14 +465,54 @@ export default function HeaderIcons() {
         )}
       </div>
 
-      {/* List Property Icon */}
-      <Link
-        to="/properties/create"
-        className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-        title="List Property"
-      >
-        <PlusCircleIcon className="w-6 h-6" />
-      </Link>
+      {/* List Property Dropdown */}
+      <div className="relative" ref={listPropertyRef}>
+        <button
+          className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+          title="List Property"
+          onClick={() => setIsListPropertyOpen(!isListPropertyOpen)}
+        >
+          <PlusCircleIcon className="w-6 h-6" />
+          {draftCount > 0 && (
+            <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[20px] h-5 px-1.5 bg-orange-500 dark:bg-orange-600 text-white text-xs font-bold rounded-full border-2 border-white dark:border-gray-800 shadow-sm z-10">
+              {draftCount > 9 ? '9+' : draftCount}
+            </span>
+          )}
+        </button>
+
+        {/* List Property Dropdown Menu */}
+        {isListPropertyOpen && (
+          <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg dark:shadow-gray-900/50 border border-gray-200 dark:border-gray-700 py-1 z-50">
+            <Link
+              to="/properties/create"
+              onClick={() => setIsListPropertyOpen(false)}
+              className="flex items-center space-x-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              <PlusCircleIcon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+              <span>List Your Property</span>
+            </Link>
+            
+            <Link
+              to="/dashboard?tab=drafts"
+              onClick={() => {
+                setIsListPropertyOpen(false)
+                navigate('/dashboard?tab=drafts')
+              }}
+              className="flex items-center justify-between space-x-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            >
+              <div className="flex items-center space-x-3">
+                <DocumentTextIcon className="w-5 h-5 text-orange-500 dark:text-orange-400" />
+                <span>Draft Properties</span>
+              </div>
+              {draftCount > 0 && (
+                <span className="px-2 py-0.5 bg-orange-500 dark:bg-orange-600 text-white text-xs font-bold rounded-full">
+                  {draftCount > 9 ? '9+' : draftCount}
+                </span>
+              )}
+            </Link>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { CheckIcon } from '@heroicons/react/24/solid'
-import { Bars3Icon } from '@heroicons/react/24/outline'
+import { Bars3Icon, DocumentTextIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 import api from '../services/api'
 import { PropertyFormData } from '../types/property'
 import { useProperty } from '../hooks/useProperties'
+import { useDrafts } from '../hooks/useDrafts'
+import { useAuthStore } from '../store/authStore'
 import Step1Category from '../components/property/Step1Category'
 import Step2Location from '../components/property/Step2Location'
 import Step3Details from '../components/property/Step3Details'
@@ -34,16 +36,27 @@ const STEPS = [
 
 export default function CreateProperty() {
   const { id } = useParams<{ id: string }>()
+  const [searchParams] = useSearchParams()
+  const draftIdFromUrl = searchParams.get('draftId')
   const isEditMode = !!id
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [propertyId, setPropertyId] = useState<string | null>(id || null)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isLoadingProperty, setIsLoadingProperty] = useState(isEditMode)
+  const [draftId, setDraftId] = useState<string | null>(draftIdFromUrl)
+  const [isDraftMode, setIsDraftMode] = useState(!!draftIdFromUrl)
+  const [lastSaved, setLastSaved] = useState<Date | null>(null)
+  const [isSavingDraft, setIsSavingDraft] = useState(false)
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const navigate = useNavigate()
+  const { user } = useAuthStore()
 
   // Fetch property data if in edit mode
   const { property, loading: propertyLoading } = useProperty(id || '', !isEditMode)
+  
+  // Fetch draft if draftId is present
+  const { getDraft, saveDraft } = useDrafts({ userId: user?.id })
 
   const form = useForm<PropertyFormData>({
     defaultValues: {
@@ -83,6 +96,47 @@ export default function CreateProperty() {
     mode: 'onChange',
   })
 
+  // Load draft data on mount if draftId is present
+  useEffect(() => {
+    const loadDraft = async () => {
+      if (draftId && !isEditMode) {
+        setIsLoadingProperty(true)
+        try {
+          const draft = await getDraft(draftId)
+          if (draft) {
+            setIsDraftMode(true)
+            setCurrentStep(draft.currentStep || 1)
+            setLastSaved(new Date(draft.lastSaved))
+            
+            // Populate form with draft data
+            if (draft.propertyData) {
+              form.reset({
+                ...draft.propertyData,
+                // Ensure all required fields have defaults
+                location: draft.propertyData.location || form.getValues().location,
+                pricing: draft.propertyData.pricing || form.getValues().pricing,
+                media: draft.propertyData.media || form.getValues().media,
+                legal: draft.propertyData.legal || form.getValues().legal,
+              })
+            }
+            
+            toast.success('Your property details were saved as a draft and have been restored.', {
+              duration: 5000,
+            })
+          }
+        } catch (error: any) {
+          console.error('Error loading draft:', error)
+        } finally {
+          setIsLoadingProperty(false)
+        }
+      } else if (!isEditMode) {
+        setIsLoadingProperty(false)
+      }
+    }
+    
+    loadDraft()
+  }, [draftId, isEditMode, getDraft, form])
+
   // Load property data into form when in edit mode
   useEffect(() => {
     if (isEditMode && property && !propertyLoading) {
@@ -104,10 +158,110 @@ export default function CreateProperty() {
         media: property.media,
         legal: property.legal,
       })
-    } else if (!isEditMode) {
-      setIsLoadingProperty(false)
     }
   }, [isEditMode, property, propertyLoading, form])
+
+  // Auto-save draft functionality
+  const autoSaveDraft = useCallback(async (showToast = false) => {
+    if (!user?.id || isEditMode) return // Don't auto-save in edit mode
+    
+    const formData = form.getValues()
+    
+    // Check if there's meaningful data to save
+    const hasData = 
+      formData.title || 
+      formData.location?.city || 
+      formData.pricing?.expectedPrice || 
+      formData.pricing?.rentAmount || 
+      formData.description
+    
+    if (!hasData && !draftId) return // Don't save empty drafts
+    
+    setIsSavingDraft(true)
+    
+    try {
+      const savedDraft = await saveDraft(draftId, formData, currentStep)
+      
+      if (savedDraft) {
+        if (!draftId) {
+          setDraftId(savedDraft.draftId)
+          setIsDraftMode(true)
+          // Update URL without navigation
+          const newUrl = `/properties/create?draftId=${savedDraft.draftId}`
+          window.history.replaceState({}, '', newUrl)
+        }
+        
+        setLastSaved(new Date(savedDraft.lastSaved))
+        
+        // Trigger custom event to update draft count in other components
+        window.dispatchEvent(new CustomEvent('draftSaved', { 
+          detail: { draftId: savedDraft.draftId } 
+        }))
+        
+        if (showToast) {
+          toast.success('Draft saved successfully!')
+        }
+      }
+    } catch (error: any) {
+      if (showToast) {
+        toast.error('Failed to save draft. Your data is safe in browser storage.')
+      }
+    } finally {
+      setIsSavingDraft(false)
+    }
+  }, [user?.id, isEditMode, form, draftId, currentStep, saveDraft])
+
+  // Debounced auto-save on form changes
+  useEffect(() => {
+    if (!user?.id || isEditMode) return
+    
+    // Clear existing timeout
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current)
+    }
+    
+    // Set new timeout for auto-save (10-15 seconds as per spec)
+    saveTimeoutRef.current = setTimeout(() => {
+      autoSaveDraft(false)
+    }, 12000) // 12 seconds
+    
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current)
+      }
+    }
+  }, [form.watch(), currentStep, user?.id, isEditMode, autoSaveDraft])
+
+  // Auto-save on step change
+  useEffect(() => {
+    if (!user?.id || isEditMode || currentStep === 1) return
+    autoSaveDraft(false)
+  }, [currentStep, user?.id, isEditMode, autoSaveDraft])
+
+  // Auto-save before page unload
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (!user?.id || isEditMode) return
+      // Use sendBeacon for reliable save on page unload
+      const formData = form.getValues()
+      const hasData = 
+        formData.title || 
+        formData.location?.city || 
+        formData.pricing?.expectedPrice || 
+        formData.pricing?.rentAmount || 
+        formData.description
+      
+      if (hasData) {
+        // Save synchronously before unload
+        autoSaveDraft(false)
+      }
+    }
+    
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [user?.id, isEditMode, form, autoSaveDraft])
 
   const nextStep = async () => {
     const isValid = await form.trigger()
@@ -186,11 +340,25 @@ export default function CreateProperty() {
     }
   }
 
+  // Format time ago helper
+  const formatTimeAgo = (date: Date): string => {
+    const now = new Date()
+    const diff = now.getTime() - date.getTime()
+    const minutes = Math.floor(diff / 60000)
+    const hours = Math.floor(diff / 3600000)
+    const days = Math.floor(diff / 86400000)
+
+    if (minutes < 1) return 'just now'
+    if (minutes < 60) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`
+    if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`
+    return `${days} day${days > 1 ? 's' : ''} ago`
+  }
+
   const CurrentStepComponent = STEPS[currentStep - 1].component
 
-  // Show loader while fetching property data in edit mode
-  if (isEditMode && (isLoadingProperty || propertyLoading)) {
-    return <PageLoader text="Loading property details..." />
+  // Show loader while fetching property data in edit mode or loading draft
+  if ((isEditMode && (isLoadingProperty || propertyLoading)) || (!isEditMode && isLoadingProperty && draftId)) {
+    return <PageLoader text={draftId ? "Loading draft..." : "Loading property details..."} />
   }
 
   return (
@@ -232,14 +400,45 @@ export default function CreateProperty() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
-          <h1 className="text-3xl font-heading font-bold text-gray-900 dark:text-gray-100 mb-2">
-            {isEditMode ? 'Edit Property' : 'List Your Property'}
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            {isEditMode 
-              ? 'Update your property details below' 
-              : 'Fill in the details to create your property listing'}
-          </p>
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-3xl font-heading font-bold text-gray-900 dark:text-gray-100">
+                  {isEditMode ? 'Edit Property' : 'List Your Property'}
+                </h1>
+                {isDraftMode && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded-full text-sm font-medium">
+                    <DocumentTextIcon className="w-4 h-4" />
+                    Draft
+                  </span>
+                )}
+              </div>
+              <p className="text-gray-600 dark:text-gray-400">
+                {isEditMode 
+                  ? 'Update your property details below' 
+                  : 'Fill in the details to create your property listing'}
+              </p>
+              {isDraftMode && (
+                <div className="mt-3 flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                  <CheckCircleIcon className="w-4 h-4" />
+                  <span>Saved as Draft</span>
+                  {lastSaved && (
+                    <>
+                      <span className="text-gray-400 dark:text-gray-600">•</span>
+                      <span className="text-gray-500 dark:text-gray-400">
+                        Last saved {formatTimeAgo(lastSaved)}
+                      </span>
+                    </>
+                  )}
+                </div>
+              )}
+              {isSavingDraft && (
+                <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                  Saving draft...
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Progress Steps */}

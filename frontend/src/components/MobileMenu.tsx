@@ -10,12 +10,14 @@ import {
   MapPinIcon,
   ChevronDownIcon,
   Squares2X2Icon,
-  HeartIcon
+  HeartIcon,
+  DocumentTextIcon
 } from '@heroicons/react/24/outline'
 import { useAuthStore } from '../store/authStore'
 import { useLocationStore } from '../store/locationStore'
 import { useWishlistStore } from '../store/wishlistStore'
 import { useWishlist } from '../hooks/useWishlist'
+import { useDrafts } from '../hooks/useDrafts'
 import Logo from './Logo'
 import HeaderLocation from './HeaderLocation'
 import ThemeToggle from './ThemeToggle'
@@ -43,6 +45,41 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       getWishlistCount().then(setWishlistCount)
     }
   }, [isAuthenticated, getWishlistCount, wishlistLastUpdate])
+
+  // Fetch draft count
+  const { getDraftCount } = useDrafts({ userId: user?.id })
+  const [draftCount, setDraftCount] = useState(0)
+
+  useEffect(() => {
+    if (isAuthenticated && user?.id) {
+      getDraftCount().then(setDraftCount)
+    }
+  }, [isAuthenticated, user?.id, getDraftCount])
+
+  // Listen for draft saved events to refresh count immediately
+  useEffect(() => {
+    if (!isAuthenticated) return
+
+    const handleDraftSaved = () => {
+      getDraftCount().then(setDraftCount)
+    }
+
+    window.addEventListener('draftSaved', handleDraftSaved)
+    return () => {
+      window.removeEventListener('draftSaved', handleDraftSaved)
+    }
+  }, [isAuthenticated, getDraftCount])
+
+  // Also refetch periodically to keep count updated
+  useEffect(() => {
+    if (!isAuthenticated) return
+    
+    const interval = setInterval(() => {
+      getDraftCount().then(setDraftCount)
+    }, 30000) // Refetch every 30 seconds
+    
+    return () => clearInterval(interval)
+  }, [isAuthenticated, getDraftCount])
 
   const handleLogout = () => {
     logout()
@@ -169,7 +206,25 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                   >
                     <PlusCircleIcon className="w-5 h-5" />
-                    <span>List Property</span>
+                    <span>List Your Property</span>
+                  </Link>
+
+                  <Link
+                    to="/dashboard?tab=drafts"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      navigate('/dashboard?tab=drafts')
+                      onClose()
+                    }}
+                    className="relative flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  >
+                    <DocumentTextIcon className="w-5 h-5 text-orange-500 dark:text-orange-400" />
+                    <span>Draft Properties</span>
+                    {draftCount > 0 && (
+                      <span className="ml-auto flex items-center justify-center min-w-[20px] h-5 px-1.5 bg-orange-500 dark:bg-orange-600 text-white text-xs font-bold rounded-full">
+                        {draftCount > 9 ? '9+' : draftCount}
+                      </span>
+                    )}
                   </Link>
 
                   <Link
