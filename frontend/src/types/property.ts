@@ -1,4 +1,4 @@
-export type TransactionType = 'SELL' | 'RENT' | 'LEASE' | 'BUY' | 'SUB_LEASE' | 'FRACTIONAL';
+export type TransactionType = 'SELL' | 'RENT' | 'LEASE' | 'SUB_LEASE' | 'FRACTIONAL';
 export type PropertyCategory = 'RESIDENTIAL' | 'COMMERCIAL' | 'INDUSTRIAL' | 'LAND' | 'SPECIAL' | 'ISLAND';
 export type OwnershipType = 'FREEHOLD' | 'LEASEHOLD' | 'GOVERNMENT' | 'TRUST';
 export type PossessionStatus = 'READY' | 'UNDER_CONSTRUCTION' | 'PRE_LAUNCH';

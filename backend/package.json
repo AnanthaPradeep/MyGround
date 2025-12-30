@@ -11,7 +11,8 @@
     "fix-index": "tsx scripts/fix-geospatial-index.ts",
     "fix-assetdna": "tsx scripts/fix-assetdna-index.ts",
     "fix-assetdna-duplicates": "tsx scripts/fix-assetdna-duplicates.ts",
-    "fix-phone-index": "tsx scripts/fix-phone-index.ts"
+    "fix-phone-index": "tsx scripts/fix-phone-index.ts",
+    "seed-filters": "tsx scripts/seedFilterOptions.ts"
   },
   "keywords": [
     "real-estate",

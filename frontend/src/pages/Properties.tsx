@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useProperties } from '../hooks/useProperties'
 import PropertyCard from '../components/PropertyCard'
-import AdvancedFilters from '../components/AdvancedFilters'
+import PropertyFilters from '../components/PropertyFilters'
 import Logo from '../components/Logo'
 import HeaderSearchBar from '../components/HeaderSearchBar'
 import HeaderIcons from '../components/HeaderIcons'
@@ -141,7 +141,7 @@ export default function Properties() {
           {/* Filters Sidebar */}
           {showFilters && (
             <div className="lg:col-span-1">
-              <AdvancedFilters
+              <PropertyFilters
                 searchParams={searchParams}
                 onFilterChange={handleFilterChange}
               />

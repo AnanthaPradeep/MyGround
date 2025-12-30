@@ -4,7 +4,7 @@ export interface IProperty extends Document {
   assetId: string; // MG Asset DNA™ ID (immutable)
   listedBy: mongoose.Types.ObjectId;
   transactionType: 'SELL' | 'RENT' | 'LEASE' | 'SUB_LEASE' | 'FRACTIONAL';
-  propertyCategory: 'RESIDENTIAL' | 'COMMERCIAL' | 'INDUSTRIAL' | 'LAND' | 'SPECIAL';
+  propertyCategory: 'RESIDENTIAL' | 'COMMERCIAL' | 'INDUSTRIAL' | 'LAND' | 'SPECIAL' | 'ISLAND';
   propertySubType: string;
   
   // Location & Geo
@@ -152,7 +152,7 @@ const PropertySchema = new Schema<IProperty>(
     },
     propertyCategory: {
       type: String,
-      enum: ['RESIDENTIAL', 'COMMERCIAL', 'INDUSTRIAL', 'LAND', 'SPECIAL'],
+      enum: ['RESIDENTIAL', 'COMMERCIAL', 'INDUSTRIAL', 'LAND', 'SPECIAL', 'ISLAND'],
       required: true,
     },
     propertySubType: {

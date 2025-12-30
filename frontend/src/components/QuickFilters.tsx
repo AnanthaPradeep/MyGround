@@ -18,7 +18,7 @@ export default function QuickFilters() {
   const { propertyTypes } = usePropertyTypes({ useSampleData: true })
 
   // Filter to show only main transaction types in quick filters
-  const mainTransactionTypes = transactionTypes.filter((t) => ['SELL', 'RENT', 'LEASE', 'BUY'].includes(t.value))
+  const mainTransactionTypes = transactionTypes.filter((t) => ['SELL', 'RENT', 'LEASE'].includes(t.value))
   const mainPropertyCategories = propertyTypes.filter((p) => ['RESIDENTIAL', 'COMMERCIAL', 'INDUSTRIAL', 'LAND', 'SPECIAL', 'ISLAND'].includes(p.value))
 
   const checkOverflow = (ref: React.RefObject<HTMLDivElement>, setOverflow: (value: boolean) => void) => {

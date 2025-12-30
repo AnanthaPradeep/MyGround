@@ -471,12 +471,29 @@ router.get('/', async (req, res) => {
     const {
       transactionType,
       propertyCategory,
+      propertySubType,
       city,
       state,
+      area,
+      pincode,
       minPrice,
       maxPrice,
+      minRentAmount,
+      maxRentAmount,
+      minLeaseValue,
+      maxLeaseValue,
       minArea,
       maxArea,
+      bhk,
+      furnishing,
+      parking,
+      ownershipType,
+      possessionStatus,
+      reraRegistered,
+      titleClear,
+      encumbranceFree,
+      verified,
+      maxAge,
       status,
       page = 1,
       limit = 20,
@@ -484,16 +501,23 @@ router.get('/', async (req, res) => {
 
     const query: any = {};
 
+    // Basic filters
     if (transactionType) query.transactionType = transactionType;
     if (propertyCategory) query.propertyCategory = propertyCategory;
+    if (propertySubType) query.propertySubType = propertySubType;
+    
+    // Location filters
     if (city) query['location.city'] = new RegExp(city as string, 'i');
     if (state) query['location.state'] = new RegExp(state as string, 'i');
+    if (area) query['location.area'] = new RegExp(area as string, 'i');
+    if (pincode) query['location.pincode'] = pincode;
     
     // Filter by listedBy if provided (for user's own properties in dashboard)
     if (req.query.listedBy) {
       query.listedBy = req.query.listedBy;
     }
     
+    // Status filter
     if (status) {
       query.status = status;
     } else {
@@ -509,21 +533,114 @@ router.get('/', async (req, res) => {
       }
     }
 
-    // Price filters
-    if (minPrice || maxPrice) {
+    // Pricing filters - handle different transaction types
+    const pricingQuery: any = {};
+    
+    // For SELL or FRACTIONAL - use expectedPrice
+    if ((transactionType === 'SELL' || transactionType === 'FRACTIONAL' || !transactionType) && (minPrice || maxPrice)) {
+      if (minPrice) pricingQuery['pricing.expectedPrice'] = { $gte: Number(minPrice) };
+      if (maxPrice) {
+        pricingQuery['pricing.expectedPrice'] = {
+          ...(pricingQuery['pricing.expectedPrice'] || {}),
+          $lte: Number(maxPrice),
+        };
+      }
+    }
+    
+    // For RENT or SUB_LEASE - use rentAmount
+    if ((transactionType === 'RENT' || transactionType === 'SUB_LEASE') && (minRentAmount || maxRentAmount || minPrice || maxPrice)) {
+      const minRent = minRentAmount || minPrice;
+      const maxRent = maxRentAmount || maxPrice;
+      if (minRent) pricingQuery['pricing.rentAmount'] = { $gte: Number(minRent) };
+      if (maxRent) {
+        pricingQuery['pricing.rentAmount'] = {
+          ...(pricingQuery['pricing.rentAmount'] || {}),
+          $lte: Number(maxRent),
+        };
+      }
+    }
+    
+    // For LEASE - use leaseValue
+    if (transactionType === 'LEASE' && (minLeaseValue || maxLeaseValue)) {
+      if (minLeaseValue) pricingQuery['pricing.leaseValue'] = { $gte: Number(minLeaseValue) };
+      if (maxLeaseValue) {
+        pricingQuery['pricing.leaseValue'] = {
+          ...(pricingQuery['pricing.leaseValue'] || {}),
+          $lte: Number(maxLeaseValue),
+        };
+      }
+    }
+    
+    // If no transaction type specified, check all pricing fields
+    if (!transactionType && (minPrice || maxPrice)) {
       query.$or = [
         { 'pricing.expectedPrice': {} },
         { 'pricing.rentAmount': {} },
+        { 'pricing.leaseValue': {} },
       ];
       if (minPrice) {
         query.$or[0]['pricing.expectedPrice'].$gte = Number(minPrice);
         query.$or[1]['pricing.rentAmount'].$gte = Number(minPrice);
+        query.$or[2]['pricing.leaseValue'].$gte = Number(minPrice);
       }
       if (maxPrice) {
         query.$or[0]['pricing.expectedPrice'].$lte = Number(maxPrice);
         query.$or[1]['pricing.rentAmount'].$lte = Number(maxPrice);
+        query.$or[2]['pricing.leaseValue'].$lte = Number(maxPrice);
+      }
+    } else if (Object.keys(pricingQuery).length > 0) {
+      Object.assign(query, pricingQuery);
+    }
+
+    // Area filters
+    if (minArea || maxArea) {
+      const areaQuery: any = {};
+      if (propertyCategory === 'LAND') {
+        // For land, filter by land.plotArea
+        if (minArea) areaQuery['land.plotArea'] = { $gte: Number(minArea) };
+        if (maxArea) {
+          areaQuery['land.plotArea'] = {
+            ...(areaQuery['land.plotArea'] || {}),
+            $lte: Number(maxArea),
+          };
+        }
+      } else if (propertyCategory === 'RESIDENTIAL') {
+        // For residential, might need to add area field or use a different approach
+        // This would depend on your schema - you might need to add area to residential
+        // For now, we'll skip residential area filtering or handle it differently
+      } else {
+        // For commercial/industrial, filter by commercial.builtUpArea
+        if (minArea) areaQuery['commercial.builtUpArea'] = { $gte: Number(minArea) };
+        if (maxArea) {
+          areaQuery['commercial.builtUpArea'] = {
+            ...(areaQuery['commercial.builtUpArea'] || {}),
+            $lte: Number(maxArea),
+          };
+        }
+      }
+      if (Object.keys(areaQuery).length > 0) {
+        Object.assign(query, areaQuery);
       }
     }
+
+    // Residential specific filters
+    if (bhk) query['residential.bhk'] = Number(bhk);
+    if (furnishing) query['residential.furnishing'] = furnishing;
+    if (parking) query['residential.parking'] = parking;
+
+    // Property details filters
+    if (ownershipType) query.ownershipType = ownershipType;
+    if (possessionStatus) query.possessionStatus = possessionStatus;
+    if (maxAge) {
+      const currentYear = new Date().getFullYear();
+      query.propertyAge = { $lte: Number(maxAge) };
+    }
+
+    // Legal filters
+    if (reraRegistered === 'true') query['legal.reraNumber'] = { $exists: true, $ne: '' };
+    if (titleClear === 'true') query['legal.titleClear'] = true;
+    if (encumbranceFree === 'true') query['legal.encumbranceFree'] = true;
+    if (verified === 'true') query.isVerified = true;
 
     const skip = (Number(page) - 1) * Number(limit);
 
