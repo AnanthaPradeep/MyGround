@@ -522,13 +522,13 @@ export default function CreateProperty() {
         </div>
 
         {/* Progress Steps */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
-          <div className="flex items-center justify-between">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6 mb-6">
+          <div className="flex items-center">
             {STEPS.map((step, index) => (
-              <div key={step.id} className="flex items-center flex-1">
-                <div className="flex flex-col items-center flex-1">
+              <div key={step.id} className={`flex items-center ${index < STEPS.length - 1 ? 'flex-1 min-w-0' : 'flex-shrink-0'}`}>
+                <div className="flex flex-col items-center flex-shrink-0">
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
+                    className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-semibold text-sm sm:text-base ${
                       currentStep > step.id
                         ? 'bg-primary-600 dark:bg-primary-500 text-white'
                         : currentStep === step.id
@@ -537,13 +537,13 @@ export default function CreateProperty() {
                     }`}
                   >
                     {currentStep > step.id ? (
-                      <CheckIcon className="w-5 h-5" />
+                      <CheckIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                     ) : (
                       step.id
                     )}
                   </div>
                   <span
-                    className={`mt-2 text-xs font-medium ${
+                    className={`mt-1.5 sm:mt-2 text-[10px] sm:text-xs font-medium text-center whitespace-nowrap ${
                       currentStep >= step.id ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'
                     }`}
                   >
@@ -552,7 +552,7 @@ export default function CreateProperty() {
                 </div>
                 {index < STEPS.length - 1 && (
                   <div
-                    className={`h-1 flex-1 mx-2 ${
+                    className={`h-1 flex-1 mx-1 sm:mx-2 min-w-[8px] sm:min-w-[12px] ${
                       currentStep > step.id ? 'bg-primary-600 dark:bg-primary-500' : 'bg-gray-200 dark:bg-gray-700'
                     }`}
                   />
