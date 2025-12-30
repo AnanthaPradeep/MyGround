@@ -22,6 +22,36 @@ export interface IUser extends Document {
   trustScore: number;
   profilePicture?: string;
   savedSearches: mongoose.Types.ObjectId[];
+  location?: {
+    // Coordinates (GeoJSON Point format)
+    coordinates: {
+      type: 'Point';
+      coordinates: [number, number]; // [longitude, latitude]
+    };
+    // Location details in English
+    city: string;
+    state: string;
+    country: string;
+    area?: string;
+    locality?: string;
+    pincode?: string;
+    address?: string;
+    displayName: string;
+    // Location details in regional language (optional)
+    regionalNames?: {
+      city?: string;
+      state?: string;
+      area?: string;
+      locality?: string;
+      language?: string; // e.g., 'hi', 'mr', 'ta', 'te', etc.
+    };
+    // Source of location
+    source: 'GPS' | 'MANUAL' | 'SEARCH';
+    // Accuracy in meters (for GPS)
+    accuracy?: number;
+    // Last updated timestamp
+    lastUpdated: Date;
+  };
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -96,11 +126,54 @@ const UserSchema = new Schema<IUser>(
       type: Schema.Types.ObjectId,
       ref: 'SavedSearch',
     }],
+    location: {
+      coordinates: {
+        type: {
+          type: String,
+          enum: ['Point'],
+          // Remove default to prevent invalid GeoJSON
+        },
+        coordinates: {
+          type: [Number],
+        },
+      },
+      city: String,
+      state: String,
+      country: {
+        type: String,
+        default: 'India',
+      },
+      area: String,
+      locality: String,
+      pincode: String,
+      address: String,
+      displayName: String,
+      regionalNames: {
+        city: String,
+        state: String,
+        area: String,
+        locality: String,
+        language: String, // Language code (ISO 639-1)
+      },
+      source: {
+        type: String,
+        enum: ['GPS', 'MANUAL', 'SEARCH'],
+        default: 'MANUAL',
+      },
+      accuracy: Number,
+      lastUpdated: {
+        type: Date,
+        default: Date.now,
+      },
+    },
   },
   {
     timestamps: true,
   }
 );
+
+// Index for location coordinates (for geospatial queries)
+UserSchema.index({ 'location.coordinates': '2dsphere' });
 
 // Hash password before saving
 UserSchema.pre('save', async function (next) {
@@ -110,6 +183,19 @@ UserSchema.pre('save', async function (next) {
   
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+  next();
+});
+
+// Validate location coordinates before saving
+UserSchema.pre('save', function (next) {
+  // If location exists but coordinates are incomplete, remove location entirely
+  if (this.location && this.location.coordinates) {
+    const coords = this.location.coordinates;
+    // If type is set but coordinates array is missing or invalid, remove the location
+    if (coords.type === 'Point' && (!coords.coordinates || !Array.isArray(coords.coordinates) || coords.coordinates.length !== 2)) {
+      this.location = undefined;
+    }
+  }
   next();
 });
 

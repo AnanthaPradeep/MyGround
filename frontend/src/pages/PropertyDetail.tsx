@@ -13,6 +13,7 @@ import UserDropdown from '../components/UserDropdown'
 import MobileMenu from '../components/MobileMenu'
 import Footer from '../components/Footer'
 import { PageLoader } from '../components/Loader'
+import ImageWithFallback from '../components/ImageWithFallback'
 import { useAuthStore } from '../store/authStore'
 import { useWishlistStore } from '../store/wishlistStore'
 import { useWishlist } from '../hooks/useWishlist'
@@ -206,12 +207,17 @@ export default function PropertyDetail() {
           <div className="lg:col-span-2 space-y-6">
             {/* Image Gallery */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
-              <div className="relative h-96 bg-gray-200">
+              <div className="relative h-96 bg-gray-200 dark:bg-gray-700">
                 {property.media.images && property.media.images.length > 0 ? (
-                  <img
+                  <ImageWithFallback
                     src={property.media.images[activeImageIndex]}
                     alt={property.title}
                     className="w-full h-full object-cover"
+                    placeholder={
+                      <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
+                        <PhotoIcon className="w-24 h-24" />
+                      </div>
+                    }
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
@@ -229,7 +235,11 @@ export default function PropertyDetail() {
                         activeImageIndex === index ? 'border-primary-600' : 'border-transparent'
                       }`}
                     >
-                      <img src={img} alt={`${property.title} ${index + 1}`} className="w-full h-full object-cover" />
+                      <ImageWithFallback
+                        src={img}
+                        alt={`${property.title} ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
                     </button>
                   ))}
                 </div>

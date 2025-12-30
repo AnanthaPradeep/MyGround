@@ -1,7 +1,38 @@
-import { useEffect, useState, useCallback, useRef } from 'react'
-import { useLoadScript, GoogleMap, Marker } from '@react-google-maps/api'
+import { useEffect, useState, useRef, useCallback } from 'react'
+import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents, ZoomControl } from 'react-leaflet'
+import { Icon, LatLngExpression } from 'leaflet'
+import type { Marker as LeafletMarker } from 'leaflet'
 import { MapPinIcon } from '@heroicons/react/24/outline'
-import { GOOGLE_MAPS_CONFIG } from '../config/googleMaps'
+import 'leaflet/dist/leaflet.css'
+
+// Fix for default marker icon in Leaflet with Vite
+import L from 'leaflet'
+import icon from 'leaflet/dist/images/marker-icon.png'
+import iconShadow from 'leaflet/dist/images/marker-shadow.png'
+import iconRetina from 'leaflet/dist/images/marker-icon-2x.png'
+
+// Fix default icon issue
+delete (L.Icon.Default.prototype as any)._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconUrl: icon,
+  iconRetinaUrl: iconRetina,
+  shadowUrl: iconShadow,
+})
+
+// Custom marker icon with primary color
+const createCustomIcon = (color: string = '#0259bb') => {
+  return new Icon({
+    iconUrl: `data:image/svg+xml;base64,${btoa(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40">
+        <path fill="${color}" d="M16 0C7.163 0 0 7.163 0 16c0 11 16 24 16 24s16-13 16-24C32 7.163 24.837 0 16 0z"/>
+        <circle fill="#ffffff" cx="16" cy="16" r="8"/>
+      </svg>
+    `)}`,
+    iconSize: [32, 40],
+    iconAnchor: [16, 40],
+    popupAnchor: [0, -40],
+  })
+}
 
 interface MapPickerProps {
   latitude: number
@@ -10,44 +41,60 @@ interface MapPickerProps {
   className?: string
   height?: string
   readOnly?: boolean
+  onConfirm?: (lat: number, lng: number) => void
+  showConfirmButton?: boolean
 }
 
-const containerStyle = {
-  width: '100%',
-  height: '100%',
+const defaultCenter: [number, number] = [19.0760, 72.8777] // Mumbai
+
+// Component to handle map click events
+function MapClickHandler({ 
+  onLocationChange, 
+  readOnly 
+}: { 
+  onLocationChange: (lat: number, lng: number, isAuto: boolean) => void
+  readOnly: boolean 
+}) {
+  useMapEvents({
+    click: (e) => {
+      if (!readOnly) {
+        const { lat, lng } = e.latlng
+        onLocationChange(lat, lng, false)
+      }
+    },
+  })
+  return null
 }
 
-const defaultCenter = {
-  lat: 19.0760, // Mumbai
-  lng: 72.8777,
-}
-
-// Custom marker icon - using a simpler approach that works even if Google Maps API has issues
-const getMarkerIcon = (isLoaded: boolean): google.maps.Icon | string | undefined => {
-  if (!isLoaded || typeof google === 'undefined' || !google.maps) {
-    // Return a simple URL-based icon if Google Maps API isn't fully loaded
-    return 'https://maps.google.com/mapfiles/ms/icons/red-dot.png'
-  }
+// Component to update map center when props change and store map reference
+function MapCenterUpdater({ 
+  center, 
+  zoom,
+  onMapReady
+}: { 
+  center: LatLngExpression
+  zoom: number
+  onMapReady?: (map: L.Map) => void
+}) {
+  const map = useMap()
   
-  try {
-    return {
-      url: 'data:image/svg+xml;base64,' + btoa(`
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40">
-          <path fill="#0259bb" d="M16 0C7.163 0 0 7.163 0 16c0 11 16 24 16 24s16-13 16-24C32 7.163 24.837 0 16 0z"/>
-          <circle fill="#ffffff" cx="16" cy="16" r="8"/>
-        </svg>
-      `),
-      scaledSize: new google.maps.Size(32, 40),
-      anchor: new google.maps.Point(16, 40),
+  useEffect(() => {
+    if (onMapReady) {
+      onMapReady(map)
     }
-  } catch (error) {
-    console.warn('Error creating custom marker icon, using default:', error)
-    return undefined // Use default Google Maps marker
-  }
+  }, [map, onMapReady])
+  
+  useEffect(() => {
+    if (Array.isArray(center) && center.length === 2) {
+      map.setView(center, zoom)
+    }
+  }, [map, center, zoom])
+  
+  return null
 }
 
 /**
- * Map Picker Component using Google Maps
+ * Map Picker Component using Leaflet
  * Interactive map for selecting property location
  * Click on map to automatically set location
  */
@@ -58,244 +105,313 @@ export default function MapPicker({
   className = '',
   height = '400px',
   readOnly = false,
+  onConfirm,
+  showConfirmButton = false,
 }: MapPickerProps) {
-  const [position, setPosition] = useState<{ lat: number; lng: number }>({
-    lat: latitude || defaultCenter.lat,
-    lng: longitude || defaultCenter.lng,
-  })
-  const [error, setError] = useState<string | null>(null)
-  const mapRef = useRef<google.maps.Map | null>(null)
+  const getInitialPosition = (): [number, number] => {
+    if (latitude && latitude !== 0 && longitude && longitude !== 0) {
+      return [latitude, longitude]
+    }
+    return [defaultCenter[0], defaultCenter[1]]
+  }
 
-  // Load Google Maps script
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: GOOGLE_MAPS_CONFIG.apiKey,
-    libraries: GOOGLE_MAPS_CONFIG.libraries as any,
-    id: 'google-map-script', // Add unique ID to prevent multiple loads
-  })
+  const [position, setPosition] = useState<[number, number]>(getInitialPosition())
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isLocationChanged, setIsLocationChanged] = useState(false)
+  const [pendingLocation, setPendingLocation] = useState<[number, number] | null>(null)
+  const markerRef = useRef<LeafletMarker>(null)
+  const mapRef = useRef<L.Map | null>(null)
 
   // Update position when props change
   useEffect(() => {
-    if (latitude && longitude) {
-      const newPosition = { lat: latitude, lng: longitude }
-      if (newPosition.lat !== position.lat || newPosition.lng !== position.lng) {
-        setPosition(newPosition)
+    if (latitude && longitude && latitude !== 0 && longitude !== 0) {
+      const newPosition: [number, number] = [latitude, longitude]
+      setPosition(newPosition)
+      setError(null)
+      setIsLocationChanged(false)
+      setPendingLocation(null)
+    }
+  }, [latitude, longitude])
+
+  // Handle location change
+  const handleLocationChange = useCallback((lat: number, lng: number, isAuto = false) => {
+    const newPosition: [number, number] = [lat, lng]
+    setPosition(newPosition)
+    setError(null)
+    
+    // If auto-location (from current location button), confirm immediately
+    if (isAuto) {
+      onLocationChange(lat, lng)
+      setIsLocationChanged(false)
+      setPendingLocation(null)
+      if (onConfirm) {
+        onConfirm(lat, lng)
+      }
+    } else {
+      // Manual location change - set as pending
+      setPendingLocation(newPosition)
+      setIsLocationChanged(true)
+    }
+    
+    // Update marker position
+    if (markerRef.current) {
+      markerRef.current.setLatLng(newPosition)
+    }
+  }, [onLocationChange, onConfirm])
+  
+  // Confirm location manually set
+  const handleConfirmLocation = useCallback(() => {
+    if (pendingLocation) {
+      onLocationChange(pendingLocation[0], pendingLocation[1])
+      setIsLocationChanged(false)
+      setPendingLocation(null)
+      if (onConfirm) {
+        onConfirm(pendingLocation[0], pendingLocation[1])
+      }
+    }
+  }, [pendingLocation, onLocationChange, onConfirm])
+
+  // Get current location with high accuracy
+  const getCurrentLocation = useCallback(() => {
+    if (!navigator.geolocation) {
+      setError('Geolocation is not supported by your browser')
+      return
+    }
+
+    setIsLoading(true)
+    setError(null)
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude: lat, longitude: lng } = position.coords
         
-        // Center map on new position
+        // Update position immediately and auto-confirm (isAuto = true)
+        handleLocationChange(lat, lng, true)
+        
+        // Center and zoom to current location (zoom level 18 for street-level view)
         if (mapRef.current) {
-          mapRef.current.setCenter(newPosition)
-          mapRef.current.setZoom(15)
+          mapRef.current.setView([lat, lng], 18, { animate: true, duration: 0.5 })
+        }
+        
+        setIsLoading(false)
+      },
+      (error) => {
+        console.error('Geolocation error:', error)
+        let errorMessage = 'Unable to get your location'
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = 'Location access denied. Please enable location permissions in your browser settings.'
+            break
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = 'Location information unavailable. Please try again.'
+            break
+          case error.TIMEOUT:
+            errorMessage = 'Location request timed out. Please try again.'
+            break
+        }
+        
+        setError(errorMessage)
+        setIsLoading(false)
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 0,
+      }
+    )
+  }, [handleLocationChange])
+  
+  // Store map reference when ready
+  const handleMapReady = useCallback((map: L.Map) => {
+    mapRef.current = map
+  }, [])
+
+  // Handle marker drag end - immediately update location and trigger reverse geocoding
+  const handleMarkerDragEnd = useCallback((e: any) => {
+    if (!readOnly && e.target) {
+      const marker = e.target as LeafletMarker
+      const latlng = marker.getLatLng()
+      const lat = latlng.lat
+      const lng = latlng.lng
+      
+      // Update position immediately
+      setPosition([lat, lng])
+      setError(null)
+      
+      // Immediately call onLocationChange to update parent and trigger reverse geocoding
+      // This ensures coordinates and address fields are updated when dragging
+      onLocationChange(lat, lng)
+      
+      // Also set as pending if showConfirmButton is enabled
+      if (showConfirmButton) {
+        setPendingLocation([lat, lng])
+        setIsLocationChanged(true)
+      } else {
+        // If no confirm button, auto-confirm
+        setIsLocationChanged(false)
+        setPendingLocation(null)
+        if (onConfirm) {
+          onConfirm(lat, lng)
         }
       }
     }
-  }, [latitude, longitude])
+  }, [readOnly, onLocationChange, onConfirm, showConfirmButton])
 
-  // Initialize map center - only if no coordinates provided
-  useEffect(() => {
-    if (isLoaded && mapRef.current) {
-      // If coordinates are provided, use them
-      if (latitude && longitude && latitude !== 0 && longitude !== 0) {
-        const center = { lat: latitude, lng: longitude }
-        setPosition(center)
-        mapRef.current.setCenter(center)
-        mapRef.current.setZoom(15)
-      } else {
-        // Use default center if no coordinates
-        mapRef.current.setCenter(defaultCenter)
-        mapRef.current.setZoom(10)
-      }
-    }
-  }, [isLoaded, latitude, longitude])
-
-  const onMapLoad = useCallback((mapInstance: google.maps.Map) => {
-    mapRef.current = mapInstance
-    
-    // Set initial center
-    if (latitude && longitude) {
-      mapInstance.setCenter({ lat: latitude, lng: longitude })
-      mapInstance.setZoom(15)
-    } else {
-      mapInstance.setCenter(defaultCenter)
-      mapInstance.setZoom(10)
-    }
-  }, [latitude, longitude])
-
-  const onMapUnmount = useCallback(() => {
-    mapRef.current = null
-  }, [])
-
-  // Handle map click - PRIMARY METHOD TO SET LOCATION
-  const handleMapClick = useCallback((e: google.maps.MapMouseEvent) => {
-    if (!readOnly && e.latLng) {
-      const lat = e.latLng.lat()
-      const lng = e.latLng.lng()
-      const newPosition = { lat, lng }
-      
-      setPosition(newPosition)
-      setError(null)
-      
-      // IMPORTANT: Call the callback to update parent
-      onLocationChange(lat, lng)
-      
-      // Center map on clicked location
-      if (mapRef.current) {
-        mapRef.current.setCenter(newPosition)
-        mapRef.current.setZoom(15)
-      }
-    }
-  }, [readOnly, onLocationChange])
-
-  // Handle marker drag end
-  const handleMarkerDragEnd = useCallback((e: google.maps.MapMouseEvent) => {
-    if (!readOnly && e.latLng) {
-      const lat = e.latLng.lat()
-      const lng = e.latLng.lng()
-      const newPosition = { lat, lng }
-      
-      setPosition(newPosition)
-      setError(null)
-      onLocationChange(lat, lng)
-    }
-  }, [readOnly, onLocationChange])
-
-
-  // Show error if Google Maps fails to load
-  if (loadError) {
-    console.error('Google Maps load error:', loadError)
-    const isBillingError = loadError.message?.includes('BillingNotEnabled') || loadError.message?.includes('billing')
-    
-    return (
-      <div className={`relative ${className}`} style={{ height }}>
-        <div className="w-full h-full flex items-center justify-center bg-red-50 border-2 border-red-200 rounded-lg">
-          <div className="text-center p-4 max-w-md">
-            <p className="text-red-700 font-medium mb-2">⚠️ Failed to load Google Maps</p>
-            
-            {isBillingError ? (
-              <>
-                <p className="text-red-600 font-semibold mb-2">🔴 Billing Not Enabled</p>
-                <p className="text-red-600 text-sm mb-3">
-                  You must enable billing for your Google Cloud project. <strong>Don't worry - Google Maps has a generous free tier ($200/month free credit) that covers most apps!</strong>
-                </p>
-                <div className="bg-yellow-50 border border-yellow-200 rounded p-3 mb-3 text-left">
-                  <p className="text-xs font-semibold text-yellow-800 mb-1">Quick Fix:</p>
-                  <ol className="text-xs text-yellow-700 space-y-1 list-decimal list-inside">
-                    <li>Go to <a href="https://console.cloud.google.com/billing" target="_blank" rel="noopener noreferrer" className="underline font-medium">Google Cloud Billing</a></li>
-                    <li>Link a billing account to your project</li>
-                    <li>Wait 2-5 minutes, then refresh this page</li>
-                  </ol>
-                </div>
-                <a
-                  href="https://console.cloud.google.com/billing"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
-                >
-                  Enable Billing Now →
-                </a>
-                <p className="text-xs text-gray-600 mt-3">
-                  See <code className="bg-gray-100 px-1 rounded">ENABLE_BILLING_GUIDE.md</code> for detailed instructions
-                </p>
-              </>
-            ) : (
-              <>
-                <p className="text-red-600 text-sm mb-3">Common fixes:</p>
-                <ul className="text-left text-xs text-red-600 space-y-1 mb-3">
-                  <li>• Check API key in <code className="bg-red-100 px-1 rounded">.env</code> file</li>
-                  <li>• Verify Maps JavaScript API is enabled in Google Cloud Console</li>
-                  <li>• Check API key restrictions (allow <code className="bg-red-100 px-1 rounded">localhost:5173</code>)</li>
-                  <li>• Ensure billing is enabled for your Google Cloud project</li>
-                </ul>
-                <p className="text-red-500 text-xs mt-2">Error: {loadError.message}</p>
-              </>
-            )}
-            
-            <button
-              onClick={() => window.location.reload()}
-              className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm"
-            >
-              Reload Page
-            </button>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // Show loading state
-  if (!isLoaded) {
-    return (
-      <div className={`relative ${className}`} style={{ height }}>
-        <div className="w-full h-full flex items-center justify-center bg-gray-100 border-2 border-gray-300 rounded-lg">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading Google Maps...</p>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  const center: LatLngExpression = position
+  const zoom = position[0] === defaultCenter[0] && position[1] === defaultCenter[1] ? 10 : 15
 
   return (
     <div className={`relative ${className}`} style={{ height }}>
-      <div className="w-full h-full rounded-lg overflow-hidden border-2 border-gray-300">
-        <GoogleMap
-          mapContainerStyle={containerStyle}
-          center={position}
-          zoom={position.lat === defaultCenter.lat && position.lng === defaultCenter.lng ? 10 : 15}
-          onLoad={onMapLoad}
-          onUnmount={onMapUnmount}
-          onClick={handleMapClick}
-          options={{
-            disableDefaultUI: false,
-            zoomControl: true,
-            streetViewControl: false,
-            mapTypeControl: false,
-            fullscreenControl: true,
-            clickableIcons: false,
-            gestureHandling: 'greedy',
-            draggable: true,
-            scrollwheel: true,
-          }}
+      <div className="w-full h-full rounded-lg overflow-hidden border-2 border-gray-300 dark:border-gray-600">
+        <MapContainer
+          center={center}
+          zoom={zoom}
+          style={{ height: '100%', width: '100%' }}
+          scrollWheelZoom={true}
+          className="z-0"
+          zoomControl={false}
         >
-          {/* Marker - Always show when map is loaded */}
-          {isLoaded && typeof google !== 'undefined' && google.maps && (
-            <Marker
-              position={position}
-              draggable={!readOnly}
-              onDragEnd={handleMarkerDragEnd}
-              animation={google.maps.Animation.DROP}
-              icon={getMarkerIcon(isLoaded)}
-              visible={true}
-              zIndex={1000}
-              title="Property Location"
-              clickable={true}
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          
+          {/* Custom Zoom Controls - Bottom Right */}
+          <ZoomControl position="bottomright" />
+          
+          {/* Update map center when position changes and store map reference */}
+          <MapCenterUpdater center={center} zoom={zoom} onMapReady={handleMapReady} />
+          
+          {/* Handle map clicks */}
+          {!readOnly && (
+            <MapClickHandler 
+              onLocationChange={handleLocationChange}
+              readOnly={readOnly}
             />
           )}
-        </GoogleMap>
+
+          {/* Marker */}
+          <Marker
+            position={position}
+            draggable={!readOnly}
+            ref={markerRef}
+            icon={createCustomIcon('#0259bb')}
+            eventHandlers={{
+              dragend: handleMarkerDragEnd,
+            } as any}
+          >
+            <Popup>
+              <div className="text-center">
+                <p className="font-medium text-gray-900 dark:text-gray-100">Property Location</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  {position[0].toFixed(6)}, {position[1].toFixed(6)}
+                </p>
+                {!readOnly && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Drag marker to adjust location
+                  </p>
+                )}
+              </div>
+            </Popup>
+          </Marker>
+        </MapContainer>
       </div>
 
       {/* Instructions Overlay */}
       {!readOnly && (
-        <div className="absolute top-2 left-2 bg-white/95 backdrop-blur-sm px-3 py-2 rounded-lg shadow-lg text-xs text-gray-700 z-[1000] max-w-[220px]">
+        <div className="absolute top-2 left-2 bg-white dark:bg-gray-800/95 backdrop-blur-sm px-3 py-2 rounded-lg shadow-lg text-xs text-gray-700 dark:text-gray-300 z-[1000] max-w-[220px] border border-gray-200 dark:border-gray-700">
           <p className="font-medium mb-1 flex items-center gap-1">
-            <MapPinIcon className="w-4 h-4 text-primary-600" />
-            Click on map to set location
+            <MapPinIcon className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+            Click on map or use current location
           </p>
         </div>
       )}
 
+      {/* Current Location Button - Top Right Corner */}
+      {!readOnly && (
+        <button
+          onClick={getCurrentLocation}
+          disabled={isLoading}
+          className="absolute top-2 right-2 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 w-10 h-10 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-[1000] flex items-center justify-center transition-all hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+          title="Use my current location"
+          aria-label="Get current location"
+        >
+          {isLoading ? (
+            <div className="animate-spin rounded-full h-5 w-5 border-2 border-primary-600 border-t-transparent"></div>
+          ) : (
+            <svg
+              className="w-5 h-5 text-primary-600 dark:text-primary-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+          )}
+        </button>
+      )}
+
+      {/* Confirm Location Button - Shows when location is manually changed */}
+      {!readOnly && showConfirmButton && isLocationChanged && pendingLocation && (
+        <button
+          onClick={handleConfirmLocation}
+          className="absolute bottom-2 right-2 bg-primary-600 dark:bg-primary-500 hover:bg-primary-700 dark:hover:bg-primary-600 text-white px-4 py-2 rounded-lg shadow-lg border border-primary-700 dark:border-primary-600 z-[1000] flex items-center gap-2 text-sm font-medium transition-all hover:shadow-xl"
+          title="Confirm this location"
+        >
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+          Confirm Location
+        </button>
+      )}
+
       {readOnly && (
-        <div className="absolute top-2 left-2 bg-white/95 backdrop-blur-sm px-3 py-2 rounded-lg shadow-lg text-xs text-gray-700 z-[1000]">
+        <div className="absolute top-2 left-2 bg-white dark:bg-gray-800/95 backdrop-blur-sm px-3 py-2 rounded-lg shadow-lg text-xs text-gray-700 dark:text-gray-300 z-[1000] border border-gray-200 dark:border-gray-700">
           <p className="font-medium">Property Location</p>
         </div>
       )}
 
       {/* Error Message */}
       {error && (
-        <div className="absolute top-2 right-2 bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg shadow-lg text-xs z-[1000] max-w-[250px]">
+        <div className="absolute top-2 right-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-3 py-2 rounded-lg shadow-lg text-xs z-[1000] max-w-[250px]">
           <p className="font-medium">⚠️ {error}</p>
         </div>
       )}
 
+      {/* Coordinates Display */}
+      {position[0] !== defaultCenter[0] || position[1] !== defaultCenter[1] ? (
+        <div className="absolute bottom-2 left-2 bg-white dark:bg-gray-800/95 backdrop-blur-sm px-3 py-2 rounded-lg shadow-lg text-xs text-gray-700 dark:text-gray-300 z-[1000] border border-gray-200 dark:border-gray-700">
+          <p className="font-medium text-green-600 dark:text-green-400 mb-1">✅ Location Set</p>
+          <p className="text-xs font-mono">
+            {position[0].toFixed(6)}, {position[1].toFixed(6)}
+          </p>
+        </div>
+      ) : null}
     </div>
   )
 }

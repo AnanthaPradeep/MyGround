@@ -1,7 +1,5 @@
-import { GOOGLE_MAPS_CONFIG } from '../config/googleMaps'
-
 /**
- * Reverse Geocoding using Google Geocoding API
+ * Reverse Geocoding using OpenStreetMap Nominatim API
  * Converts coordinates to address
  */
 export const reverseGeocode = async (lat: number, lng: number): Promise<{
@@ -15,100 +13,35 @@ export const reverseGeocode = async (lat: number, lng: number): Promise<{
 } | null> => {
   try {
     const response = await fetch(
-      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_MAPS_CONFIG.apiKey}`
+      `https://nominatim.openstreetmap.org/reverse?` +
+      `lat=${lat}&lon=${lng}` +
+      `&format=json` +
+      `&addressdetails=1` +
+      `&email=contact@myground.in`,
+      {
+        headers: {
+          'User-Agent': 'MyGround Real Estate Platform',
+        },
+      }
     )
+    
+    if (!response.ok) {
+      throw new Error('Reverse geocoding failed')
+    }
     
     const data = await response.json()
     
-    if (data.status === 'OK' && data.results.length > 0) {
-      const result = data.results[0]
-      const addressComponents = result.address_components
-      
-      let city = ''
-      let state = ''
-      let country = 'India'
-      let pincode = ''
-      let area = ''
-      let locality = ''
-      
-      addressComponents.forEach((component: any) => {
-        const types = component.types
-        
-        // Priority order for area/locality
-        if (types.includes('sublocality_level_1') || types.includes('sublocality_level_2') || types.includes('sublocality')) {
-          if (!area) area = component.long_name
-          if (!locality) locality = component.long_name
-        }
-        
-        // City/Locality
-        if (types.includes('locality')) {
-          city = component.long_name
-          if (!area) area = component.long_name // Use city as area if no sublocality
-        }
-        
-        // Administrative area level 2 (district)
-        if (types.includes('administrative_area_level_2')) {
-          if (!city) city = component.long_name
-        }
-        
-        // State
-        if (types.includes('administrative_area_level_1')) {
-          state = component.long_name
-        }
-        
-        // Country
-        if (types.includes('country')) {
-          country = component.long_name
-        }
-        
-        // Pincode
-        if (types.includes('postal_code')) {
-          pincode = component.long_name
-        }
-        
-        // Neighborhood (can be used as area)
-        if (types.includes('neighborhood') && !area) {
-          area = component.long_name
-        }
-      })
-      
-      // Fallback: if no area found, use city or first available component
-      if (!area && !locality) {
-        const sublocality = addressComponents.find((c: any) => 
-          c.types.some((t: string) => t.includes('sublocality') || t.includes('neighborhood'))
-        )
-        if (sublocality) {
-          area = sublocality.long_name
-          locality = sublocality.long_name
-        } else if (city) {
-          area = city
-          locality = city
-        } else {
-          // Use first component as fallback
-          const firstComponent = addressComponents[0]
-          if (firstComponent) {
-            area = firstComponent.long_name
-            locality = firstComponent.long_name
-          }
-        }
-      }
-      
-      const finalArea = area || locality || city
-      const finalLocality = locality || area || city
+    if (data && data.address) {
+      const address = data.address
       
       return {
-        address: result.formatted_address,
-        city: city || addressComponents.find((c: any) => c.types.includes('administrative_area_level_2'))?.long_name || '',
-        state: state || '',
-        country,
-        pincode: pincode || undefined,
-        area: finalArea || undefined,
-        locality: finalLocality || undefined,
-      }
-    } else {
-      console.warn('📍 Reverse geocoding failed:', data.status, data.error_message || 'No results')
-      if (data.status === 'REQUEST_DENIED') {
-        console.error('📍 Geocoding API request denied. Check API key and billing status.')
+        address: data.display_name || '',
+        city: address.city || address.town || address.village || address.county || '',
+        state: address.state || '',
+        country: address.country || 'India',
+        pincode: address.postcode || undefined,
+        area: address.suburb || address.neighbourhood || address.locality || undefined,
+        locality: address.locality || address.suburb || undefined,
       }
     }
     
@@ -209,4 +142,3 @@ export const getCurrentLocationWithAddress = async (
     )
   })
 }
-

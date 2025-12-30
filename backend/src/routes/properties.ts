@@ -377,6 +377,19 @@ router.post(
       property.publishedAt = new Date();
       await property.save();
 
+      // Delete draft from Draft collection if draftId is provided
+      // This ensures draft is removed when property is submitted
+      const { draftId } = req.body;
+      if (draftId) {
+        try {
+          const Draft = (await import('../models/Draft')).default;
+          await Draft.deleteOne({ draftId, userId: req.user!.userId });
+        } catch (draftError: any) {
+          // Log but don't fail - draft might not exist or already deleted
+          console.warn(`Failed to delete draft ${draftId} after property submission:`, draftError.message);
+        }
+      }
+
       // Create notification for property owner (ONLY to owner)
       await notifyPropertyApproved(
         property.listedBy,

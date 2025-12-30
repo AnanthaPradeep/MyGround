@@ -8,6 +8,7 @@ import notificationRoutes from './routes/notifications';
 import publicNotificationRoutes from './routes/publicNotifications';
 import wishlistRoutes from './routes/wishlist';
 import draftRoutes from './routes/drafts';
+import userLocationRoutes from './routes/userLocation';
 
 // Load environment variables
 dotenv.config();
@@ -84,6 +85,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/public-notifications', publicNotificationRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/drafts', draftRoutes);
+app.use('/api/user/location', userLocationRoutes);
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

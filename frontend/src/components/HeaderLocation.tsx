@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { MapPinIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { useLocationStore } from '../store/locationStore'
+import { useUserLocation } from '../hooks/useUserLocation'
 import LocationAutocomplete, { LocationSuggestion } from './LocationAutocomplete'
 import MapPicker from './MapPicker'
 
@@ -10,6 +11,7 @@ import MapPicker from './MapPicker'
  */
 export default function HeaderLocation() {
   const { userLocation, setLocation } = useLocationStore()
+  const { saveUserLocation } = useUserLocation({ autoSync: true })
   const [isOpen, setIsOpen] = useState(false)
   const [step, setStep] = useState<'select' | 'map'>('select')
   const [selectedLocation, setSelectedLocation] = useState<LocationSuggestion | null>(null)
@@ -94,7 +96,7 @@ export default function HeaderLocation() {
     }
   }
 
-  const handleMapChange = async (lat: number, lng: number) => {
+  const handleMapChange = async (lat: number, lng: number, _source: 'GPS' | 'MANUAL' = 'MANUAL') => {
     setLatitude(lat)
     setLongitude(lng)
     
@@ -167,6 +169,12 @@ export default function HeaderLocation() {
           displayName: finalLocation.displayName,
         }
         setLocation(newLocation)
+        
+        // Save to backend if authenticated
+        await saveUserLocation(newLocation, 'MANUAL').catch((err: any) => {
+          console.warn('Failed to save user location to backend:', err)
+        })
+        
         setIsOpen(false)
         setStep('select')
       }

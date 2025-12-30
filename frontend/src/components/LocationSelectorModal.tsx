@@ -3,6 +3,8 @@ import { XMarkIcon, MapPinIcon, CheckCircleIcon } from '@heroicons/react/24/outl
 import LocationAutocomplete, { LocationSuggestion } from './LocationAutocomplete'
 import MapPicker from './MapPicker'
 import { useLocationStore, UserLocation } from '../store/locationStore'
+import { useUserLocation } from '../hooks/useUserLocation'
+import { useAuthStore } from '../store/authStore'
 
 interface LocationSelectorModalProps {
   onClose: () => void
@@ -16,6 +18,8 @@ interface LocationSelectorModalProps {
  */
 export default function LocationSelectorModal({ onClose, isOpen }: LocationSelectorModalProps) {
   const { setLocation } = useLocationStore()
+  const { isAuthenticated } = useAuthStore()
+  const { saveUserLocation } = useUserLocation({ autoSync: false })
   const [selectedLocation, setSelectedLocation] = useState<LocationSuggestion | null>(null)
   const [latitude, setLatitude] = useState(19.0760) // Default to Mumbai
   const [longitude, setLongitude] = useState(72.8777)
@@ -164,6 +168,15 @@ export default function LocationSelectorModal({ onClose, isOpen }: LocationSelec
       }
       
       setLocation(userLocation)
+      
+      // Save to backend if authenticated
+      if (isAuthenticated && saveUserLocation) {
+        await saveUserLocation(userLocation, 'MANUAL').catch(err => {
+          console.warn('Failed to save user location to backend:', err)
+          // Continue even if backend save fails
+        })
+      }
+      
       onClose()
     } else {
       setError('Please select a location on the map or search for a location.')
@@ -389,6 +402,10 @@ export default function LocationSelectorModal({ onClose, isOpen }: LocationSelec
                     }}
                     height="100%"
                     readOnly={false}
+                    showConfirmButton={true}
+                    onConfirm={(lat, lng) => {
+                      handleMapChange(lat, lng)
+                    }}
                   />
                 </div>
               </div>

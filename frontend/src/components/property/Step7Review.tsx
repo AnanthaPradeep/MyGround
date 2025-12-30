@@ -1,6 +1,8 @@
 import { UseFormReturn } from 'react-hook-form'
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/solid'
 import { PropertyFormData } from '../../types/property'
+import { calculateAssetDNAPreview } from '../../utils/calculateAssetDNAPreview'
+import ImageWithFallback from '../ImageWithFallback'
 
 interface Props {
   form: UseFormReturn<PropertyFormData>
@@ -201,7 +203,7 @@ export default function Step7Review({ form }: Props) {
           <p className="text-sm text-gray-600 mb-2">Images</p>
           <div className="grid grid-cols-4 gap-2">
             {formData.media.images?.slice(0, 4).map((img, index) => (
-              <img
+              <ImageWithFallback
                 key={index}
                 src={img}
                 alt={`Preview ${index + 1}`}
@@ -241,42 +243,73 @@ export default function Step7Review({ form }: Props) {
       </div>
 
       {/* MG Asset DNA Preview */}
-      <div className="bg-gradient-to-r from-primary-50 to-blue-50 border border-primary-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">MG Asset DNA™ Preview</h3>
-        <p className="text-sm text-gray-600 mb-4">
-          Your property will receive a unique Asset DNA ID and verification score after submission.
-        </p>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white rounded-lg p-3 text-center">
-            <p className="text-xs text-gray-600">Verification Score</p>
-            <p className="text-lg font-bold text-primary-600">Calculating...</p>
-          </div>
-          <div className="bg-white rounded-lg p-3 text-center">
-            <p className="text-xs text-gray-600">Legal Risk</p>
-            <p className="text-lg font-bold">Analyzing...</p>
-          </div>
-          <div className="bg-white rounded-lg p-3 text-center">
-            <p className="text-xs text-gray-600">Trust Score</p>
-            <p className="text-lg font-bold">Calculating...</p>
-          </div>
-          <div className="bg-white rounded-lg p-3 text-center">
-            <p className="text-xs text-gray-600">Geo-Verified</p>
-            <p className="text-lg font-bold text-green-600 flex items-center justify-center space-x-1">
-              {formData.location.coordinates.coordinates[0] !== 0 ? (
-                <>
-                  <CheckCircleIcon className="w-5 h-5" />
-                  <span>Yes</span>
-                </>
-              ) : (
-                <>
-                  <XCircleIcon className="w-5 h-5 text-red-600" />
-                  <span className="text-red-600">No</span>
-                </>
-              )}
+      {(() => {
+        const dnaPreview = calculateAssetDNAPreview(formData)
+        return (
+          <div className="bg-gradient-to-r from-primary-50 to-blue-50 dark:from-primary-900/20 dark:to-blue-900/20 border border-primary-200 dark:border-primary-800 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">MG Asset DNA™ Preview</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Your property will receive a unique Asset DNA ID and verification score after submission.
             </p>
+            <div className="mb-4 p-3 bg-white dark:bg-gray-800 rounded-lg border border-primary-200 dark:border-primary-700">
+              <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Asset DNA ID</p>
+              <p className="text-sm font-mono font-semibold text-primary-600 dark:text-primary-400">{dnaPreview.assetId}</p>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 text-center border border-gray-200 dark:border-gray-700">
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Verification Score</p>
+                <p className="text-lg font-bold text-primary-600 dark:text-primary-400">{dnaPreview.verificationScore}/100</p>
+                <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full mt-2 overflow-hidden">
+                  <div
+                    className="h-full bg-primary-600 dark:bg-primary-500 transition-all"
+                    style={{ width: `${dnaPreview.verificationScore}%` }}
+                  />
+                </div>
+              </div>
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 text-center border border-gray-200 dark:border-gray-700">
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Legal Risk</p>
+                <p
+                  className={`text-lg font-bold ${
+                    dnaPreview.legalRisk === 'LOW'
+                      ? 'text-green-600 dark:text-green-400'
+                      : dnaPreview.legalRisk === 'MEDIUM'
+                      ? 'text-yellow-600 dark:text-yellow-400'
+                      : 'text-red-600 dark:text-red-400'
+                  }`}
+                >
+                  {dnaPreview.legalRisk}
+                </p>
+              </div>
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 text-center border border-gray-200 dark:border-gray-700">
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Trust Score</p>
+                <p className="text-lg font-bold text-gray-900 dark:text-gray-100">{dnaPreview.assetTrustScore}/100</p>
+                <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full mt-2 overflow-hidden">
+                  <div
+                    className="h-full bg-gray-600 dark:bg-gray-400 transition-all"
+                    style={{ width: `${dnaPreview.assetTrustScore}%` }}
+                  />
+                </div>
+              </div>
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-3 text-center border border-gray-200 dark:border-gray-700">
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Geo-Verified</p>
+                <p className="text-lg font-bold text-green-600 dark:text-green-400 flex items-center justify-center space-x-1">
+                  {formData.location.coordinates.coordinates[0] !== 0 ? (
+                    <>
+                      <CheckCircleIcon className="w-5 h-5" />
+                      <span>Yes</span>
+                    </>
+                  ) : (
+                    <>
+                      <XCircleIcon className="w-5 h-5 text-red-600 dark:text-red-400" />
+                      <span className="text-red-600 dark:text-red-400">No</span>
+                    </>
+                  )}
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        )
+      })()}
     </div>
   )
 }

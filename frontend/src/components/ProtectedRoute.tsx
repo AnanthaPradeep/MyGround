@@ -1,5 +1,6 @@
 import { Navigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
+import { PageLoader } from './Loader'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
@@ -7,7 +8,12 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
-  const { isAuthenticated, user } = useAuthStore()
+  const { isAuthenticated, user, isLoading } = useAuthStore()
+
+  // Show loader while checking authentication (prevents redirect during auth check)
+  if (isLoading) {
+    return <PageLoader />
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />

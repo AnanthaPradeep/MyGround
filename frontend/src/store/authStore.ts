@@ -95,9 +95,10 @@ export const useAuthStore = create<AuthState>()(
       },
 
       checkAuth: async () => {
+        set({ isLoading: true });
         const token = localStorage.getItem('token');
         if (!token) {
-          set({ isAuthenticated: false, user: null });
+          set({ isAuthenticated: false, user: null, isLoading: false });
           return;
         }
 
@@ -112,6 +113,7 @@ export const useAuthStore = create<AuthState>()(
             user,
             token,
             isAuthenticated: true,
+            isLoading: false,
           });
         } catch (error) {
           localStorage.removeItem('token');
@@ -119,6 +121,7 @@ export const useAuthStore = create<AuthState>()(
             user: null,
             token: null,
             isAuthenticated: false,
+            isLoading: false,
           });
         }
       },
@@ -126,7 +129,13 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'auth-storage',
       partialize: (state) => ({ token: state.token, user: state.user }),
+      // On rehydrate, if token exists, set isLoading to true so ProtectedRoute waits for checkAuth
+      onRehydrateStorage: () => (state) => {
+        if (state?.token) {
+          // Token exists, but we need to verify it - keep isLoading true until checkAuth completes
+          state.isLoading = true;
+        }
+      },
     }
   )
 );
-

@@ -50,6 +50,7 @@ export default function CreateProperty() {
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [isSavingDraft, setIsSavingDraft] = useState(false)
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const draftLoadedRef = useRef(false) // Track if draft has been loaded to prevent duplicate toasts
   const navigate = useNavigate()
   const { user } = useAuthStore()
 
@@ -100,7 +101,11 @@ export default function CreateProperty() {
   // Load draft data on mount if draftId is present
   useEffect(() => {
     const loadDraft = async () => {
+      // Prevent duplicate loading and duplicate toast messages
+      if (draftLoadedRef.current) return
+      
       if (draftId && !isEditMode) {
+        draftLoadedRef.current = true // Mark as loaded
         setIsLoadingProperty(true)
         try {
           const draft = await getDraft(draftId)
@@ -121,12 +126,14 @@ export default function CreateProperty() {
               })
             }
             
+            // Show toast only once
             toast.success('Your property details were saved as a draft and have been restored.', {
               duration: 5000,
             })
           }
         } catch (error: any) {
           console.error('Error loading draft:', error)
+          draftLoadedRef.current = false // Reset on error so it can retry
         } finally {
           setIsLoadingProperty(false)
         }
@@ -136,7 +143,8 @@ export default function CreateProperty() {
     }
     
     loadDraft()
-  }, [draftId, isEditMode, getDraft, form])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draftId, isEditMode])
 
   // Load property data into form when in edit mode
   useEffect(() => {
@@ -282,17 +290,65 @@ export default function CreateProperty() {
   const onSubmit = async (data: PropertyFormData) => {
     setIsSubmitting(true)
     try {
+      // Validate required fields before submission
+      if (!data.title || data.title.trim().length < 10) {
+        toast.error('Title must be at least 10 characters long')
+        setIsSubmitting(false)
+        return
+      }
+
+      if (!data.description || data.description.trim().length < 50) {
+        toast.error('Description must be at least 50 characters long')
+        setIsSubmitting(false)
+        return
+      }
+
+      if (!data.location?.city || !data.location?.state || !data.location?.area || !data.location?.pincode) {
+        toast.error('Please complete all location fields (city, state, area, pincode)')
+        setIsSubmitting(false)
+        return
+      }
+
+      if (!data.location?.coordinates?.coordinates || 
+          !Array.isArray(data.location.coordinates.coordinates) || 
+          data.location.coordinates.coordinates.length !== 2 ||
+          data.location.coordinates.coordinates[0] === 0 && data.location.coordinates.coordinates[1] === 0) {
+        toast.error('Please select a location on the map')
+        setIsSubmitting(false)
+        return
+      }
+
+      if (!data.media?.images || data.media.images.length < 3) {
+        toast.error('Please upload at least 3 images')
+        setIsSubmitting(false)
+        return
+      }
+
+      // Ensure coordinates are properly formatted
+      const formattedData = {
+        ...data,
+        location: {
+          ...data.location,
+          coordinates: {
+            type: 'Point',
+            coordinates: Array.isArray(data.location.coordinates?.coordinates) 
+              ? data.location.coordinates.coordinates 
+              : [data.location.coordinates?.coordinates?.[0] || 0, data.location.coordinates?.coordinates?.[1] || 0]
+          }
+        }
+      }
+
       let response
       let finalPropertyId: string | null = null
       
       if (propertyId) {
         // Update existing property
-        response = await api.put(`/properties/${propertyId}`, data)
+        response = await api.put(`/properties/${propertyId}`, formattedData)
         // Use the existing propertyId for updates
         finalPropertyId = propertyId
       } else {
         // Create new property
-        response = await api.post('/properties', data)
+        response = await api.post('/properties', formattedData)
         // Get property ID from response (could be id or _id)
         finalPropertyId = response.data.property?.id || response.data.property?._id
         if (finalPropertyId) {
@@ -306,7 +362,23 @@ export default function CreateProperty() {
       const propertyStatus = response.data.property?.status
       if (propertyStatus === 'DRAFT' && finalPropertyId && finalPropertyId !== 'undefined') {
         try {
-          await api.post(`/properties/${finalPropertyId}/submit`)
+          // Submit property (changes status from DRAFT to APPROVED)
+          await api.post(`/properties/${finalPropertyId}/submit`, {
+            draftId: draftId || null, // Pass draftId if exists to delete it
+          })
+          
+          // Delete draft from Draft collection if it was created from a draft
+          // This is handled in the backend submit endpoint, but we also try here as a fallback
+          if (draftId) {
+            try {
+              await api.delete(`/drafts/${draftId}`)
+              // Trigger custom event to update draft count
+              window.dispatchEvent(new CustomEvent('draftSaved'))
+            } catch (draftError: any) {
+              // Log but don't fail - draft might already be deleted by backend
+              console.warn('Failed to delete draft after submission:', draftError.response?.data?.error || draftError.message)
+            }
+          }
         } catch (submitError: any) {
           // If submit fails, log but don't fail the whole operation
           console.warn('Failed to auto-submit property:', submitError.response?.data?.error || submitError.message)
@@ -333,9 +405,16 @@ export default function CreateProperty() {
       }
     } catch (error: any) {
       console.error('Error submitting property:', error)
-      toast.error(
-        error.response?.data?.error || 'Failed to submit property. Please try again.'
-      )
+      
+      // Show detailed validation errors if available
+      if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
+        const errorMessages = error.response.data.errors.map((err: any) => err.msg || err.message).join(', ')
+        toast.error(`Validation errors: ${errorMessages}`)
+      } else if (error.response?.data?.error) {
+        toast.error(error.response.data.error)
+      } else {
+        toast.error('Failed to submit property. Please check all required fields and try again.')
+      }
     } finally {
       setIsSubmitting(false)
     }

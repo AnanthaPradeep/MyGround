@@ -4,6 +4,7 @@ import { HeartIcon, PhotoIcon, MapPinIcon } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid'
 import { Property } from '../types/property'
 import { formatPrice } from '../utils/formatters'
+import ImageWithFallback from './ImageWithFallback'
 import { useAuthStore } from '../store/authStore'
 import { useWishlistStore } from '../store/wishlistStore'
 import { useWishlist } from '../hooks/useWishlist'
@@ -45,10 +46,15 @@ export default function PropertyCard({ property }: Props) {
       {/* Image */}
       <div className="relative h-48 bg-gray-200 dark:bg-gray-700 overflow-hidden">
         {property.media.images && property.media.images.length > 0 ? (
-          <img
+          <ImageWithFallback
             src={property.media.images[0]}
             alt={property.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            placeholder={
+              <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
+                <PhotoIcon className="w-16 h-16" />
+              </div>
+            }
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-400 dark:text-gray-500">
