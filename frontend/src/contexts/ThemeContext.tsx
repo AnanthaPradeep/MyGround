@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import { getThemeCookie, setThemeCookie } from '../utils/cookies'
 
 type Theme = 'light' | 'dark'
 
@@ -12,24 +13,30 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => {
-    // Check localStorage first
+    // Priority: Cookie > localStorage > HTML class > default
     if (typeof window !== 'undefined') {
+      // 1. Check cookie first (primary storage)
+      const cookieTheme = getThemeCookie()
+      if (cookieTheme && (cookieTheme === 'light' || cookieTheme === 'dark')) {
+        return cookieTheme
+      }
+      
+      // 2. Fallback to localStorage (backward compatibility)
       const savedTheme = localStorage.getItem('theme') as Theme
       if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
-        // Theme should already be applied by the script in index.html
-        // Verify it's correct
-        const root = window.document.documentElement
-        const currentClass = root.classList.contains('dark') ? 'dark' : 'light'
-        if (currentClass !== savedTheme) {
-          root.classList.remove('light', 'dark')
-          root.classList.add(savedTheme)
-        }
+        // Migrate to cookie
+        setThemeCookie(savedTheme)
         return savedTheme
       }
-      // If no saved theme, check what's currently on the HTML element (from script)
+      
+      // 3. Check HTML class (from index.html script)
       const root = window.document.documentElement
-      const currentTheme = root.classList.contains('dark') ? 'dark' : 'light'
-      return currentTheme
+      const currentClass = root.classList.contains('dark') ? 'dark' : 'light'
+      if (currentClass === 'dark' || currentClass === 'light') {
+        // Save to cookie for future
+        setThemeCookie(currentClass)
+        return currentClass
+      }
     }
     return 'light'
   })
@@ -42,7 +49,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       root.classList.remove('light', 'dark')
       // Add the current theme class
       root.classList.add(theme)
-      // Save to localStorage
+      
+      // Save to both cookie (primary) and localStorage (backup for compatibility)
+      setThemeCookie(theme)
       localStorage.setItem('theme', theme)
     }
   }, [theme])

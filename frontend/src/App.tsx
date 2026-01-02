@@ -5,10 +5,12 @@ import { useAuthStore } from './store/authStore'
 import { useLocationStore } from './store/locationStore'
 import { useLanguageStore } from './store/languageStore'
 import { ThemeProvider } from './contexts/ThemeContext'
+import { QueryProvider } from './providers/QueryProvider'
 import { changeLanguage } from './config/i18n'
 import i18n from './config/i18n'
 import SplashScreen from './components/SplashScreen'
 import LocationSelectorModal from './components/LocationSelectorModal'
+import CookieBanner from './components/CookieBanner'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { OfflineIndicator } from './components/NetworkError'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -32,6 +34,7 @@ const Settings = lazy(() => import('./pages/Settings'))
 const Notifications = lazy(() => import('./pages/Notifications'))
 const Wishlist = lazy(() => import('./pages/Wishlist'))
 const LocationTest = lazy(() => import('./pages/LocationTest'))
+const CookiePreferences = lazy(() => import('./pages/CookiePreferences'))
 const NotFoundPage = lazy(() => import('./pages/ErrorPages').then(module => ({ default: module.NotFoundPage })))
 
 function App() {
@@ -92,19 +95,22 @@ function App() {
 
   return (
     <ThemeProvider>
-      <ErrorBoundary>
-        <Router>
-          {isLoading && <SplashScreen onComplete={handleSplashComplete} minDisplayTime={500} />}
-          <OfflineIndicator />
-          <LocationSelectorModal isOpen={showLocationModal} onClose={handleLocationModalClose} />
-          <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${isLoading ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}>
-          <Suspense fallback={<PageLoader />}>
+      <QueryProvider>
+        <ErrorBoundary>
+          <Router>
+            {isLoading && <SplashScreen onComplete={handleSplashComplete} minDisplayTime={500} />}
+            <OfflineIndicator />
+            <LocationSelectorModal isOpen={showLocationModal} onClose={handleLocationModalClose} />
+            <CookieBanner />
+            <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${isLoading ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}>
+            <Suspense fallback={<PageLoader />}>
             <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/terms" element={<TermsAndConditions />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/cookie-preferences" element={<CookiePreferences />} />
             <Route path="/properties" element={<Properties />} />
             <Route path="/properties/:id" element={<PropertyDetail />} />
             <Route
@@ -178,6 +184,7 @@ function App() {
           </div>
         </Router>
       </ErrorBoundary>
+      </QueryProvider>
     </ThemeProvider>
   )
 }

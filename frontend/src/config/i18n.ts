@@ -2,6 +2,7 @@ import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import type { Language } from '../types/language'
 import api from '../services/api'
+import { getLanguageCookie, setLanguageCookie } from '../utils/cookies'
 
 // Default namespace
 const defaultNamespace = 'common'
@@ -38,13 +39,24 @@ const fallbackResources = {
   },
 }
 
-// Get saved language from localStorage (from our custom store)
+// Get saved language from cookie (primary) or localStorage (backup)
 const getSavedLanguageCode = (): string => {
   try {
+    if (typeof window === 'undefined') return 'en'
+    
+    // 1. Check cookie first (primary storage)
+    const cookieLang = getLanguageCookie()
+    if (cookieLang) {
+      return cookieLang
+    }
+    
+    // 2. Fallback to localStorage (backward compatibility with Zustand persist)
     const saved = localStorage.getItem('myground-language-storage')
     if (saved) {
       const parsed = JSON.parse(saved)
       if (parsed?.state?.selectedLanguage?.languageCode) {
+        // Migrate to cookie
+        setLanguageCookie(parsed.state.selectedLanguage.languageCode)
         return parsed.state.selectedLanguage.languageCode
       }
     }
