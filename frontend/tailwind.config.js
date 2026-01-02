@@ -49,9 +49,9 @@ export default {
         },
       },
       fontFamily: {
-        'heading': ['Poppins', 'sans-serif'],
-        'body': ['Roboto', 'sans-serif'],
-        'sans': ['Roboto', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'sans-serif'],
+        'heading': ['Playfair Display', 'Merriweather', 'serif'],
+        'body': ['Merriweather', 'Roboto', 'serif'],
+        'sans': ['Merriweather', 'Roboto', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'sans-serif'],
       },
     },
   },
