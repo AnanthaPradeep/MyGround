@@ -72,6 +72,7 @@ export default function ImageWithFallback({
         onError={handleError}
         onLoad={handleLoad}
         loading="lazy"
+        decoding="async"
       />
     </div>
   )

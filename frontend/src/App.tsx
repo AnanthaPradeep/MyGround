@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, lazy, Suspense } from 'react'
 import { useAuthStore } from './store/authStore'
 import { useLocationStore } from './store/locationStore'
 import { useLanguageStore } from './store/languageStore'
@@ -11,23 +11,28 @@ import SplashScreen from './components/SplashScreen'
 import LocationSelectorModal from './components/LocationSelectorModal'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { OfflineIndicator } from './components/NetworkError'
-import CreateProperty from './pages/CreateProperty'
+import ProtectedRoute from './components/ProtectedRoute'
+import ChatWidget from './components/ChatWidget'
+import { PageLoader } from './components/Loader'
+
+// Keep lightweight routes as direct imports (fast initial load)
 import Home from './pages/Home'
 import Login from './pages/Login'
 import Register from './pages/Register'
-import Dashboard from './pages/Dashboard'
 import Properties from './pages/Properties'
-import PropertyDetail from './pages/PropertyDetail'
-import Profile from './pages/Profile'
-import Settings from './pages/Settings'
-import Notifications from './pages/Notifications'
-import Wishlist from './pages/Wishlist'
-import LocationTest from './pages/LocationTest'
 import TermsAndConditions from './pages/TermsAndConditions'
 import PrivacyPolicy from './pages/PrivacyPolicy'
-import ProtectedRoute from './components/ProtectedRoute'
-import ChatWidget from './components/ChatWidget'
-import { NotFoundPage } from './pages/ErrorPages'
+
+// Lazy load heavy routes (code splitting for better performance)
+const CreateProperty = lazy(() => import('./pages/CreateProperty'))
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const PropertyDetail = lazy(() => import('./pages/PropertyDetail'))
+const Profile = lazy(() => import('./pages/Profile'))
+const Settings = lazy(() => import('./pages/Settings'))
+const Notifications = lazy(() => import('./pages/Notifications'))
+const Wishlist = lazy(() => import('./pages/Wishlist'))
+const LocationTest = lazy(() => import('./pages/LocationTest'))
+const NotFoundPage = lazy(() => import('./pages/ErrorPages').then(module => ({ default: module.NotFoundPage })))
 
 function App() {
   const { checkAuth } = useAuthStore()
@@ -89,11 +94,12 @@ function App() {
     <ThemeProvider>
       <ErrorBoundary>
         <Router>
-          {isLoading && <SplashScreen onComplete={handleSplashComplete} minDisplayTime={1500} />}
+          {isLoading && <SplashScreen onComplete={handleSplashComplete} minDisplayTime={500} />}
           <OfflineIndicator />
           <LocationSelectorModal isOpen={showLocationModal} onClose={handleLocationModalClose} />
           <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${isLoading ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}>
-          <Routes>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -159,7 +165,8 @@ function App() {
             />
             <Route path="/location-test" element={<LocationTest />} />
             <Route path="*" element={<NotFoundPage />} />
-          </Routes>
+            </Routes>
+          </Suspense>
           <Toaster 
             position="top-right"
             toastOptions={{
