@@ -65,3 +65,4 @@ FilterOptionSchema.index({ optionType: 1, category: 1, isActive: 1 });
 
 export default mongoose.model<IFilterOption>('FilterOption', FilterOptionSchema);
 
+

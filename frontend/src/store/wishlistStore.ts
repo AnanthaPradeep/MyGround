@@ -10,3 +10,4 @@ export const useWishlistStore = create<WishlistStore>((set) => ({
   triggerRefetch: () => set({ lastUpdate: Date.now() }),
 }))
 
+

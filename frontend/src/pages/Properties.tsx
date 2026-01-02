@@ -109,31 +109,33 @@ export default function Properties() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-heading font-bold text-gray-900 dark:text-gray-100 mb-2">Browse Properties</h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              {properties.length} properties found
-            </p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-            >
-              <option value="newest">Newest First</option>
-              <option value="price-low">Price: Low to High</option>
-              <option value="price-high">Price: High to Low</option>
-              <option value="area-small">Area: Small to Large</option>
-              <option value="verified">Verified First</option>
-            </select>
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800"
-            >
-              {showFilters ? 'Hide' : 'Show'} Filters
-            </button>
+        <div className="mb-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-heading font-bold text-gray-900 dark:text-gray-100 mb-2">Browse Properties</h1>
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+                {properties.length} properties found
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              >
+                <option value="newest">Newest First</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="area-small">Area: Small to Large</option>
+                <option value="verified">Verified First</option>
+              </select>
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 whitespace-nowrap"
+              >
+                {showFilters ? 'Hide' : 'Show'} Filters
+              </button>
+            </div>
           </div>
         </div>
 

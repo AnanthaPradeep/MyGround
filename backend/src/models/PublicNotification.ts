@@ -71,3 +71,4 @@ PublicNotificationSchema.index({ propertyId: 1 });
 export default mongoose.model<IPublicNotification>('PublicNotification', PublicNotificationSchema);
 
 
+
