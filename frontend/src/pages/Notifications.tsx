@@ -321,12 +321,21 @@ export default function Notifications() {
             ) : (
               notifications.map((notification) => {
                 const isPublic = (notification as any).isPublic
+                const hasLink = notification.link
                 return (
                   <div
                     key={notification.id}
-                    onClick={() => !isPublic && handleNotificationClick(notification)}
+                    onClick={() => {
+                      if (hasLink) {
+                        // Navigate to the link for both public and private notifications
+                        navigate(notification.link!)
+                      } else if (!isPublic) {
+                        // Only mark as read for private notifications without links
+                        handleNotificationClick(notification)
+                      }
+                    }}
                     className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 hover:shadow-md dark:hover:shadow-gray-900/50 transition-all ${
-                      !isPublic ? 'cursor-pointer' : 'cursor-default'
+                      hasLink ? 'cursor-pointer' : (!isPublic ? 'cursor-pointer' : 'cursor-default')
                     } ${
                       !notification.read && !isPublic ? 'border-l-4 border-primary-600 dark:border-primary-400' : ''
                     } ${isPublic ? 'border-l-4 border-blue-500 dark:border-blue-400' : ''}`}

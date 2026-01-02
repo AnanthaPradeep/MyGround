@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import api from '../services/api'
 import { Notification } from '../types/notification'
 import sampleNotificationsData from '../data/sampleNotifications.json'
+import { useAuthStore } from '../store/authStore'
 
 interface UseNotificationsOptions {
   useSampleData?: boolean
@@ -10,6 +11,7 @@ interface UseNotificationsOptions {
 
 export const useNotifications = (options: UseNotificationsOptions = {}) => {
   const { useSampleData = true, userId } = options
+  const { isAuthenticated } = useAuthStore()
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -17,6 +19,13 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
   const lastFetchRef = useRef(0) // Track last fetch time for throttling
 
   const fetchNotifications = useCallback(async () => {
+    // Don't fetch if not authenticated (unless using sample data)
+    if (!useSampleData && !isAuthenticated) {
+      setNotifications([])
+      setLoading(false)
+      return
+    }
+
     // Throttle: Don't fetch if last fetch was less than 2 seconds ago
     const now = Date.now()
     if (now - lastFetchRef.current < 2000) {
@@ -43,7 +52,12 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
         })) as Notification[]
         setNotifications(sampleData)
       } else {
-        // Fetch from API
+        // Fetch from API (only if authenticated)
+        if (!isAuthenticated) {
+          setNotifications([])
+          return
+        }
+
         const params = new URLSearchParams()
         if (userId) params.append('userId', userId)
         const response = await api.get(`/notifications?${params.toString()}`)
@@ -59,15 +73,19 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
         setNotifications(apiData)
       }
     } catch (err: any) {
-      console.error('Error fetching notifications:', err)
-      setError(err.response?.data?.error || 'Failed to fetch notifications')
+      // Only log error if authenticated (401 when not authenticated is expected)
+      if (isAuthenticated) {
+        console.error('Error fetching notifications:', err)
+        setError(err.response?.data?.error || 'Failed to fetch notifications')
+      }
       // Don't fallback to sample data on error - keep existing notifications
       // This prevents showing fake data when API fails
+      setNotifications([])
     } finally {
       setLoading(false)
       fetchingRef.current = false
     }
-  }, [useSampleData, userId])
+  }, [useSampleData, userId, isAuthenticated])
 
   useEffect(() => {
     fetchNotifications()
