@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
-import i18n, { initializeLanguage } from './config/i18n' // Initialize i18n
+import { initializeLanguage } from './config/i18n' // Initialize i18n
 import './index.css'
 
 // Initialize language before rendering app

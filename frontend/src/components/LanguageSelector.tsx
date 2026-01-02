@@ -5,7 +5,6 @@ import { useLanguages } from '../hooks/useLanguages'
 import { useLanguageStore } from '../store/languageStore'
 import { changeLanguage } from '../config/i18n'
 import { Language } from '../types/language'
-import api from '../services/api'
 
 interface LanguageSelectorProps {
   className?: string

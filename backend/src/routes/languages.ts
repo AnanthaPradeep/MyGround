@@ -115,7 +115,7 @@ router.get('/:languageCode/translations', async (req: express.Request, res: Resp
 
     // Transform translations into nested object structure for i18next
     // Format: { namespace: { key: value } }
-    const resources: Record<string, Record<string, string>> = {};
+    const resources: Record<string, Record<string, any>> = {};
 
     translations.forEach((trans) => {
       if (!resources[trans.namespace]) {
@@ -125,7 +125,7 @@ router.get('/:languageCode/translations', async (req: express.Request, res: Resp
       // Simple key: "welcome" -> { common: { welcome: "..." } }
       // Nested key: "button.save" -> { common: { button: { save: "..." } } }
       const keys = trans.key.split('.');
-      let current = resources[trans.namespace];
+      let current: Record<string, any> = resources[trans.namespace];
       
       if (keys.length === 1) {
         // Simple key
@@ -136,7 +136,7 @@ router.get('/:languageCode/translations', async (req: express.Request, res: Resp
           if (!current[keys[i]] || typeof current[keys[i]] !== 'object') {
             current[keys[i]] = {};
           }
-          current = current[keys[i]] as any;
+          current = current[keys[i]] as Record<string, any>;
         }
         current[keys[keys.length - 1]] = trans.value;
       }
