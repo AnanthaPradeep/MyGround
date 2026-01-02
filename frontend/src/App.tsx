@@ -23,6 +23,8 @@ import Settings from './pages/Settings'
 import Notifications from './pages/Notifications'
 import Wishlist from './pages/Wishlist'
 import LocationTest from './pages/LocationTest'
+import TermsAndConditions from './pages/TermsAndConditions'
+import PrivacyPolicy from './pages/PrivacyPolicy'
 import ProtectedRoute from './components/ProtectedRoute'
 import ChatWidget from './components/ChatWidget'
 import { NotFoundPage } from './pages/ErrorPages'
@@ -95,6 +97,8 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/terms" element={<TermsAndConditions />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/properties" element={<Properties />} />
             <Route path="/properties/:id" element={<PropertyDetail />} />
             <Route

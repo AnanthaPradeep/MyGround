@@ -6,6 +6,8 @@ import { useAuthStore } from '../store/authStore'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
 import api from '../services/api'
 import Logo from '../components/Logo'
+import TermsModal from '../components/TermsModal'
+import PrivacyModal from '../components/PrivacyModal'
 
 interface RegisterForm {
   firstName: string
@@ -26,6 +28,8 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false)
   const [otpSent, setOtpSent] = useState(false)
   const [otp, setOtp] = useState('')
+  const [showTermsModal, setShowTermsModal] = useState(false)
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false)
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -72,6 +76,12 @@ export default function Register() {
   }
 
   const onSubmit = async (data: RegisterForm) => {
+    // Check if user has agreed to terms
+    if (!data.agreeToTerms) {
+      toast.error('You must agree to the Terms & Conditions and Privacy Policy to create an account')
+      return
+    }
+
     // OTP is optional for now - can skip directly to registration
     // If OTP was sent, verify it before proceeding
     if (otpSent && otp) {
@@ -369,19 +379,35 @@ export default function Register() {
                 id="agreeToTerms"
                 type="checkbox"
                 {...register('agreeToTerms', {
-                  required: 'You must agree to the terms and conditions',
+                  required: 'You must agree to the Terms & Conditions and Privacy Policy to create an account',
                 })}
                 className="h-4 w-4 text-primary-600 dark:text-primary-400 focus:ring-primary-500 dark:focus:ring-primary-400 border-gray-300 dark:border-gray-600 rounded mt-1 bg-white dark:bg-gray-700"
               />
               <label htmlFor="agreeToTerms" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                 I agree to the{' '}
-                <Link to="/terms" className="text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setShowTermsModal(true)
+                  }}
+                  className="text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300 underline"
+                >
                   Terms and Conditions
-                </Link>{' '}
+                </button>{' '}
                 and{' '}
-                <Link to="/privacy" className="text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setShowPrivacyModal(true)
+                  }}
+                  className="text-primary-600 dark:text-primary-400 hover:text-primary-500 dark:hover:text-primary-300 underline"
+                >
                   Privacy Policy
-                </Link>
+                </button>
                 <span className="text-red-500 dark:text-red-400">*</span>
               </label>
             </div>
@@ -458,6 +484,12 @@ export default function Register() {
           </p>
         </div>
       </div>
+
+      {/* Terms & Conditions Modal */}
+      <TermsModal isOpen={showTermsModal} onClose={() => setShowTermsModal(false)} />
+
+      {/* Privacy Policy Modal */}
+      <PrivacyModal isOpen={showPrivacyModal} onClose={() => setShowPrivacyModal(false)} />
     </div>
   )
 }
