@@ -3,6 +3,9 @@ import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents, ZoomContr
 import { Icon, LatLngExpression } from 'leaflet'
 import type { Marker as LeafletMarker } from 'leaflet'
 import { MapPinIcon } from '@heroicons/react/24/outline'
+// Import Leaflet CSS - Vite will code-split this into map-vendor chunk
+// The CSS loads asynchronously when this component is used (lazy-loaded routes)
+// The HTML script will apply media trick to make it non-blocking
 import 'leaflet/dist/leaflet.css'
 
 // Fix for default marker icon in Leaflet with Vite
