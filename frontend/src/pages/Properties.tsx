@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useProperties } from '../hooks/useProperties'
 import PropertyCard from '../components/PropertyCard'
@@ -18,6 +18,11 @@ export default function Properties() {
   const [showFilters, setShowFilters] = useState(false)
   const [sortBy, setSortBy] = useState('newest')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+  // Scroll to top when component mounts or search params change (navigation from other pages)
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [searchParams])
 
   // Build filters from URL params
   const filters = useMemo(() => {
@@ -70,6 +75,11 @@ export default function Properties() {
     setSearchParams(params)
   }
 
+  // Scroll to top when component mounts or search params change (navigation from other pages)
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [searchParams])
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Navigation */}
@@ -114,9 +124,15 @@ export default function Properties() {
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
             <div>
               <h1 className="text-2xl sm:text-3xl font-heading font-bold text-gray-900 dark:text-gray-100 mb-2">Browse Properties</h1>
-              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
-                {properties.length} properties found
-              </p>
+              {loading ? (
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+                  Loading properties...
+                </p>
+              ) : (
+                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+                  {properties.length} properties found
+                </p>
+              )}
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
               <select
