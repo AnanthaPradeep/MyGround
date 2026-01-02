@@ -109,7 +109,7 @@ export default function PropertyCard({ property }: Props) {
 
       {/* Content */}
       <div className="p-4">
-        <h3 className="font-heading font-semibold text-gray-900 dark:text-gray-100 mb-1 line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400">
+        <h3 className="font-body font-semibold text-gray-900 dark:text-gray-100 mb-1 line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400">
           {property.title}
         </h3>
         

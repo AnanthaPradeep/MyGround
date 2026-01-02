@@ -24,7 +24,7 @@ export default function AssetDNAPreview({ properties }: Props) {
           className="bg-gradient-to-br from-primary-50 dark:from-primary-900/20 to-blue-50 dark:to-blue-900/20 border-2 border-primary-200 dark:border-primary-800 rounded-xl p-6 hover:shadow-lg dark:hover:shadow-gray-900/50 transition-shadow"
         >
           <div className="flex items-center justify-between mb-4">
-            <h4 className="font-heading font-semibold text-gray-900 dark:text-gray-100 text-sm line-clamp-1">{property.title}</h4>
+            <h4 className="font-body font-semibold text-gray-900 dark:text-gray-100 text-sm line-clamp-1">{property.title}</h4>
             <ShieldCheckIcon className="w-6 h-6 text-primary-600 dark:text-primary-400" />
           </div>
 

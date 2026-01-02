@@ -251,7 +251,7 @@ export default function PropertyDetail() {
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h1 className="text-3xl font-heading font-bold text-gray-900 dark:text-gray-100 mb-2">{property.title}</h1>
+                  <h1 className="text-3xl font-body font-bold text-gray-900 dark:text-gray-100 mb-2">{property.title}</h1>
                   <p className="text-gray-600 dark:text-gray-400">
                     {property.location.locality}, {property.location.area}, {property.location.city}
                   </p>
