@@ -163,11 +163,15 @@ export default function HeaderIcons() {
     }),
   ].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
 
-  // Update notification count when user notifications change (only count user notifications)
+  // Update notification count to include both user notifications and public notifications (other creators' properties)
   useEffect(() => {
-    const unreadCount = userNotifications.filter(n => !n.read).length
-    setNotificationCount(unreadCount)
-  }, [userNotifications])
+    // Count unread user notifications
+    const unreadUserCount = userNotifications.filter(n => !n.read).length
+    // Count all public notifications (properties from other creators - always considered "new")
+    const publicNotificationsCount = publicNotifications.length
+    // Total count includes both user notifications and public notifications from other creators
+    setNotificationCount(unreadUserCount + publicNotificationsCount)
+  }, [userNotifications, publicNotifications])
 
   // Fetch draft count
   const { getDraftCount } = useDrafts({ userId: user?.id })
