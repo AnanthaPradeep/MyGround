@@ -18,6 +18,10 @@
     
     <!-- Preload critical logo image -->
     <link rel="preload" href="/logo2.svg" as="image" type="image/svg+xml">
+    
+    <!-- Note: Fonts are NOT preloaded to avoid blocking render.
+         They use font-display: swap/optional for optimal performance.
+         Preloading large fonts (Merriweather 2.8MB) would block LCP. -->
     <script>
       // Apply theme immediately to prevent flash
       (function() {

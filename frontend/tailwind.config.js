@@ -5,6 +5,8 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  // Optimize CSS by removing unused styles in production
+  // Tailwind automatically purges unused CSS based on content paths
   safelist: [
     // Gradient classes for ExploreByPurpose component
     'from-blue-500',
