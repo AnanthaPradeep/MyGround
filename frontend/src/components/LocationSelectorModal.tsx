@@ -36,29 +36,8 @@ export default function LocationSelectorModal({ onClose, isOpen }: LocationSelec
     }
   }, [selectedLocation])
 
-  // Try to get user's location on mount
-  useEffect(() => {
-    if (isOpen && navigator.geolocation) {
-      setIsLoading(true)
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords
-          setLatitude(latitude)
-          setLongitude(longitude)
-          setIsLoading(false)
-        },
-        (_error) => {
-          setIsLoading(false)
-          // Don't show error, just use default location
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 5000,
-          maximumAge: 0,
-        }
-      )
-    }
-  }, [isOpen])
+  // Remove automatic geolocation request on mount
+  // Location will only be requested when user clicks "Use Current Location" button
 
   const handleLocationSelect = (location: LocationSuggestion | null) => {
     setSelectedLocation(location)
@@ -188,19 +167,40 @@ export default function LocationSelectorModal({ onClose, isOpen }: LocationSelec
     setError(null)
     
     if (!navigator.geolocation) {
-      setError('Geolocation is not supported by your browser.')
+      setError('Geolocation is not supported by your browser. Please use the search option above.')
       setIsLoading(false)
       return
     }
 
+    // Check permission status first (if available)
+    let permissionStatus: PermissionState | null = null
+    if (navigator.permissions && navigator.permissions.query) {
+      try {
+        const permission = await navigator.permissions.query({ name: 'geolocation' as PermissionName })
+        permissionStatus = permission.state
+        // Don't request again if permission was denied
+        if (permissionStatus === 'denied') {
+          setError('Location access was previously denied. Please enable location permissions in your browser settings, or use the search option above.')
+          setIsLoading(false)
+          return
+        }
+      } catch {
+        // Permission query not supported, continue anyway
+      }
+    }
+
     try {
-      // Get current position
+      // Get current position (only called on user action - button click)
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0,
-        })
+        navigator.geolocation.getCurrentPosition(
+          resolve, 
+          reject, 
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 60000, // Use cached location if available (up to 1 minute old)
+          }
+        )
       })
 
       const { latitude, longitude } = position.coords
@@ -312,6 +312,21 @@ export default function LocationSelectorModal({ onClose, isOpen }: LocationSelec
                 <div className="flex-1 border-t border-gray-200"></div>
                 <span className="text-sm text-gray-500">OR</span>
                 <div className="flex-1 border-t border-gray-200"></div>
+              </div>
+
+              {/* Location Permission Explanation */}
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <MapPinIcon className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
+                      Use Your Current Location
+                    </p>
+                    <p className="text-xs text-blue-700 dark:text-blue-300">
+                      We'll request permission to access your location to show you properties nearby. You can always search manually instead.
+                    </p>
+                  </div>
+                </div>
               </div>
 
               <button
@@ -437,6 +452,7 @@ export default function LocationSelectorModal({ onClose, isOpen }: LocationSelec
                   onClick={handleUseCurrentLocation}
                   disabled={isLoading}
                   className="w-full px-4 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  title="Click to use your current GPS location"
                 >
                   {isLoading ? (
                     <>

@@ -183,17 +183,31 @@ export default function HeaderLocation() {
 
   const handleUseCurrentLocation = async () => {
     if (!navigator.geolocation) {
-      alert('Geolocation is not supported by your browser.')
+      alert('Geolocation is not supported by your browser. Please use the search option.')
       return
     }
 
+    // Check permission status first (if available)
+    if (navigator.permissions && navigator.permissions.query) {
+      try {
+        const permission = await navigator.permissions.query({ name: 'geolocation' as PermissionName })
+        // Don't request again if permission was denied
+        if (permission.state === 'denied') {
+          alert('Location access was previously denied. Please enable location permissions in your browser settings, or use the search option.')
+          return
+        }
+      } catch {
+        // Permission query not supported, continue anyway
+      }
+    }
+
     try {
-      // Get current position
+      // Get current position (only called on user action - button click)
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, reject, {
           enableHighAccuracy: true,
           timeout: 15000,
-          maximumAge: 0,
+          maximumAge: 60000, // Use cached location if available (up to 1 minute old)
         })
       })
 
