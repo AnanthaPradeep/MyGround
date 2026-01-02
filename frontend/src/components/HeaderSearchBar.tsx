@@ -1,16 +1,31 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
+import { useAuthStore } from '../store/authStore'
+
+interface HeaderSearchBarProps {
+  showLoginModal?: () => void
+}
 
 /**
  * Compact search bar for header/navigation
  */
-export default function HeaderSearchBar() {
+export default function HeaderSearchBar({ showLoginModal }: HeaderSearchBarProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const navigate = useNavigate()
+  const { isAuthenticated } = useAuthStore()
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
+    if (!isAuthenticated) {
+      if (showLoginModal) {
+        showLoginModal()
+      } else {
+        navigate('/login')
+      }
+      return
+    }
+    
     if (searchQuery.trim()) {
       navigate(`/properties?search=${encodeURIComponent(searchQuery)}`)
     } else {

@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
+import ProtectedLink from '../components/ProtectedLink'
 import { useState, useMemo } from 'react'
 import { ShieldCheckIcon, MapPinIcon, ScaleIcon, ClockIcon } from '@heroicons/react/24/outline'
 import { useAuthStore } from '../store/authStore'
@@ -18,17 +19,19 @@ import Footer from '../components/Footer'
 import { Bars3Icon } from '@heroicons/react/24/outline'
 import Logo from '../components/Logo'
 import { CardSkeleton } from '../components/Loader'
+import LoginPromptModal from '../components/LoginPromptModal'
 
 export default function Home() {
   const { isAuthenticated } = useAuthStore()
   const navigate = useNavigate()
   const { properties, loading } = useProperties({ useSampleData: false }) // Fetch from API to get recent properties
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [showLoginModal, setShowLoginModal] = useState(false)
 
-  // Handle protected route navigation - redirect to login if not authenticated
+  // Handle protected route navigation - show modal if not authenticated
   const handleProtectedNavigation = (path: string) => {
     if (!isAuthenticated) {
-      navigate('/login')
+      setShowLoginModal(true)
     } else {
       navigate(path)
     }
@@ -122,10 +125,10 @@ export default function Home() {
           </div>
 
           {/* Search Bar */}
-          <SearchBar />
+          <SearchBar showLoginModal={() => setShowLoginModal(true)} />
 
           {/* Quick Filters */}
-          <QuickFilters />
+          <QuickFilters showLoginModal={() => setShowLoginModal(true)} />
         </div>
       </section>
 
@@ -145,12 +148,13 @@ export default function Home() {
                 <p className="text-gray-600 dark:text-gray-400">Newly listed properties on MyGround</p>
               </div>
             </div>
-            <Link
+            <ProtectedLink
               to="/properties"
+              showLoginModal={() => setShowLoginModal(true)}
               className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
             >
               View All →
-            </Link>
+            </ProtectedLink>
           </div>
 
           {loading ? (
@@ -168,7 +172,20 @@ export default function Home() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+            <div 
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
+              onClickCapture={(e) => {
+                if (!isAuthenticated) {
+                  const target = e.target as HTMLElement
+                  const link = target.closest('a')
+                  if (link && link.getAttribute('href')) {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setShowLoginModal(true)
+                  }
+                }
+              }}
+            >
               {recentProperties.map((property) => (
                 <PropertyCard key={property._id} property={property} />
               ))}
@@ -185,12 +202,13 @@ export default function Home() {
               <h2 className="text-3xl font-heading font-bold text-gray-900 dark:text-gray-100 mb-2">Featured Properties</h2>
               <p className="text-gray-600 dark:text-gray-400">Verified properties with complete Asset DNA</p>
             </div>
-            <Link
+            <ProtectedLink
               to="/properties"
+              showLoginModal={() => setShowLoginModal(true)}
               className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
             >
               View All →
-            </Link>
+            </ProtectedLink>
           </div>
 
           {loading ? (
@@ -198,7 +216,20 @@ export default function Home() {
               <CardSkeleton count={8} />
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+            <div 
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
+              onClickCapture={(e) => {
+                if (!isAuthenticated) {
+                  const target = e.target as HTMLElement
+                  const link = target.closest('a')
+                  if (link && link.getAttribute('href')) {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    setShowLoginModal(true)
+                  }
+                }
+              }}
+            >
               {properties.map((property) => (
                 <PropertyCard key={property._id} property={property} />
               ))}
@@ -220,7 +251,7 @@ export default function Home() {
       </section>
 
       {/* Explore by Purpose */}
-      <ExploreByPurpose />
+      <ExploreByPurpose showLoginModal={() => setShowLoginModal(true)} />
 
       {/* MG Asset DNA Preview Section */}
       <section className="py-12 bg-white dark:bg-gray-800">
@@ -233,12 +264,12 @@ export default function Home() {
               Every property on MyGround comes with MG Asset DNA™ - a unique verification system
             </p>
           </div>
-          <AssetDNAPreview properties={properties.slice(0, 4)} />
+          <AssetDNAPreview properties={properties.slice(0, 4)} showLoginModal={() => setShowLoginModal(true)} />
         </div>
       </section>
 
       {/* Trending & Insights */}
-      <TrendingSection />
+      <TrendingSection showLoginModal={() => setShowLoginModal(true)} />
 
       {/* Why Choose MyGround */}
       <section className="py-12 bg-white dark:bg-gray-800">
@@ -333,7 +364,10 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <Footer />
+      <Footer showLoginModal={() => setShowLoginModal(true)} />
+
+      {/* Login Prompt Modal */}
+      <LoginPromptModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
     </div>
   )
 }

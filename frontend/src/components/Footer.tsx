@@ -2,8 +2,13 @@ import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import Logo from './Logo'
+import ProtectedLink from './ProtectedLink'
 
-export default function Footer() {
+interface FooterProps {
+  showLoginModal?: () => void
+}
+
+export default function Footer({ showLoginModal }: FooterProps) {
   const [email, setEmail] = useState('')
 
   const handleSubscribe = (e: React.FormEvent) => {
@@ -78,28 +83,31 @@ export default function Footer() {
                 </h4>
                 <ul className="space-y-3 text-sm sm:text-base text-gray-600 dark:text-gray-400">
                   <li>
-                    <Link 
-                      to="/properties" 
+                    <ProtectedLink 
+                      to="/properties"
+                      showLoginModal={showLoginModal}
                       className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors inline-block"
                     >
                       Browse Properties
-                    </Link>
+                    </ProtectedLink>
                   </li>
                   <li>
-                    <Link 
-                      to="/properties/create" 
+                    <ProtectedLink 
+                      to="/properties/create"
+                      showLoginModal={showLoginModal}
                       className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors inline-block"
                     >
                       List Your Property
-                    </Link>
+                    </ProtectedLink>
                   </li>
                   <li>
-                    <Link 
-                      to="/search" 
+                    <ProtectedLink 
+                      to="/properties"
+                      showLoginModal={showLoginModal}
                       className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors inline-block"
                     >
                       Advanced Search
-                    </Link>
+                    </ProtectedLink>
                   </li>
                   <li>
                     <Link 
@@ -119,20 +127,22 @@ export default function Footer() {
                 </h4>
                 <ul className="space-y-3 text-sm sm:text-base text-gray-600 dark:text-gray-400">
                   <li>
-                    <Link 
-                      to="/dashboard" 
+                    <ProtectedLink 
+                      to="/dashboard"
+                      showLoginModal={showLoginModal}
                       className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors inline-block"
                     >
                       For Property Owners
-                    </Link>
+                    </ProtectedLink>
                   </li>
                   <li>
-                    <Link 
-                      to="/properties" 
+                    <ProtectedLink 
+                      to="/properties"
+                      showLoginModal={showLoginModal}
                       className="hover:text-primary-600 dark:hover:text-primary-400 transition-colors inline-block"
                     >
                       For Buyers
-                    </Link>
+                    </ProtectedLink>
                   </li>
                   <li>
                     <Link 

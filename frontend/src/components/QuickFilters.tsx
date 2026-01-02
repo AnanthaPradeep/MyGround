@@ -3,9 +3,15 @@ import { useNavigate } from 'react-router-dom'
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 import { useTransactionTypes } from '../hooks/useTransactionTypes'
 import { usePropertyTypes } from '../hooks/usePropertyTypes'
+import { useAuthStore } from '../store/authStore'
 
-export default function QuickFilters() {
+interface QuickFiltersProps {
+  showLoginModal?: () => void
+}
+
+export default function QuickFilters({ showLoginModal }: QuickFiltersProps) {
   const navigate = useNavigate()
+  const { isAuthenticated } = useAuthStore()
   const [selectedTransaction, setSelectedTransaction] = useState<string>('')
   const [selectedCategory, setSelectedCategory] = useState<string>('')
   const transactionScrollRef = useRef<HTMLDivElement>(null)
@@ -42,6 +48,13 @@ export default function QuickFilters() {
   }, [])
 
   const handleFilter = (type: string, value: string) => {
+    if (!isAuthenticated) {
+      if (showLoginModal) {
+        showLoginModal()
+      }
+      return
+    }
+
     if (type === 'transaction') {
       setSelectedTransaction(value)
       navigate(`/properties?transactionType=${value}`)
@@ -49,6 +62,17 @@ export default function QuickFilters() {
       setSelectedCategory(value)
       navigate(`/properties?propertyCategory=${value}`)
     }
+  }
+
+  const handleQuickAction = (filter: string) => {
+    if (!isAuthenticated) {
+      if (showLoginModal) {
+        showLoginModal()
+      }
+      return
+    }
+    // Navigate with the quick action filter
+    navigate(`/properties?${filter}=true`)
   }
 
   const scroll = (ref: React.RefObject<HTMLDivElement>, direction: 'left' | 'right') => {
@@ -157,13 +181,22 @@ export default function QuickFilters() {
 
       {/* Quick Action Buttons */}
       <div className="flex flex-wrap gap-2 pt-2">
-        <button className="px-4 py-2 bg-white/20 text-white rounded-full text-sm font-medium hover:bg-white/30">
+        <button 
+          onClick={() => handleQuickAction('verified')}
+          className="px-4 py-2 bg-white/20 text-white rounded-full text-sm font-medium hover:bg-white/30"
+        >
           Verified Only
         </button>
-        <button className="px-4 py-2 bg-white/20 text-white rounded-full text-sm font-medium hover:bg-white/30">
+        <button 
+          onClick={() => handleQuickAction('readyToMove')}
+          className="px-4 py-2 bg-white/20 text-white rounded-full text-sm font-medium hover:bg-white/30"
+        >
           Ready to Move
         </button>
-        <button className="px-4 py-2 bg-white/20 text-white rounded-full text-sm font-medium hover:bg-white/30">
+        <button 
+          onClick={() => handleQuickAction('underConstruction')}
+          className="px-4 py-2 bg-white/20 text-white rounded-full text-sm font-medium hover:bg-white/30"
+        >
           Under Construction
         </button>
       </div>

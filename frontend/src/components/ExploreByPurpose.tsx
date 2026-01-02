@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import ProtectedLink from './ProtectedLink'
 import { 
   HomeIcon, 
   BriefcaseIcon, 
@@ -14,7 +14,11 @@ import {
 } from '@heroicons/react/24/outline'
 import { useExplorePurposes } from '../hooks/useExplorePurposes'
 
-export default function ExploreByPurpose() {
+interface ExploreByPurposeProps {
+  showLoginModal?: () => void
+}
+
+export default function ExploreByPurpose({ showLoginModal }: ExploreByPurposeProps) {
   const { purposes: purposesData, loading } = useExplorePurposes({ useSampleData: true })
 
   // Map icon names to components
@@ -88,15 +92,16 @@ export default function ExploreByPurpose() {
           {purposes.map((purpose, index) => {
             const Icon = purpose.icon
             return (
-              <Link
+              <ProtectedLink
                 key={`${purpose.title}-${index}`}
                 to={purpose.link}
+                showLoginModal={showLoginModal}
                 className={`bg-gradient-to-br ${purpose.colorClass} rounded-xl p-6 text-white hover:shadow-xl transition-all duration-200 hover:scale-105`}
               >
                 <Icon className="w-12 h-12 mb-4 text-white" />
                 <h3 className="text-xl font-semibold mb-2 text-white">{purpose.title}</h3>
                 <p className="text-white/90 text-sm">{purpose.description}</p>
-              </Link>
+              </ProtectedLink>
             )
           })}
         </div>

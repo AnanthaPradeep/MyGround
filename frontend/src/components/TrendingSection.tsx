@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import ProtectedLink from './ProtectedLink'
 import {
   FireIcon,
   ShieldCheckIcon,
@@ -23,7 +23,11 @@ import {
 } from '@heroicons/react/24/outline'
 import { useTrendingData } from '../hooks/useTrendingData'
 
-export default function TrendingSection() {
+interface TrendingSectionProps {
+  showLoginModal?: () => void
+}
+
+export default function TrendingSection({ showLoginModal }: TrendingSectionProps) {
   const { data } = useTrendingData({ useSampleData: true })
   const [activeTab, setActiveTab] = useState('trending')
 
@@ -103,12 +107,13 @@ export default function TrendingSection() {
             <h2 className="text-3xl font-heading font-bold text-gray-900 dark:text-gray-100 mb-2">Trending & Insights</h2>
             <p className="text-gray-600 dark:text-gray-400">{getDescription()}</p>
           </div>
-          <Link 
-            to="/properties" 
+          <ProtectedLink 
+            to="/properties"
+            showLoginModal={showLoginModal}
             className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
           >
             View All →
-          </Link>
+          </ProtectedLink>
         </div>
 
         {/* Futuristic Tabs */}
@@ -273,14 +278,15 @@ export default function TrendingSection() {
 
         {/* CTA Link */}
         <div className="mt-6 text-center">
-          <Link
+          <ProtectedLink
             to={`/properties?filter=${activeTab}`}
+            showLoginModal={showLoginModal}
             className="inline-flex items-center gap-2 px-6 py-3 bg-white dark:bg-gray-800 border-2 border-primary-300 dark:border-primary-600 text-primary-700 dark:text-primary-300 font-semibold rounded-xl hover:bg-primary-50 dark:hover:bg-primary-900/30 hover:border-primary-400 dark:hover:border-primary-500 transition-all duration-300 shadow-md dark:shadow-gray-900/50 hover:shadow-lg transform hover:scale-105"
           >
             <MapPinIcon className="w-5 h-5" />
             <span>Explore {trendingTabs.find(t => t.id === activeTab)?.label}</span>
             <ArrowTrendingUpIcon className="w-5 h-5" />
-          </Link>
+          </ProtectedLink>
         </div>
       </div>
     </section>

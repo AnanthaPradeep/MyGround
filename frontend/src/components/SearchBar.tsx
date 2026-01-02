@@ -12,15 +12,23 @@ import { PropertyCategory } from '../types/property'
 import { usePropertyTypes } from '../hooks/usePropertyTypes'
 import { useBudgetRanges } from '../hooks/useBudgetRanges'
 import { useCurrencyStore } from '../store/currencyStore'
+import { useAuthStore } from '../store/authStore'
+import toast from 'react-hot-toast'
 
-export default function SearchBar() {
+interface SearchBarProps {
+  showLoginModal?: () => void
+}
+
+export default function SearchBar({ showLoginModal }: SearchBarProps) {
   const [selectedLocation, setSelectedLocation] = useState<LocationSuggestion | null>(null)
   const [selectedPropertyType, setSelectedPropertyType] = useState<PropertyCategory | ''>('')
   const [minBudget, setMinBudget] = useState<string>('')
   const [maxBudget, setMaxBudget] = useState<string>('')
   const [isPropertyTypeOpen, setIsPropertyTypeOpen] = useState(false)
   const [isBudgetOpen, setIsBudgetOpen] = useState(false)
+  const [searchError, setSearchError] = useState<string>('')
   const navigate = useNavigate()
+  const { isAuthenticated } = useAuthStore()
   const propertyTypeRef = useRef<HTMLDivElement>(null)
   const budgetRef = useRef<HTMLDivElement>(null)
 
@@ -92,6 +100,25 @@ export default function SearchBar() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
+    setSearchError('')
+    
+    // Check authentication first
+    if (!isAuthenticated) {
+      if (showLoginModal) {
+        showLoginModal()
+      } else {
+        navigate('/login')
+      }
+      return
+    }
+    
+    // Validate that at least location is filled
+    if (!selectedLocation || !selectedLocation.displayName) {
+      setSearchError('Please fill the search box (location) to search for properties')
+      toast.error('Please fill the search box to search for properties')
+      return
+    }
+    
     const params = new URLSearchParams()
     
     if (selectedLocation) {
@@ -115,20 +142,30 @@ export default function SearchBar() {
   }
 
   return (
-    <form onSubmit={handleSearch} className="w-full max-w-5xl mx-auto px-2 sm:px-0 relative z-10" style={{ overflow: 'visible' }}>
-      <div className="bg-white dark:bg-gray-800 rounded-2xl sm:rounded-full border border-gray-300 dark:border-gray-700 shadow-lg dark:shadow-gray-900/50 flex flex-col sm:flex-row items-stretch" style={{ overflow: 'visible' }}>
-        {/* Location Input */}
-        <div className="flex-1 flex items-center px-4 sm:px-5 md:px-7 py-3.5 sm:py-4 md:py-5 border-b sm:border-b-0 sm:border-r border-gray-200 dark:border-gray-700 min-w-0">
-          <MapPinIcon className="w-5 h-5 text-primary-600 dark:text-primary-400 flex-shrink-0 mr-2.5 sm:mr-3.5" />
-          <div className="flex-1 min-w-0 relative search-bar-location">
-            <LocationAutocomplete
-              value={selectedLocation?.displayName || ''}
-              onChange={setSelectedLocation}
-              placeholder="Enter City, Locality, Project"
-              className="[&>div>div>svg]:!hidden [&>div>input]:!border-0 [&>div>input]:!focus:ring-0 [&>div>input]:!p-0 [&>div>input]:!pl-2 [&>div>input]:!pr-8 [&>div>input]:!py-2.5 [&>div>input]:text-sm [&>div>input]:sm:text-base [&>div>input]:text-gray-900 [&>div>input]:placeholder:text-gray-400 [&>div>input]:w-full [&>div>input]:bg-transparent"
-            />
+    <div className="w-full max-w-5xl mx-auto px-2 sm:px-0 relative z-10" style={{ overflow: 'visible' }}>
+      <form onSubmit={handleSearch}>
+        <div className={`bg-white dark:bg-gray-800 rounded-2xl sm:rounded-full border shadow-lg dark:shadow-gray-900/50 flex flex-col sm:flex-row items-stretch ${
+          searchError ? 'border-red-500 dark:border-red-500' : 'border-gray-300 dark:border-gray-700'
+        }`} style={{ overflow: 'visible' }}>
+          {/* Location Input */}
+          <div className="flex-1 flex items-center px-4 sm:px-5 md:px-7 py-3.5 sm:py-4 md:py-5 border-b sm:border-b-0 sm:border-r border-gray-200 dark:border-gray-700 min-w-0">
+            <MapPinIcon className={`w-5 h-5 flex-shrink-0 mr-2.5 sm:mr-3.5 ${
+              searchError ? 'text-red-500 dark:text-red-400' : 'text-primary-600 dark:text-primary-400'
+            }`} />
+            <div className="flex-1 min-w-0 relative search-bar-location">
+              <LocationAutocomplete
+                value={selectedLocation?.displayName || ''}
+                onChange={(location) => {
+                  setSelectedLocation(location)
+                  if (location) {
+                    setSearchError('')
+                  }
+                }}
+                placeholder="Enter City, Locality, Project"
+                className="[&>div>div>svg]:!hidden [&>div>input]:!border-0 [&>div>input]:!focus:ring-0 [&>div>input]:!p-0 [&>div>input]:!pl-2 [&>div>input]:!pr-8 [&>div>input]:!py-2.5 [&>div>input]:text-sm [&>div>input]:sm:text-base [&>div>input]:text-gray-900 [&>div>input]:placeholder:text-gray-400 [&>div>input]:w-full [&>div>input]:bg-transparent"
+              />
+            </div>
           </div>
-        </div>
 
         {/* Property Type Dropdown */}
         <div className="relative flex-1 flex items-center px-4 sm:px-5 md:px-7 py-3.5 sm:py-4 md:py-5 border-b sm:border-b-0 sm:border-r border-gray-200 dark:border-gray-700 min-w-0 z-10" ref={propertyTypeRef}>
@@ -293,16 +330,22 @@ export default function SearchBar() {
         </div>
 
         {/* Search Button */}
-        <div className="flex items-center rounded-b-2xl sm:rounded-r-full sm:rounded-l-none overflow-hidden flex-shrink-0">
+        <div className="flex items-stretch flex-shrink-0">
           <button
             type="submit"
-            className="bg-primary-600 dark:bg-primary-500 hover:bg-primary-700 dark:hover:bg-primary-600 text-white px-4 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 flex items-center justify-center gap-2 font-semibold text-sm sm:text-base transition-colors whitespace-nowrap min-w-[100px] sm:min-w-[120px] w-full"
+            className="bg-primary-600 dark:bg-primary-500 hover:bg-primary-700 dark:hover:bg-primary-600 text-white px-4 sm:px-6 md:px-8 py-3.5 sm:py-4 md:py-5 flex items-center justify-center gap-2 font-semibold text-sm sm:text-base transition-colors whitespace-nowrap rounded-b-2xl sm:rounded-r-full sm:rounded-l-none w-full sm:w-auto min-w-[100px] sm:min-w-[140px]"
           >
             <MagnifyingGlassIcon className="w-5 h-5 flex-shrink-0" />
             <span className="hidden sm:inline">Search</span>
           </button>
         </div>
       </div>
-    </form>
+      </form>
+      {searchError && (
+        <p className="mt-2 text-sm text-red-600 dark:text-red-400 text-center px-4">
+          {searchError}
+        </p>
+      )}
+    </div>
   )
 }

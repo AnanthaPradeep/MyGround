@@ -1,12 +1,13 @@
-import { Link } from 'react-router-dom'
+import ProtectedLink from './ProtectedLink'
 import { Property } from '../types/property'
 import { ShieldCheckIcon, MapPinIcon } from '@heroicons/react/24/solid'
 
 interface Props {
   properties: Property[]
+  showLoginModal?: () => void
 }
 
-export default function AssetDNAPreview({ properties }: Props) {
+export default function AssetDNAPreview({ properties, showLoginModal }: Props) {
   if (properties.length === 0) {
     return (
       <div className="text-center py-12">
@@ -18,9 +19,10 @@ export default function AssetDNAPreview({ properties }: Props) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {properties.filter(p => p.assetDNA).map((property) => (
-        <Link
+        <ProtectedLink
           key={property._id}
           to={`/properties/${property._id}`}
+          showLoginModal={showLoginModal}
           className="bg-gradient-to-br from-primary-50 dark:from-primary-900/20 to-blue-50 dark:to-blue-900/20 border-2 border-primary-200 dark:border-primary-800 rounded-xl p-6 hover:shadow-lg dark:hover:shadow-gray-900/50 transition-shadow"
         >
           <div className="flex items-center justify-between mb-4">
@@ -81,7 +83,7 @@ export default function AssetDNAPreview({ properties }: Props) {
           <div className="mt-4 pt-4 border-t border-primary-200 dark:border-primary-800">
             <p className="text-xs text-primary-600 dark:text-primary-400 font-medium">View Full Details →</p>
           </div>
-        </Link>
+        </ProtectedLink>
       ))}
     </div>
   )

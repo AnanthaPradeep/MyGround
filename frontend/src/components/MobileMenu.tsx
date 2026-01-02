@@ -118,6 +118,15 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
+    if (!isAuthenticated) {
+      // Show login modal or navigate to login
+      navigate('/login')
+      setIsSearchOpen(false)
+      setSearchQuery('')
+      onClose()
+      return
+    }
+    
     if (searchQuery.trim()) {
       navigate(`/properties?search=${encodeURIComponent(searchQuery)}`)
       setIsSearchOpen(false)

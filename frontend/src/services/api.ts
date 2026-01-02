@@ -49,7 +49,25 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
-      window.location.href = '/login';
+      // Only redirect to login if not already on a public page
+      const currentPath = window.location.pathname;
+      
+      // Define public routes that don't require authentication
+      const publicRoutes = ['/', '/login', '/register', '/properties'];
+      const isExactPublicRoute = publicRoutes.includes(currentPath);
+      
+      // Check if it's a property detail page (public) like /properties/123
+      // But exclude protected routes like /properties/create or /properties/123/edit
+      const isPropertyDetailPage = /^\/properties\/[^/]+$/.test(currentPath) && 
+                                   !currentPath.includes('/create') && 
+                                   !currentPath.includes('/edit');
+      
+      const isPublicPath = isExactPublicRoute || isPropertyDetailPage;
+      
+      // Only redirect if we're on a protected route
+      if (!isPublicPath) {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
