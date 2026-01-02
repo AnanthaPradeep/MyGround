@@ -10,19 +10,23 @@ import {
   XCircleIcon,
   Squares2X2Icon,
   HomeIcon as PropertyIcon,
-  DocumentTextIcon
+  DocumentTextIcon,
+  CheckIcon,
+  GlobeAltIcon
 } from '@heroicons/react/24/outline'
 import { useState, useRef, useEffect } from 'react'
 import { useAuthStore } from '../store/authStore'
 import { useNotificationStore } from '../store/notificationStore'
 import { useWishlistStore } from '../store/wishlistStore'
 import { useNotifications } from '../hooks/useNotifications'
+import { usePublicNotifications } from '../hooks/usePublicNotifications'
 import { useWishlist } from '../hooks/useWishlist'
 import { useDrafts } from '../hooks/useDrafts'
 import { Notification } from '../types/notification'
 import api from '../services/api'
 import ThemeToggle from './ThemeToggle'
 import LanguageSelector from './LanguageSelector'
+import toast from 'react-hot-toast'
 
 /**
  * Header Icons Component - Dashboard, Notification, Wishlist, List Property
@@ -90,22 +94,80 @@ export default function HeaderIcons() {
   }, [isAuthenticated, getWishlistCount])
 
   // Fetch real notifications from API
-  const { notifications, refetch: refetchNotifications } = useNotifications({
+  const { notifications: userNotifications, refetch: refetchNotifications } = useNotifications({
     useSampleData: false, // Use real API data
     userId: user?.id,
+  })
+
+  // Fetch public notifications (property added, sold, etc.)
+  const { notifications: publicNotifications } = usePublicNotifications({
+    useSampleData: false,
+    limit: 10, // Get recent 10 public notifications
   })
 
   // Get notification store to listen for updates
   const { lastUpdate } = useNotificationStore()
 
-  // Store notification count in state for proper updates
+  // Store notification count in state for proper updates (only user notifications count)
   const [notificationCount, setNotificationCount] = useState(0)
 
-  // Update notification count when notifications change
+  // Combine user and public notifications
+  const allNotifications = [
+    ...userNotifications.map(n => ({
+      ...n,
+      isPublic: false,
+    })),
+    ...publicNotifications.map(n => {
+      const location = n.location?.area && n.location?.city 
+        ? `${n.location.area}, ${n.location.city}`
+        : n.location?.city || 'New Location'
+      
+      let displayTitle = ''
+      let displayMessage = ''
+      
+      switch (n.type) {
+        case 'PROPERTY_ADDED':
+          displayTitle = 'New Property Added'
+          const transactionLabel = n.transactionType === 'SELL' ? 'for Sale' : 
+                                  n.transactionType === 'RENT' ? 'for Rent' : 
+                                  n.transactionType === 'LEASE' ? 'for Lease' : 'available'
+          displayMessage = `New ${n.propertyCategory} property "${n.propertyTitle}" ${transactionLabel} in ${location}`
+          break
+        case 'PROPERTY_DELETED':
+          displayTitle = 'Property Removed'
+          displayMessage = `${n.propertyCategory} property "${n.propertyTitle}" has been removed from ${location}`
+          break
+        case 'PROPERTY_SOLD':
+          displayTitle = 'Property Sold'
+          displayMessage = `${n.propertyCategory} property "${n.propertyTitle}" in ${location} has been sold`
+          break
+        case 'PROPERTY_RENTED':
+          displayTitle = 'Property Rented'
+          displayMessage = `${n.propertyCategory} property "${n.propertyTitle}" in ${location} has been rented`
+          break
+        default:
+          displayTitle = 'Property Update'
+          displayMessage = `${n.propertyCategory} property "${n.propertyTitle}" in ${location} has been updated`
+      }
+      
+      return {
+        id: n._id,
+        title: displayTitle,
+        message: displayMessage,
+        type: 'info' as const,
+        read: false, // Public notifications are never "read"
+        timestamp: new Date(n.createdAt),
+        link: `/properties/${n.propertyId}`,
+        isPublic: true,
+      }
+    }),
+  ].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+
+  // Update notification count when user notifications change (only count user notifications)
   useEffect(() => {
-    const unreadCount = notifications.filter(n => !n.read).length
+    const unreadCount = userNotifications.filter(n => !n.read).length
     setNotificationCount(unreadCount)
-  }, [notifications])
+  }, [userNotifications])
 
   // Fetch draft count
   const { getDraftCount } = useDrafts({ userId: user?.id })
@@ -228,9 +290,11 @@ export default function HeaderIcons() {
 
   const { triggerRefetch } = useNotificationStore()
 
-  const handleNotificationClick = async (notification: Notification) => {
-    // Mark as read via API if not already read
-    if (!notification.read) {
+  const handleNotificationClick = async (notification: any) => {
+    const isPublic = (notification as any).isPublic
+    
+    // Mark as read via API if not already read and not public
+    if (!isPublic && !notification.read) {
       try {
         await api.put(`/notifications/${notification.id}/read`)
         // Refetch to update count
@@ -242,10 +306,26 @@ export default function HeaderIcons() {
       }
     }
 
+    // Navigate to link if available (works for both public and private)
     if (notification.link) {
       navigate(notification.link)
     }
     setIsNotificationOpen(false)
+  }
+
+  const markAllAsRead = async () => {
+    try {
+      // Call API to mark all user notifications as read
+      await api.put('/notifications/read-all')
+      // Refetch to update count
+      await refetchNotifications()
+      // Trigger refetch in other components
+      triggerRefetch()
+      toast.success('All notifications marked as read')
+    } catch (error: any) {
+      console.error('Error marking all as read:', error)
+      toast.error(error.response?.data?.error || 'Failed to mark all as read')
+    }
   }
 
   const handleSeeMore = () => {
@@ -258,8 +338,8 @@ export default function HeaderIcons() {
     setIsWishlistOpen(false)
   }
 
-  // Get recent notifications (last 5)
-  const recentNotifications = notifications.slice(0, 5)
+  // Get recent notifications (last 5 from combined list)
+  const recentNotifications = allNotifications.slice(0, 5)
   
   // Get recent wishlist items (last 4)
   const recentWishlist = wishlist.slice(0, 4)
@@ -314,9 +394,23 @@ export default function HeaderIcons() {
           <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50 max-h-96 overflow-hidden flex flex-col">
             {/* Header */}
             <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-gray-50 dark:bg-gray-900">
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100">Notifications</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100">Notifications</h3>
+                {notificationCount > 0 && (
+                  <span className="text-xs text-gray-500 dark:text-gray-400">({notificationCount} new)</span>
+                )}
+              </div>
               {notificationCount > 0 && (
-                <span className="text-xs text-gray-500 dark:text-gray-400">{notificationCount} new</span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    markAllAsRead()
+                  }}
+                  className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors"
+                  title="Mark all as read"
+                >
+                  <CheckIcon className="w-5 h-5" />
+                </button>
               )}
             </div>
 
@@ -329,37 +423,51 @@ export default function HeaderIcons() {
                 </div>
               ) : (
                 <div className="divide-y divide-gray-100 dark:divide-gray-700">
-                  {recentNotifications.map((notification) => (
-                    <button
-                      key={notification.id}
-                      onClick={() => handleNotificationClick(notification)}
-                      className={`w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
-                        !notification.read ? 'bg-primary-50 dark:bg-primary-900/20' : ''
-                      }`}
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0 mt-0.5">
-                          {getNotificationIcon(notification.type)}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-2">
-                            <p className={`text-sm font-medium ${!notification.read ? 'text-gray-900 dark:text-gray-100' : 'text-gray-700 dark:text-gray-300'}`}>
-                              {notification.title}
-                            </p>
-                            {!notification.read && (
-                              <span className="flex-shrink-0 w-2 h-2 bg-primary-600 dark:bg-primary-400 rounded-full mt-1.5"></span>
+                  {recentNotifications.map((notification) => {
+                    const isPublic = (notification as any).isPublic
+                    return (
+                      <button
+                        key={notification.id}
+                        onClick={() => handleNotificationClick(notification)}
+                        className={`w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
+                          !notification.read && !isPublic ? 'bg-primary-50 dark:bg-primary-900/20' : ''
+                        } ${isPublic ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="flex-shrink-0 mt-0.5">
+                            {isPublic ? (
+                              <GlobeAltIcon className="w-5 h-5 text-blue-500" />
+                            ) : (
+                              getNotificationIcon(notification.type)
                             )}
                           </div>
-                          <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
-                            {notification.message}
-                          </p>
-                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                            {formatTimeAgo(notification.timestamp)}
-                          </p>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex items-center gap-2 flex-1 min-w-0">
+                                <p className={`text-sm font-medium ${!notification.read && !isPublic ? 'text-gray-900 dark:text-gray-100' : 'text-gray-700 dark:text-gray-300'}`}>
+                                  {notification.title}
+                                </p>
+                                {isPublic && (
+                                  <span className="flex-shrink-0 px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-medium rounded">
+                                    Public
+                                  </span>
+                                )}
+                              </div>
+                              {!notification.read && !isPublic && (
+                                <span className="flex-shrink-0 w-2 h-2 bg-primary-600 dark:bg-primary-400 rounded-full mt-1.5"></span>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+                              {notification.message}
+                            </p>
+                            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                              {formatTimeAgo(notification.timestamp)}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </button>
-                  ))}
+                      </button>
+                    )
+                  })}
                 </div>
               )}
             </div>
