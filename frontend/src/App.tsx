@@ -3,7 +3,10 @@ import { Toaster } from 'react-hot-toast'
 import { useEffect, useState } from 'react'
 import { useAuthStore } from './store/authStore'
 import { useLocationStore } from './store/locationStore'
+import { useLanguageStore } from './store/languageStore'
 import { ThemeProvider } from './contexts/ThemeContext'
+import { changeLanguage } from './config/i18n'
+import i18n from './config/i18n'
 import SplashScreen from './components/SplashScreen'
 import LocationSelectorModal from './components/LocationSelectorModal'
 import { ErrorBoundary } from './components/ErrorBoundary'
@@ -27,8 +30,19 @@ import { NotFoundPage } from './pages/ErrorPages'
 function App() {
   const { checkAuth } = useAuthStore()
   const { isLocationSet } = useLocationStore()
+  const { selectedLanguage } = useLanguageStore()
   const [isLoading, setIsLoading] = useState(true)
   const [showLocationModal, setShowLocationModal] = useState(false)
+
+  // Update language when selectedLanguage changes (but not on initial mount to avoid double load)
+  useEffect(() => {
+    // Only change language if it's different from current i18n language
+    if (selectedLanguage && i18n.language !== selectedLanguage.languageCode) {
+      changeLanguage(selectedLanguage).catch((error) => {
+        console.error('Error changing language:', error)
+      })
+    }
+  }, [selectedLanguage])
 
   useEffect(() => {
     // Initialize app: check auth and load resources

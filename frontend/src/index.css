@@ -134,3 +134,12 @@ code {
   margin-right: 8px !important;
 }
 
+/* RTL Support */
+[dir="rtl"] {
+  direction: rtl;
+}
+
+[dir="ltr"] {
+  direction: ltr;
+}
+

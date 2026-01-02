@@ -18,7 +18,7 @@ import { useNotifications } from '../hooks/useNotifications'
 import { usePublicNotifications } from '../hooks/usePublicNotifications'
 import ProtectedRoute from '../components/ProtectedRoute'
 import Logo from '../components/Logo'
-import HeaderSearchBar from '../components/HeaderSearchBar'
+import HeaderSearchDropdown from '../components/HeaderSearchDropdown'
 import HeaderIcons from '../components/HeaderIcons'
 import HeaderLocation from '../components/HeaderLocation'
 import MobileMenu from '../components/MobileMenu'
@@ -222,14 +222,15 @@ export default function Notifications() {
               {/* Logo - Hidden on mobile (shown in menu), visible on desktop */}
               <Logo showText={true} size="md" className="hidden lg:flex lg:flex-1" />
               
-              <div className="hidden sm:block flex-1 min-w-0 lg:flex-none lg:max-w-md">
-                <HeaderSearchBar />
-              </div>
-              <div className="hidden lg:flex items-center gap-2 xl:gap-4">
+              {/* Desktop Navigation */}
+              <div className="hidden lg:flex items-center space-x-2 xl:space-x-4">
+                <HeaderSearchDropdown />
                 <HeaderLocation />
                 <HeaderIcons />
                 <UserDropdown />
               </div>
+              
+              {/* Mobile: Show only User Dropdown */}
               <div className="lg:hidden flex items-center">
                 <UserDropdown />
               </div>

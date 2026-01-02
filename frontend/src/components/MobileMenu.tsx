@@ -11,7 +11,8 @@ import {
   ChevronDownIcon,
   Squares2X2Icon,
   HeartIcon,
-  DocumentTextIcon
+  DocumentTextIcon,
+  MagnifyingGlassIcon
 } from '@heroicons/react/24/outline'
 import { useAuthStore } from '../store/authStore'
 import { useLocationStore } from '../store/locationStore'
@@ -23,6 +24,7 @@ import { useDrafts } from '../hooks/useDrafts'
 import Logo from './Logo'
 import HeaderLocation from './HeaderLocation'
 import ThemeToggle from './ThemeToggle'
+import LanguageSelector from './LanguageSelector'
 
 interface MobileMenuProps {
   isOpen: boolean
@@ -46,6 +48,8 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null)
   const [wishlistCount, setWishlistCount] = useState(0)
   const [notificationCount, setNotificationCount] = useState(0)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   // Fetch wishlist count
   useEffect(() => {
@@ -112,6 +116,20 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     onClose()
   }
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      navigate(`/properties?search=${encodeURIComponent(searchQuery)}`)
+      setIsSearchOpen(false)
+      setSearchQuery('')
+      onClose()
+    } else {
+      navigate('/properties')
+      setIsSearchOpen(false)
+      onClose()
+    }
+  }
+
   // Close menu when clicking outside
   useEffect(() => {
     if (!isOpen) return
@@ -151,17 +169,26 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-            <Logo showText={true} size="sm" />
-            <div className="flex items-center gap-2">
-              <ThemeToggle />
+          <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex-1 min-w-0">
+                <Logo showText={true} size="sm" />
+              </div>
               <button
                 onClick={onClose}
-                className="p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100"
+                className="p-1.5 sm:p-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-center h-8 w-8 sm:h-9 sm:w-9 flex-shrink-0"
                 aria-label="Close menu"
               >
-                <XMarkIcon className="w-6 h-6" />
+                <XMarkIcon className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="[&>div]:relative [&_button]:px-2.5 [&_button]:py-2 [&_button]:text-sm [&_button]:h-9 [&_button]:flex [&_button]:items-center">
+                <LanguageSelector variant="dropdown" />
+              </div>
+              <div className="[&_button]:p-2 [&_button]:h-9 [&_button]:w-9 [&_button]:flex [&_button]:items-center [&_button]:justify-center">
+                <ThemeToggle />
+              </div>
             </div>
           </div>
 
@@ -193,6 +220,55 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     </div>
                   </div>
                   <ChevronDownIcon className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                </div>
+
+                {/* Search Menu Item */}
+                <div className="mt-2">
+                  {!isSearchOpen ? (
+                    <button
+                      onClick={() => setIsSearchOpen(true)}
+                      className="w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                    >
+                      <MagnifyingGlassIcon className="w-4 h-4 sm:w-5 sm:h-5 text-primary-600 dark:text-primary-400 flex-shrink-0" />
+                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Search Properties</span>
+                    </button>
+                  ) : (
+                    <div className="px-3 sm:px-4 py-2.5 sm:py-3">
+                      <form onSubmit={handleSearch}>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Search properties..."
+                            autoFocus
+                            className="w-full px-4 py-2.5 pl-10 pr-20 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-transparent"
+                          />
+                          <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
+                          <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsSearchOpen(false)
+                                setSearchQuery('')
+                              }}
+                              className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                              aria-label="Cancel"
+                            >
+                              <XMarkIcon className="h-4 w-4" />
+                            </button>
+                            <button
+                              type="submit"
+                              className="p-1.5 bg-primary-600 dark:bg-primary-500 text-white rounded hover:bg-primary-700 dark:hover:bg-primary-600 transition-colors"
+                              aria-label="Search"
+                            >
+                              <MagnifyingGlassIcon className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  )}
                 </div>
               </div>
 

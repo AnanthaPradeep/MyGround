@@ -6,7 +6,7 @@ import { useWishlistStore } from '../store/wishlistStore'
 import { useWishlist } from '../hooks/useWishlist'
 import ProtectedRoute from '../components/ProtectedRoute'
 import Logo from '../components/Logo'
-import HeaderSearchBar from '../components/HeaderSearchBar'
+import HeaderSearchDropdown from '../components/HeaderSearchDropdown'
 import HeaderIcons from '../components/HeaderIcons'
 import HeaderLocation from '../components/HeaderLocation'
 import MobileMenu from '../components/MobileMenu'
@@ -64,6 +64,7 @@ export default function Wishlist() {
 
               {/* Desktop Navigation */}
               <div className="hidden lg:flex items-center space-x-2 xl:space-x-4">
+                <HeaderSearchDropdown />
                 <HeaderLocation />
                 <HeaderIcons />
                 <UserDropdown />

@@ -10,6 +10,7 @@ import wishlistRoutes from './routes/wishlist';
 import draftRoutes from './routes/drafts';
 import userLocationRoutes from './routes/userLocation';
 import filterRoutes from './routes/filters';
+import languageRoutes from './routes/languages';
 
 // Load environment variables
 dotenv.config();
@@ -88,6 +89,7 @@ app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/drafts', draftRoutes);
 app.use('/api/user/location', userLocationRoutes);
 app.use('/api/filters', filterRoutes);
+app.use('/api/languages', languageRoutes);
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

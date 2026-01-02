@@ -6,7 +6,7 @@ import { HeartIcon, CheckCircleIcon, XCircleIcon, PhotoIcon, MapPinIcon, TrashIc
 import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid'
 import MapPicker from '../components/MapPicker'
 import Logo from '../components/Logo'
-import HeaderSearchBar from '../components/HeaderSearchBar'
+import HeaderSearchDropdown from '../components/HeaderSearchDropdown'
 import HeaderIcons from '../components/HeaderIcons'
 import HeaderLocation from '../components/HeaderLocation'
 import UserDropdown from '../components/UserDropdown'
@@ -182,14 +182,15 @@ export default function PropertyDetail() {
             {/* Logo - Hidden on mobile (shown in menu), visible on desktop */}
             <Logo showText={true} size="md" className="hidden lg:flex lg:flex-1" />
             
-            <div className="hidden sm:block flex-1 min-w-0 lg:flex-none lg:max-w-md">
-              <HeaderSearchBar />
-            </div>
-            <div className="hidden lg:flex items-center gap-2 xl:gap-4">
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center space-x-2 xl:space-x-4">
+              <HeaderSearchDropdown />
               <HeaderLocation />
               <HeaderIcons />
               <UserDropdown />
             </div>
+            
+            {/* Mobile: Show only User Dropdown */}
             <div className="lg:hidden flex items-center">
               <HeaderIcons />
               <UserDropdown />

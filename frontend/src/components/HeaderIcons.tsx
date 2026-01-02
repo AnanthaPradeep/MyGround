@@ -22,6 +22,7 @@ import { useDrafts } from '../hooks/useDrafts'
 import { Notification } from '../types/notification'
 import api from '../services/api'
 import ThemeToggle from './ThemeToggle'
+import LanguageSelector from './LanguageSelector'
 
 /**
  * Header Icons Component - Dashboard, Notification, Wishlist, List Property
@@ -269,6 +270,9 @@ export default function HeaderIcons() {
 
   return (
     <div className="hidden lg:flex items-center gap-2 xl:gap-3">
+      {/* Language Selector */}
+      <LanguageSelector variant="dropdown" />
+
       {/* Theme Toggle */}
       <ThemeToggle />
 

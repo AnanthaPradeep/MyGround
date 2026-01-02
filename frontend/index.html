@@ -32,6 +32,32 @@
           localStorage.setItem('theme', 'light');
         }
       })();
+      
+      // Apply language and direction immediately to prevent flash
+      (function() {
+        const savedLang = localStorage.getItem('myground-language-storage');
+        const root = document.documentElement;
+        
+        if (savedLang) {
+          try {
+            const langData = JSON.parse(savedLang);
+            if (langData.state?.selectedLanguage) {
+              const lang = langData.state.selectedLanguage;
+              root.setAttribute('dir', lang.direction || 'ltr');
+              root.setAttribute('lang', lang.languageCode || 'en');
+            } else {
+              root.setAttribute('dir', 'ltr');
+              root.setAttribute('lang', 'en');
+            }
+          } catch (error) {
+            root.setAttribute('dir', 'ltr');
+            root.setAttribute('lang', 'en');
+          }
+        } else {
+          root.setAttribute('dir', 'ltr');
+          root.setAttribute('lang', 'en');
+        }
+      })();
     </script>
   </head>
   <body>
