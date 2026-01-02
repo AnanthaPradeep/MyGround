@@ -97,8 +97,14 @@ export default function HeaderIcons() {
   // Get notification store to listen for updates
   const { lastUpdate } = useNotificationStore()
 
-  // Calculate unread notification count (only count unread notifications)
-  const notificationCount = notifications.filter(n => !n.read).length
+  // Store notification count in state for proper updates
+  const [notificationCount, setNotificationCount] = useState(0)
+
+  // Update notification count when notifications change
+  useEffect(() => {
+    const unreadCount = notifications.filter(n => !n.read).length
+    setNotificationCount(unreadCount)
+  }, [notifications])
 
   // Fetch draft count
   const { getDraftCount } = useDrafts({ userId: user?.id })

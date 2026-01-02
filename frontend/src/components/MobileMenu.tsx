@@ -16,7 +16,9 @@ import {
 import { useAuthStore } from '../store/authStore'
 import { useLocationStore } from '../store/locationStore'
 import { useWishlistStore } from '../store/wishlistStore'
+import { useNotificationStore } from '../store/notificationStore'
 import { useWishlist } from '../hooks/useWishlist'
+import { useNotifications } from '../hooks/useNotifications'
 import { useDrafts } from '../hooks/useDrafts'
 import Logo from './Logo'
 import HeaderLocation from './HeaderLocation'
@@ -31,13 +33,19 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const { isAuthenticated, user, logout } = useAuthStore()
   const { userLocation } = useLocationStore()
   const { lastUpdate: wishlistLastUpdate } = useWishlistStore()
+  const { lastUpdate: notificationLastUpdate } = useNotificationStore()
   const { getWishlistCount } = useWishlist({
+    useSampleData: false,
+    userId: user?.id,
+  })
+  const { notifications, refetch: refetchNotifications } = useNotifications({
     useSampleData: false,
     userId: user?.id,
   })
   const navigate = useNavigate()
   const menuRef = useRef<HTMLDivElement>(null)
   const [wishlistCount, setWishlistCount] = useState(0)
+  const [notificationCount, setNotificationCount] = useState(0)
 
   // Fetch wishlist count
   useEffect(() => {
@@ -45,6 +53,23 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       getWishlistCount().then(setWishlistCount)
     }
   }, [isAuthenticated, getWishlistCount, wishlistLastUpdate])
+
+  // Update notification count when notifications change
+  useEffect(() => {
+    if (isAuthenticated) {
+      const unreadCount = notifications.filter(n => !n.read).length
+      setNotificationCount(unreadCount)
+    }
+  }, [notifications, isAuthenticated])
+
+  // Refetch notifications when lastUpdate changes
+  useEffect(() => {
+    if (!isAuthenticated || !notificationLastUpdate) return
+    const timeoutId = setTimeout(() => {
+      refetchNotifications()
+    }, 500)
+    return () => clearTimeout(timeoutId)
+  }, [notificationLastUpdate, isAuthenticated, refetchNotifications])
 
   // Fetch draft count
   const { getDraftCount } = useDrafts({ userId: user?.id })
@@ -234,6 +259,11 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   >
                     <BellIcon className="w-5 h-5" />
                     <span>Notifications</span>
+                    {notificationCount > 0 && (
+                      <span className="ml-auto flex items-center justify-center min-w-[20px] h-5 px-1.5 bg-red-500 dark:bg-red-600 text-white text-xs font-bold rounded-full">
+                        {notificationCount > 9 ? '9+' : notificationCount}
+                      </span>
+                    )}
                   </Link>
 
                   <Link
