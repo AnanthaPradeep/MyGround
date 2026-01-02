@@ -51,3 +51,4 @@ const Translation = mongoose.model<ITranslation>('Translation', TranslationSchem
 
 export default Translation;
 
+

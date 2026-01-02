@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useState, useMemo } from 'react'
 import { ShieldCheckIcon, MapPinIcon, ScaleIcon, ClockIcon } from '@heroicons/react/24/outline'
 import { useAuthStore } from '../store/authStore'
@@ -21,8 +21,18 @@ import { CardSkeleton } from '../components/Loader'
 
 export default function Home() {
   const { isAuthenticated } = useAuthStore()
+  const navigate = useNavigate()
   const { properties, loading } = useProperties({ useSampleData: false }) // Fetch from API to get recent properties
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
+  // Handle protected route navigation - redirect to login if not authenticated
+  const handleProtectedNavigation = (path: string) => {
+    if (!isAuthenticated) {
+      navigate('/login')
+    } else {
+      navigate(path)
+    }
+  }
 
   // Get recent properties (sorted by createdAt, newest first)
   const recentProperties = useMemo(() => {
@@ -150,12 +160,12 @@ export default function Home() {
           ) : recentProperties.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-600 dark:text-gray-400 mb-4">No recent properties yet. Be the first to list!</p>
-              <Link
-                to="/properties/create"
+              <button
+                onClick={() => handleProtectedNavigation('/properties/create')}
                 className="inline-block px-6 py-3 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600"
               >
                 List Your Property
-              </Link>
+              </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
@@ -198,12 +208,12 @@ export default function Home() {
           {properties.length === 0 && !loading && (
             <div className="text-center py-12">
               <p className="text-gray-600 dark:text-gray-400">No properties found. Be the first to list!</p>
-              <Link
-                to="/properties/create"
+              <button
+                onClick={() => handleProtectedNavigation('/properties/create')}
                 className="mt-4 inline-block px-6 py-3 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600"
               >
                 List Your Property
-              </Link>
+              </button>
             </div>
           )}
         </div>
@@ -303,12 +313,12 @@ export default function Home() {
                 >
                   Sign Up Free
                 </Link>
-                <Link
-                  to="/properties/create"
+                <button
+                  onClick={() => handleProtectedNavigation('/properties/create')}
                   className="px-8 py-3 border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-primary-600"
                 >
                   List Property
-                </Link>
+                </button>
               </>
             ) : (
               <Link

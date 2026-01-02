@@ -4,7 +4,6 @@ import { useAuthStore } from '../store/authStore'
 import { useProperties } from '../hooks/useProperties'
 import { useDrafts } from '../hooks/useDrafts'
 import { HomeIcon, MagnifyingGlassIcon, UserIcon, EyeIcon, HeartIcon, ChatBubbleLeftIcon, TrashIcon, PauseIcon, PlayIcon, Bars3Icon, DocumentTextIcon, PencilIcon, CheckCircleIcon, PlusCircleIcon } from '@heroicons/react/24/outline'
-import ProtectedRoute from '../components/ProtectedRoute'
 import UserDropdown from '../components/UserDropdown'
 import Logo from '../components/Logo'
 import HeaderSearchDropdown from '../components/HeaderSearchDropdown'
@@ -172,8 +171,7 @@ export default function Dashboard() {
   }
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
         {/* Navigation */}
         <nav className="bg-white dark:bg-gray-800 shadow-sm sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
@@ -590,11 +588,10 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-      </div>
-      
+        
       {/* Footer */}
       <Footer />
-    </ProtectedRoute>
+    </div>
   )
 }
 

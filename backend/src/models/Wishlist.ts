@@ -33,3 +33,4 @@ WishlistSchema.index({ userId: 1, propertyId: 1 }, { unique: true });
 export default mongoose.model<IWishlist>('Wishlist', WishlistSchema);
 
 
+
