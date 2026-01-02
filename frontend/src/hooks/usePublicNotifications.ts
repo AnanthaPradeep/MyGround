@@ -14,6 +14,7 @@ export interface PublicNotification {
     state?: string
   }
   createdAt: string
+  read?: boolean // Read status for authenticated users
 }
 
 interface UsePublicNotificationsOptions {
@@ -27,6 +28,7 @@ export const usePublicNotifications = (options: UsePublicNotificationsOptions = 
   const [notifications, setNotifications] = useState<PublicNotification[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [unreadCount, setUnreadCount] = useState(0)
 
   useEffect(() => {
     fetchNotifications()
@@ -41,6 +43,7 @@ export const usePublicNotifications = (options: UsePublicNotificationsOptions = 
         // Sample data for development
         await new Promise((resolve) => setTimeout(resolve, 300))
         setNotifications([])
+        setUnreadCount(0)
       } else {
         // Fetch from API
         const params = new URLSearchParams()
@@ -49,16 +52,46 @@ export const usePublicNotifications = (options: UsePublicNotificationsOptions = 
         
         const response = await api.get(`/public-notifications?${params.toString()}`)
         setNotifications(response.data.notifications || [])
+        setUnreadCount(response.data.unreadCount || 0)
       }
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to fetch public notifications')
       setNotifications([])
+      setUnreadCount(0)
     } finally {
       setLoading(false)
     }
   }
 
-  return { notifications, loading, error, refetch: fetchNotifications }
+  // Optimistically mark a public notification as read
+  const markAsRead = (notificationId: string) => {
+    setNotifications(prev => 
+      prev.map(notif => 
+        notif._id === notificationId 
+          ? { ...notif, read: true }
+          : notif
+      )
+    )
+    setUnreadCount(prev => Math.max(0, prev - 1))
+  }
+
+  // Optimistically mark all public notifications as read
+  const markAllAsRead = () => {
+    setNotifications(prev => 
+      prev.map(notif => ({ ...notif, read: true }))
+    )
+    setUnreadCount(0)
+  }
+
+  return { 
+    notifications, 
+    loading, 
+    error, 
+    unreadCount,
+    refetch: fetchNotifications,
+    markAsRead,
+    markAllAsRead,
+  }
 }
 
 

@@ -18,7 +18,7 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
   const fetchingRef = useRef(false) // Prevent concurrent fetches
   const lastFetchRef = useRef(0) // Track last fetch time for throttling
 
-  const fetchNotifications = useCallback(async () => {
+  const fetchNotifications = useCallback(async (force = false) => {
     // Don't fetch if not authenticated (unless using sample data)
     if (!useSampleData && !isAuthenticated) {
       setNotifications([])
@@ -26,9 +26,9 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
       return
     }
 
-    // Throttle: Don't fetch if last fetch was less than 2 seconds ago
+    // Throttle: Don't fetch if last fetch was less than 2 seconds ago (unless forced)
     const now = Date.now()
-    if (now - lastFetchRef.current < 2000) {
+    if (!force && now - lastFetchRef.current < 2000) {
       return
     }
 
@@ -91,6 +91,32 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
     fetchNotifications()
   }, [fetchNotifications])
 
-  return { notifications, loading, error, refetch: fetchNotifications, setNotifications }
+  // Optimistically mark a notification as read
+  const markAsRead = useCallback((notificationId: string) => {
+    setNotifications(prev => 
+      prev.map(notif => 
+        notif.id === notificationId 
+          ? { ...notif, read: true }
+          : notif
+      )
+    )
+  }, [])
+
+  // Optimistically mark all notifications as read
+  const markAllAsRead = useCallback(() => {
+    setNotifications(prev => 
+      prev.map(notif => ({ ...notif, read: true }))
+    )
+  }, [])
+
+  return { 
+    notifications, 
+    loading, 
+    error, 
+    refetch: fetchNotifications, 
+    setNotifications,
+    markAsRead,
+    markAllAsRead,
+  }
 }
 

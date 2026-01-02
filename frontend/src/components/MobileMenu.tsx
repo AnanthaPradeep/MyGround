@@ -20,6 +20,7 @@ import { useWishlistStore } from '../store/wishlistStore'
 import { useNotificationStore } from '../store/notificationStore'
 import { useWishlist } from '../hooks/useWishlist'
 import { useNotifications } from '../hooks/useNotifications'
+import { usePublicNotifications } from '../hooks/usePublicNotifications'
 import { useDrafts } from '../hooks/useDrafts'
 import Logo from './Logo'
 import HeaderLocation from './HeaderLocation'
@@ -40,10 +41,19 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     useSampleData: false,
     userId: user?.id,
   })
-  const { notifications, refetch: refetchNotifications } = useNotifications({
+  const { notifications: userNotifications, refetch: refetchNotifications } = useNotifications({
     useSampleData: false,
     userId: user?.id,
   })
+  
+  // Fetch public notifications (property added, sold, etc.)
+  const { 
+    unreadCount: unreadPublicCount,
+  } = usePublicNotifications({
+    useSampleData: false,
+    limit: 10, // Get recent 10 public notifications
+  })
+  
   const navigate = useNavigate()
   const menuRef = useRef<HTMLDivElement>(null)
   const [wishlistCount, setWishlistCount] = useState(0)
@@ -58,13 +68,16 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     }
   }, [isAuthenticated, getWishlistCount, wishlistLastUpdate])
 
-  // Update notification count when notifications change
+  // Update notification count - includes both unread user notifications and unread public notifications
   useEffect(() => {
     if (isAuthenticated) {
-      const unreadCount = notifications.filter(n => !n.read).length
-      setNotificationCount(unreadCount)
+      // Count unread user notifications
+      const unreadUserCount = userNotifications.filter(n => !n.read).length
+      // Count unread public notifications (from API)
+      // Total count includes both user and public unread notifications
+      setNotificationCount(unreadUserCount + unreadPublicCount)
     }
-  }, [notifications, isAuthenticated])
+  }, [userNotifications, unreadPublicCount, isAuthenticated])
 
   // Refetch notifications when lastUpdate changes
   useEffect(() => {

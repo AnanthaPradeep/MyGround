@@ -94,13 +94,24 @@ export default function HeaderIcons() {
   }, [isAuthenticated, getWishlistCount])
 
   // Fetch real notifications from API
-  const { notifications: userNotifications, refetch: refetchNotifications } = useNotifications({
+  const { 
+    notifications: userNotifications, 
+    refetch: refetchNotifications,
+    markAsRead: markNotificationAsRead,
+    markAllAsRead: markAllNotificationsAsRead,
+  } = useNotifications({
     useSampleData: false, // Use real API data
     userId: user?.id,
   })
 
   // Fetch public notifications (property added, sold, etc.)
-  const { notifications: publicNotifications } = usePublicNotifications({
+  const { 
+    notifications: publicNotifications,
+    unreadCount: unreadPublicCount,
+    markAsRead: markPublicAsRead,
+    markAllAsRead: markAllPublicAsRead,
+    refetch: refetchPublicNotifications,
+  } = usePublicNotifications({
     useSampleData: false,
     limit: 10, // Get recent 10 public notifications
   })
@@ -155,7 +166,7 @@ export default function HeaderIcons() {
         title: displayTitle,
         message: displayMessage,
         type: 'info' as const,
-        read: false, // Public notifications are never "read"
+        read: n.read || false, // Use read status from API
         timestamp: new Date(n.createdAt),
         link: `/properties/${n.propertyId}`,
         isPublic: true,
@@ -163,15 +174,14 @@ export default function HeaderIcons() {
     }),
   ].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
 
-  // Update notification count to include both user notifications and public notifications (other creators' properties)
+  // Update notification count - includes both unread user notifications and unread public notifications
   useEffect(() => {
     // Count unread user notifications
     const unreadUserCount = userNotifications.filter(n => !n.read).length
-    // Count all public notifications (properties from other creators - always considered "new")
-    const publicNotificationsCount = publicNotifications.length
-    // Total count includes both user notifications and public notifications from other creators
-    setNotificationCount(unreadUserCount + publicNotificationsCount)
-  }, [userNotifications, publicNotifications])
+    // Count unread public notifications (from API)
+    // Total count includes both user and public unread notifications
+    setNotificationCount(unreadUserCount + unreadPublicCount)
+  }, [userNotifications, unreadPublicCount])
 
   // Fetch draft count
   const { getDraftCount } = useDrafts({ userId: user?.id })
@@ -297,16 +307,32 @@ export default function HeaderIcons() {
   const handleNotificationClick = async (notification: any) => {
     const isPublic = (notification as any).isPublic
     
-    // Mark as read via API if not already read and not public
-    if (!isPublic && !notification.read) {
-      try {
-        await api.put(`/notifications/${notification.id}/read`)
-        // Refetch to update count
-        await refetchNotifications()
-        // Trigger refetch in other components
-        triggerRefetch()
-      } catch (error: any) {
-        console.error('Error marking notification as read:', error)
+    // Mark as read via API if not already read
+    if (!notification.read) {
+      if (isPublic) {
+        // Optimistically update local state immediately for public notification
+        markPublicAsRead(notification.id)
+        // Then update on server
+        api.put(`/public-notifications/${notification.id}/read`).then(() => {
+          // Refetch public notifications to update unread count
+          refetchPublicNotifications()
+          triggerRefetch()
+        }).catch((error: any) => {
+          console.error('Error marking public notification as read:', error)
+          // On error, refetch to revert optimistic update
+          refetchPublicNotifications()
+        })
+      } else {
+        // Optimistically update local state immediately for user notification
+        markNotificationAsRead(notification.id)
+        // Then update on server
+        api.put(`/notifications/${notification.id}/read`).then(() => {
+          refetchNotifications(true)
+          triggerRefetch()
+        }).catch((error: any) => {
+          console.error('Error marking notification as read:', error)
+          refetchNotifications(true)
+        })
       }
     }
 
@@ -319,13 +345,24 @@ export default function HeaderIcons() {
 
   const markAllAsRead = async () => {
     try {
-      // Call API to mark all user notifications as read
-      await api.put('/notifications/read-all')
-      // Refetch to update count
-      await refetchNotifications()
-      // Trigger refetch in other components
-      triggerRefetch()
+      // Optimistically update local state immediately - this will trigger count update via useEffect
+      markAllNotificationsAsRead() // Mark all user notifications as read
+      markAllPublicAsRead() // Mark all public notifications as read
+      // Show success immediately since count is already updated
       toast.success('All notifications marked as read')
+      // Then update on server (fire and forget - optimistic update already applied)
+      Promise.all([
+        api.put('/notifications/read-all'),
+        api.put('/public-notifications/read-all'),
+      ]).then(() => {
+        // Refetch after server confirms to ensure sync
+        refetchNotifications(true)
+        triggerRefetch()
+      }).catch((error: any) => {
+        console.error('Error marking all as read on server:', error)
+        // On error, refetch to revert optimistic update
+        refetchNotifications(true)
+      })
     } catch (error: any) {
       console.error('Error marking all as read:', error)
       toast.error(error.response?.data?.error || 'Failed to mark all as read')
@@ -387,7 +424,7 @@ export default function HeaderIcons() {
         >
           <BellIcon className="w-6 h-6" />
           {notificationCount > 0 && (
-            <span className="absolute top-1 right-1 flex items-center justify-center w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full">
+            <span className="absolute top-0 right-0 flex items-center justify-center min-w-[20px] h-5 px-1.5 bg-red-500 dark:bg-red-600 text-white text-xs font-bold rounded-full transform translate-x-1/2 -translate-y-1/2">
               {notificationCount > 9 ? '9+' : notificationCount}
             </span>
           )}
@@ -433,22 +470,46 @@ export default function HeaderIcons() {
                       <button
                         key={notification.id}
                         onClick={() => handleNotificationClick(notification)}
-                        className={`w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
-                          !notification.read && !isPublic ? 'bg-primary-50 dark:bg-primary-900/20' : ''
-                        } ${isPublic ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}
+                        className={`relative w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
+                          !notification.read && !isPublic 
+                            ? 'bg-primary-50 dark:bg-primary-900/20 border-l-2 border-primary-500 dark:border-primary-400' 
+                            : notification.read && !isPublic
+                            ? 'bg-gray-50/50 dark:bg-gray-800/30 opacity-75'
+                            : !notification.read && isPublic
+                            ? 'bg-blue-50 dark:bg-blue-900/20 border-l-2 border-blue-500 dark:border-blue-400'
+                            : notification.read && isPublic
+                            ? 'bg-blue-50/30 dark:bg-blue-900/10 opacity-75'
+                            : ''
+                        }`}
                       >
+                        {/* Blue dot indicator for unread notifications - top right corner */}
+                        {!notification.read && (
+                          <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-blue-500 dark:bg-blue-400 rounded-full shadow-sm"></span>
+                        )}
+                        {/* Checkmark indicator for read notifications */}
+                        {notification.read && (
+                          <span className="absolute top-2 right-2 w-4 h-4 flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-full">
+                            <CheckIcon className="w-2.5 h-2.5 text-gray-500 dark:text-gray-400" />
+                          </span>
+                        )}
                         <div className="flex items-start gap-3">
                           <div className="flex-shrink-0 mt-0.5">
                             {isPublic ? (
-                              <GlobeAltIcon className="w-5 h-5 text-blue-500" />
+                              <div className={notification.read ? 'opacity-60' : ''}>
+                                <GlobeAltIcon className="w-5 h-5 text-blue-500" />
+                              </div>
                             ) : (
-                              getNotificationIcon(notification.type)
+                              <div className={notification.read ? 'opacity-60' : ''}>
+                                {getNotificationIcon(notification.type)}
+                              </div>
                             )}
                           </div>
-                          <div className="flex-1 min-w-0">
+                          <div className="flex-1 min-w-0 pr-2">
                             <div className="flex items-start justify-between gap-2">
                               <div className="flex items-center gap-2 flex-1 min-w-0">
-                                <p className={`text-sm font-medium ${!notification.read && !isPublic ? 'text-gray-900 dark:text-gray-100' : 'text-gray-700 dark:text-gray-300'}`}>
+                                <p className={`text-sm ${!notification.read 
+                                  ? 'font-semibold text-gray-900 dark:text-gray-100' 
+                                  : 'font-normal text-gray-600 dark:text-gray-400'}`}>
                                   {notification.title}
                                 </p>
                                 {isPublic && (
@@ -457,14 +518,19 @@ export default function HeaderIcons() {
                                   </span>
                                 )}
                               </div>
-                              {!notification.read && !isPublic && (
-                                <span className="flex-shrink-0 w-2 h-2 bg-primary-600 dark:bg-primary-400 rounded-full mt-1.5"></span>
-                              )}
                             </div>
-                            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+                            <p className={`text-xs mt-1 line-clamp-2 ${
+                              notification.read 
+                                ? 'text-gray-500 dark:text-gray-500' 
+                                : 'text-gray-600 dark:text-gray-400'
+                            }`}>
                               {notification.message}
                             </p>
-                            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                            <p className={`text-xs mt-1 ${
+                              notification.read 
+                                ? 'text-gray-400 dark:text-gray-600' 
+                                : 'text-gray-400 dark:text-gray-500'
+                            }`}>
                               {formatTimeAgo(notification.timestamp)}
                             </p>
                           </div>

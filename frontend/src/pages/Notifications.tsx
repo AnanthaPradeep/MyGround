@@ -36,13 +36,26 @@ export default function Notifications() {
   const { triggerRefetch } = useNotificationStore()
 
   // Fetch user-specific notifications (only for property owner)
-  const { notifications: userNotifications, loading: loadingUser, refetch: refetchUserNotifications } = useNotifications({
+  const { 
+    notifications: userNotifications, 
+    loading: loadingUser, 
+    refetch: refetchUserNotifications,
+    markAsRead: markNotificationAsRead,
+    markAllAsRead: markAllNotificationsAsRead,
+  } = useNotifications({
     useSampleData: false, // Fetch from API
     userId: user?.id,
   })
 
   // Fetch public notifications (for all users - property added, deleted, sold, etc.)
-  const { notifications: publicNotifications, loading: loadingPublic, refetch: refetchPublicNotifications } = usePublicNotifications({
+  const { 
+    notifications: publicNotifications, 
+    loading: loadingPublic, 
+    refetch: refetchPublicNotifications,
+    unreadCount: unreadPublicCount,
+    markAsRead: markPublicAsRead,
+    markAllAsRead: markAllPublicAsRead,
+  } = usePublicNotifications({
     useSampleData: false, // Fetch from API
     limit: 50,
   })
@@ -93,7 +106,7 @@ export default function Notifications() {
         title: displayTitle,
         message: displayMessage,
         type: 'info' as const,
-        read: false,
+        read: n.read || false, // Use read status from API
         timestamp: new Date(n.createdAt),
         link: `/properties/${n.propertyId}`,
         isPublic: true,
@@ -109,7 +122,8 @@ export default function Notifications() {
     ? allNotifications.filter(n => (n as any).isPublic)
     : allNotifications
 
-  const unreadCount = userNotifications.filter(n => !n.read).length
+  const unreadUserCount = userNotifications.filter(n => !n.read).length
+  const unreadCount = unreadUserCount + unreadPublicCount // Total unread (user + public)
   const publicCount = publicNotifications.length
 
   const getNotificationIcon = (type: Notification['type']) => {
@@ -149,16 +163,34 @@ export default function Notifications() {
   }
 
   const handleNotificationClick = async (notification: any) => {
-    // Only mark as read if it's a user notification (not public)
-    if (!notification.isPublic && !notification.read) {
+    // Mark as read if not already read (works for both user and public notifications)
+    if (!notification.read) {
       try {
-        await api.put(`/notifications/${notification.id}/read`)
-        // Refetch to get updated status
-        await refetchUserNotifications()
+        if (notification.isPublic) {
+          // Optimistically update local state immediately for public notification
+          markPublicAsRead(notification.id)
+          // Then update on server
+          await api.put(`/public-notifications/${notification.id}/read`)
+          // Refetch to ensure sync
+          await refetchPublicNotifications()
+        } else {
+          // Optimistically update local state immediately for user notification
+          markNotificationAsRead(notification.id)
+          // Then update on server
+          await api.put(`/notifications/${notification.id}/read`)
+          // Refetch to ensure sync (bypass throttle)
+          await refetchUserNotifications(true)
+        }
         // Trigger refetch in HeaderIcons component
         triggerRefetch()
       } catch (error: any) {
         console.error('Error marking notification as read:', error)
+        // On error, refetch to revert optimistic update
+        if (notification.isPublic) {
+          await refetchPublicNotifications()
+        } else {
+          await refetchUserNotifications(true)
+        }
         toast.error(error.response?.data?.error || 'Failed to mark notification as read')
       }
     }
@@ -170,12 +202,18 @@ export default function Notifications() {
 
   const markAllAsRead = async () => {
     try {
-      // Call API to mark all notifications as read
-      await api.put('/notifications/read-all')
+      // Optimistically update local state immediately for both user and public notifications
+      markAllNotificationsAsRead() // Mark all user notifications as read
+      markAllPublicAsRead() // Mark all public notifications as read
       
-      // Refetch notifications to get updated read status
-      await refetchUserNotifications()
-      // Also refetch public notifications (though they don't have read status)
+      // Then update on server
+      await Promise.all([
+        api.put('/notifications/read-all'),
+        api.put('/public-notifications/read-all'),
+      ])
+      
+      // Refetch notifications to ensure sync (bypass throttle)
+      await refetchUserNotifications(true)
       await refetchPublicNotifications()
       
       // Trigger refetch in HeaderIcons component
@@ -185,6 +223,9 @@ export default function Notifications() {
     } catch (error: any) {
       console.error('Error marking all as read:', error)
       console.error('Error details:', error.response?.data)
+      // On error, refetch to revert optimistic update
+      await refetchUserNotifications(true)
+      await refetchPublicNotifications()
       toast.error(error.response?.data?.error || 'Failed to mark all as read')
     }
   }
@@ -326,48 +367,76 @@ export default function Notifications() {
                   <div
                     key={notification.id}
                     onClick={() => {
-                      if (hasLink) {
-                        // Navigate to the link for both public and private notifications
-                        navigate(notification.link!)
-                      } else if (!isPublic) {
-                        // Only mark as read for private notifications without links
+                      // Mark as read when clicked (for both public and private)
+                      if (!notification.read) {
                         handleNotificationClick(notification)
                       }
+                      // Navigate to the link if available
+                      if (hasLink) {
+                        navigate(notification.link!)
+                      }
                     }}
-                    className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 hover:shadow-md dark:hover:shadow-gray-900/50 transition-all ${
-                      hasLink ? 'cursor-pointer' : (!isPublic ? 'cursor-pointer' : 'cursor-default')
+                    className={`relative bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 hover:shadow-md dark:hover:shadow-gray-900/50 transition-all ${
+                      hasLink ? 'cursor-pointer' : (!isPublic ? 'cursor-pointer' : 'cursor-pointer')
                     } ${
-                      !notification.read && !isPublic ? 'border-l-4 border-primary-600 dark:border-primary-400' : ''
-                    } ${isPublic ? 'border-l-4 border-blue-500 dark:border-blue-400' : ''}`}
+                      !notification.read && !isPublic 
+                        ? 'border-l-4 border-primary-600 dark:border-primary-400 bg-primary-50/30 dark:bg-primary-900/10' 
+                        : notification.read && !isPublic
+                        ? 'border-l-2 border-gray-300 dark:border-gray-600 opacity-75'
+                        : !notification.read && isPublic
+                        ? 'border-l-4 border-blue-500 dark:border-blue-400 bg-blue-50/30 dark:bg-blue-900/10'
+                        : notification.read && isPublic
+                        ? 'border-l-2 border-blue-300 dark:border-blue-600 opacity-75'
+                        : ''
+                    }`}
                   >
+                    {/* Blue dot indicator for unread notifications - top right corner */}
+                    {!notification.read && (
+                      <span className="absolute top-3 right-3 w-3 h-3 bg-blue-500 dark:bg-blue-400 rounded-full shadow-sm ring-2 ring-blue-200 dark:ring-blue-800"></span>
+                    )}
+                    {/* Checkmark indicator for read notifications */}
+                    {notification.read && (
+                      <span className="absolute top-3 right-3 w-5 h-5 flex items-center justify-center bg-gray-200 dark:bg-gray-700 rounded-full">
+                        <CheckIcon className="w-3 h-3 text-gray-500 dark:text-gray-400" />
+                      </span>
+                    )}
                     <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0">
+                      <div className={`flex-shrink-0 ${notification.read ? 'opacity-60' : ''}`}>
                         {isPublic ? (
                           <GlobeAltIcon className="w-6 h-6 text-blue-500" />
                         ) : (
                           getNotificationIcon(notification.type)
                         )}
                       </div>
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0 pr-2">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                              <h3 className={`text-base font-heading font-semibold ${!notification.read && !isPublic ? 'text-gray-900 dark:text-gray-100' : 'text-gray-700 dark:text-gray-300'}`}>
+                              <h3 className={`text-base font-heading ${
+                                !notification.read 
+                                  ? 'font-bold text-gray-900 dark:text-gray-100' 
+                                  : 'font-normal text-gray-600 dark:text-gray-400'
+                              }`}>
                                 {notification.title}
                               </h3>
-                              {!notification.read && !isPublic && (
-                                <span className="flex-shrink-0 w-2 h-2 bg-primary-600 rounded-full"></span>
-                              )}
                               {isPublic && (
                                 <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded">
                                   Public
                                 </span>
                               )}
                             </div>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                            <p className={`text-sm mb-2 ${
+                              notification.read 
+                                ? 'text-gray-500 dark:text-gray-500' 
+                                : 'text-gray-600 dark:text-gray-400'
+                            }`}>
                               {notification.message}
                             </p>
-                            <p className="text-xs text-gray-400">
+                            <p className={`text-xs ${
+                              notification.read 
+                                ? 'text-gray-400 dark:text-gray-600' 
+                                : 'text-gray-400'
+                            }`}>
                               {formatTimeAgo(notification.timestamp)}
                             </p>
                           </div>
