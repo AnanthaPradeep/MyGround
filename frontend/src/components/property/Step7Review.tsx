@@ -21,40 +21,40 @@ export default function Step7Review({ form }: Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Review & Submit</h2>
-        <p className="text-gray-600">Review all details before submitting your property listing</p>
+        <h2 className="text-2xl font-heading font-bold text-gray-900 dark:text-gray-100 mb-2">Review & Submit</h2>
+        <p className="text-gray-600 dark:text-gray-400">Review all details before submitting your property listing</p>
       </div>
 
       {/* Category & Transaction */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Category & Transaction</h3>
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Category & Transaction</h3>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <p className="text-sm text-gray-600">Transaction Type</p>
-            <p className="font-medium">{formData.transactionType}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Transaction Type</p>
+            <p className="font-medium text-gray-900 dark:text-gray-100">{formData.transactionType}</p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">Property Category</p>
-            <p className="font-medium">{formData.propertyCategory}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Property Category</p>
+            <p className="font-medium text-gray-900 dark:text-gray-100">{formData.propertyCategory}</p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">Property Sub-Type</p>
-            <p className="font-medium">{formData.propertySubType}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Property Sub-Type</p>
+            <p className="font-medium text-gray-900 dark:text-gray-100">{formData.propertySubType}</p>
           </div>
         </div>
       </div>
 
       {/* Location */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Location</h3>
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Location</h3>
         <div className="space-y-2">
-          <p className="font-medium">{formData.location.address}</p>
-          <p className="text-sm text-gray-600">
+          <p className="font-medium text-gray-900 dark:text-gray-100">{formData.location.address}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             {formData.location.locality}, {formData.location.area}, {formData.location.city}, {formData.location.state}
           </p>
-          <p className="text-sm text-gray-600">Pincode: {formData.location.pincode}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">Pincode: {formData.location.pincode}</p>
           {formData.location.coordinates.coordinates[0] !== 0 && (
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 dark:text-gray-500">
               Coordinates: {formData.location.coordinates.coordinates[1].toFixed(6)}, {formData.location.coordinates.coordinates[0].toFixed(6)}
             </p>
           )}
@@ -62,24 +62,24 @@ export default function Step7Review({ form }: Props) {
       </div>
 
       {/* Property Details */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Property Details</h3>
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Property Details</h3>
         <div className="space-y-2">
-          <p className="font-medium text-lg">{formData.title}</p>
-          <p className="text-sm text-gray-600">{formData.description}</p>
+          <p className="font-medium text-lg text-gray-900 dark:text-gray-100">{formData.title}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{formData.description}</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
             <div>
-              <p className="text-sm text-gray-600">Ownership</p>
-              <p className="font-medium">{formData.ownershipType}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Ownership</p>
+              <p className="font-medium text-gray-900 dark:text-gray-100">{formData.ownershipType}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Possession</p>
-              <p className="font-medium">{formData.possessionStatus}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Possession</p>
+              <p className="font-medium text-gray-900 dark:text-gray-100">{formData.possessionStatus}</p>
             </div>
             {formData.propertyAge && (
               <div>
-                <p className="text-sm text-gray-600">Age</p>
-                <p className="font-medium">{formData.propertyAge} years</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Age</p>
+                <p className="font-medium text-gray-900 dark:text-gray-100">{formData.propertyAge} years</p>
               </div>
             )}
           </div>
@@ -88,31 +88,31 @@ export default function Step7Review({ form }: Props) {
 
       {/* Category-Specific Details */}
       {formData.propertyCategory === 'RESIDENTIAL' && formData.residential && (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Residential Details</h3>
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Residential Details</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {formData.residential.bhk && (
               <div>
-                <p className="text-sm text-gray-600">BHK</p>
-                <p className="font-medium">{formData.residential.bhk} BHK</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">BHK</p>
+                <p className="font-medium text-gray-900 dark:text-gray-100">{formData.residential.bhk} BHK</p>
               </div>
             )}
             {formData.residential.bathrooms && (
               <div>
-                <p className="text-sm text-gray-600">Bathrooms</p>
-                <p className="font-medium">{formData.residential.bathrooms}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Bathrooms</p>
+                <p className="font-medium text-gray-900 dark:text-gray-100">{formData.residential.bathrooms}</p>
               </div>
             )}
             {formData.residential.furnishing && (
               <div>
-                <p className="text-sm text-gray-600">Furnishing</p>
-                <p className="font-medium">{formData.residential.furnishing.replace('_', ' ')}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Furnishing</p>
+                <p className="font-medium text-gray-900 dark:text-gray-100">{formData.residential.furnishing.replace('_', ' ')}</p>
               </div>
             )}
             {formData.residential.parking && (
               <div>
-                <p className="text-sm text-gray-600">Parking</p>
-                <p className="font-medium">{formData.residential.parking}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Parking</p>
+                <p className="font-medium text-gray-900 dark:text-gray-100">{formData.residential.parking}</p>
               </div>
             )}
           </div>
@@ -120,23 +120,23 @@ export default function Step7Review({ form }: Props) {
       )}
 
       {formData.propertyCategory === 'COMMERCIAL' && formData.commercial && (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Commercial Details</h3>
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Commercial Details</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div>
-              <p className="text-sm text-gray-600">Built-up Area</p>
-              <p className="font-medium">{formData.commercial.builtUpArea} sqft</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Built-up Area</p>
+              <p className="font-medium text-gray-900 dark:text-gray-100">{formData.commercial.builtUpArea} sqft</p>
             </div>
             {formData.commercial.carpetArea && (
               <div>
-                <p className="text-sm text-gray-600">Carpet Area</p>
-                <p className="font-medium">{formData.commercial.carpetArea} sqft</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Carpet Area</p>
+                <p className="font-medium text-gray-900 dark:text-gray-100">{formData.commercial.carpetArea} sqft</p>
               </div>
             )}
             {formData.commercial.powerLoad && (
               <div>
-                <p className="text-sm text-gray-600">Power Load</p>
-                <p className="font-medium">{formData.commercial.powerLoad} kVA</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Power Load</p>
+                <p className="font-medium text-gray-900 dark:text-gray-100">{formData.commercial.powerLoad} kVA</p>
               </div>
             )}
           </div>
@@ -144,23 +144,23 @@ export default function Step7Review({ form }: Props) {
       )}
 
       {formData.propertyCategory === 'LAND' && formData.land && (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Land Details</h3>
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Land Details</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div>
-              <p className="text-sm text-gray-600">Plot Area</p>
-              <p className="font-medium">{formData.land.plotArea} {formData.land.areaUnit}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Plot Area</p>
+              <p className="font-medium text-gray-900 dark:text-gray-100">{formData.land.plotArea} {formData.land.areaUnit}</p>
             </div>
             {formData.land.frontage && (
               <div>
-                <p className="text-sm text-gray-600">Frontage</p>
-                <p className="font-medium">{formData.land.frontage} ft</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Frontage</p>
+                <p className="font-medium text-gray-900 dark:text-gray-100">{formData.land.frontage} ft</p>
               </div>
             )}
             {formData.land.depth && (
               <div>
-                <p className="text-sm text-gray-600">Depth</p>
-                <p className="font-medium">{formData.land.depth} ft</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Depth</p>
+                <p className="font-medium text-gray-900 dark:text-gray-100">{formData.land.depth} ft</p>
               </div>
             )}
           </div>
@@ -168,75 +168,75 @@ export default function Step7Review({ form }: Props) {
       )}
 
       {/* Pricing */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Pricing</h3>
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Pricing</h3>
         <div className="space-y-2">
           {formData.transactionType === 'SELL' && formData.pricing.expectedPrice && (
             <div>
-              <p className="text-sm text-gray-600">Expected Price</p>
-              <p className="font-medium text-xl">{formatPrice(formData.pricing.expectedPrice, formData.pricing.currency)}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Expected Price</p>
+              <p className="font-medium text-xl text-gray-900 dark:text-gray-100">{formatPrice(formData.pricing.expectedPrice, formData.pricing.currency)}</p>
             </div>
           )}
           {formData.transactionType === 'RENT' && formData.pricing.rentAmount && (
             <div>
-              <p className="text-sm text-gray-600">Monthly Rent</p>
-              <p className="font-medium text-xl">{formatPrice(formData.pricing.rentAmount, formData.pricing.currency)}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Monthly Rent</p>
+              <p className="font-medium text-xl text-gray-900 dark:text-gray-100">{formatPrice(formData.pricing.rentAmount, formData.pricing.currency)}</p>
             </div>
           )}
           {formData.pricing.maintenanceCharges && (
             <div>
-              <p className="text-sm text-gray-600">Maintenance Charges</p>
-              <p className="font-medium">{formatPrice(formData.pricing.maintenanceCharges, formData.pricing.currency)}/month</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Maintenance Charges</p>
+              <p className="font-medium text-gray-900 dark:text-gray-100">{formatPrice(formData.pricing.maintenanceCharges, formData.pricing.currency)}/month</p>
             </div>
           )}
           <div>
-            <p className="text-sm text-gray-600">Price Negotiable</p>
-            <p className="font-medium">{formData.pricing.priceNegotiable ? 'Yes' : 'No'}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Price Negotiable</p>
+            <p className="font-medium text-gray-900 dark:text-gray-100">{formData.pricing.priceNegotiable ? 'Yes' : 'No'}</p>
           </div>
         </div>
       </div>
 
       {/* Media */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Media</h3>
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Media</h3>
         <div>
-          <p className="text-sm text-gray-600 mb-2">Images</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Images</p>
           <div className="grid grid-cols-4 gap-2">
             {formData.media.images?.slice(0, 4).map((img, index) => (
               <ImageWithFallback
                 key={index}
                 src={img}
                 alt={`Preview ${index + 1}`}
-                className="w-full h-20 object-cover rounded border border-gray-300"
+                className="w-full h-20 object-cover rounded border border-gray-300 dark:border-gray-600"
               />
             ))}
           </div>
           {formData.media.images && formData.media.images.length > 4 && (
-            <p className="text-xs text-gray-500 mt-2">+{formData.media.images.length - 4} more images</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">+{formData.media.images.length - 4} more images</p>
           )}
         </div>
       </div>
 
       {/* Legal */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Legal Status</h3>
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Legal Status</h3>
         <div className="space-y-2">
           <div className="flex items-center">
             <span className={`w-3 h-3 rounded-full mr-2 ${formData.legal.titleClear ? 'bg-green-500' : 'bg-red-500'}`} />
-            <span className="text-sm">Title Clear: {formData.legal.titleClear ? 'Yes' : 'No'}</span>
+            <span className="text-sm text-gray-900 dark:text-gray-100">Title Clear: {formData.legal.titleClear ? 'Yes' : 'No'}</span>
           </div>
           <div className="flex items-center">
             <span className={`w-3 h-3 rounded-full mr-2 ${formData.legal.encumbranceFree ? 'bg-green-500' : 'bg-red-500'}`} />
-            <span className="text-sm">Encumbrance Free: {formData.legal.encumbranceFree ? 'Yes' : 'No'}</span>
+            <span className="text-sm text-gray-900 dark:text-gray-100">Encumbrance Free: {formData.legal.encumbranceFree ? 'Yes' : 'No'}</span>
           </div>
           <div>
-            <p className="text-sm text-gray-600">Litigation Status</p>
-            <p className="font-medium">{formData.legal.litigationStatus}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Litigation Status</p>
+            <p className="font-medium text-gray-900 dark:text-gray-100">{formData.legal.litigationStatus}</p>
           </div>
           {formData.legal.reraNumber && (
             <div>
-              <p className="text-sm text-gray-600">RERA Number</p>
-              <p className="font-medium">{formData.legal.reraNumber}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">RERA Number</p>
+              <p className="font-medium text-gray-900 dark:text-gray-100">{formData.legal.reraNumber}</p>
             </div>
           )}
         </div>

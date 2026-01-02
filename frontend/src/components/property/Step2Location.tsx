@@ -193,13 +193,13 @@ export default function Step2Location({ form }: Props) {
       <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-heading font-bold text-gray-900 dark:text-gray-100 mb-2">Location & Geo-Verification</h2>
-        <p className="text-gray-600 dark:text-gray-400">Provide the exact location of your property (All fields are optional temporarily)</p>
+        <p className="text-gray-600 dark:text-gray-400">Provide the exact location of your property</p>
       </div>
 
       {/* Location Search */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Search Location <span className="text-gray-400 dark:text-gray-500 text-xs">(Optional - temporarily)</span>
+          Search Location
         </label>
         <LocationAutocomplete
           value={locationAddress || (watch('location.city') ? `${watch('location.city')}${watch('location.state') ? `, ${watch('location.state')}` : ''}` : '')}
@@ -210,7 +210,7 @@ export default function Step2Location({ form }: Props) {
           onCoordinatesChange={handleMapClick}
         />
         <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-          Start typing to search for locations. This will auto-fill the location details below. (Optional temporarily)
+          Start typing to search for locations. This will auto-fill the location details below.
         </p>
       </div>
 
@@ -218,7 +218,7 @@ export default function Step2Location({ form }: Props) {
         {/* Country */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Country <span className="text-gray-400 dark:text-gray-500 text-xs">(Optional)</span>
+            Country
           </label>
           <input
             type="text"
@@ -231,10 +231,10 @@ export default function Step2Location({ form }: Props) {
         {/* State */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            State <span className="text-gray-400 dark:text-gray-500 text-xs">(Optional)</span>
+            State <span className="text-red-500 dark:text-red-400">*</span>
           </label>
           <select
-            {...register('location.state')}
+            {...register('location.state', { required: 'State is required' })}
             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400"
           >
             <option value="">Select state</option>
@@ -244,36 +244,45 @@ export default function Step2Location({ form }: Props) {
               </option>
             ))}
           </select>
+          {errors.location?.state && (
+            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.location.state.message}</p>
+          )}
         </div>
 
         {/* City */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            City <span className="text-gray-400 dark:text-gray-500 text-xs">(Optional)</span>
+            City <span className="text-red-500 dark:text-red-400">*</span>
           </label>
           <input
             type="text"
-            {...register('location.city')}
+            {...register('location.city', { required: 'City is required' })}
             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400"
           />
+          {errors.location?.city && (
+            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.location.city.message}</p>
+          )}
         </div>
 
         {/* Area */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Area / Locality <span className="text-gray-400 dark:text-gray-500 text-xs">(Optional)</span>
+            Area / Locality <span className="text-red-500 dark:text-red-400">*</span>
           </label>
           <input
             type="text"
-            {...register('location.area')}
+            {...register('location.area', { required: 'Area is required' })}
             className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 focus:border-primary-500 dark:focus:border-primary-400"
           />
+          {errors.location?.area && (
+            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.location.area.message}</p>
+          )}
         </div>
 
         {/* Locality */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Locality <span className="text-gray-400 dark:text-gray-500 text-xs">(Optional)</span>
+            Locality
           </label>
           <input
             type="text"
@@ -285,11 +294,12 @@ export default function Step2Location({ form }: Props) {
         {/* Pincode */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Pincode / ZIP <span className="text-gray-400 dark:text-gray-500 text-xs">(Optional)</span>
+            Pincode / ZIP <span className="text-red-500 dark:text-red-400">*</span>
           </label>
           <input
             type="text"
             {...register('location.pincode', {
+              required: 'Pincode is required',
               pattern: {
                 value: /^[0-9]{6}$/,
                 message: 'Pincode must be 6 digits',
@@ -305,7 +315,7 @@ export default function Step2Location({ form }: Props) {
 
       {/* Landmark */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Landmark (Optional)</label>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Landmark</label>
         <input
           type="text"
           {...register('location.landmark')}
@@ -318,7 +328,7 @@ export default function Step2Location({ form }: Props) {
       <div>
         <div className="flex items-center justify-between mb-2">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-            Complete Address <span className="text-gray-400 dark:text-gray-500 text-xs">(Optional)</span>
+            Complete Address
           </label>
           <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
             <input
@@ -347,7 +357,7 @@ export default function Step2Location({ form }: Props) {
       {/* Interactive Map */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Select Exact Location on Map <span className="text-gray-400 dark:text-gray-500 text-xs">(Optional - temporarily)</span>
+          Select Exact Location on Map <span className="text-red-500 dark:text-red-400">*</span>
         </label>
         <div className="border-2 border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
           <MapPicker

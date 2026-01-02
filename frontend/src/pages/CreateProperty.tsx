@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { CheckIcon } from '@heroicons/react/24/solid'
-import { Bars3Icon, DocumentTextIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
+import { Bars3Icon, DocumentTextIcon, CheckCircleIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 import api from '../services/api'
 import { PropertyFormData } from '../types/property'
@@ -564,6 +564,41 @@ export default function CreateProperty() {
 
         {/* Form */}
         <form onSubmit={form.handleSubmit(onSubmit)}>
+          {/* Step Navigation Arrows */}
+          <div className="flex items-center justify-between mb-4">
+            <button
+              type="button"
+              onClick={prevStep}
+              disabled={currentStep === 1}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                currentStep === 1
+                  ? 'opacity-50 cursor-not-allowed text-gray-400 dark:text-gray-600'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400'
+              }`}
+              aria-label="Previous step"
+            >
+              <ChevronLeftIcon className="w-5 h-5" />
+              <span className="hidden sm:inline font-medium">Previous</span>
+            </button>
+            
+            <div className="flex-1"></div>
+            
+            <button
+              type="button"
+              onClick={nextStep}
+              disabled={currentStep === STEPS.length}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                currentStep === STEPS.length
+                  ? 'opacity-50 cursor-not-allowed text-gray-400 dark:text-gray-600'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400'
+              }`}
+              aria-label="Next step"
+            >
+              <span className="hidden sm:inline font-medium">Next</span>
+              <ChevronRightIcon className="w-5 h-5" />
+            </button>
+          </div>
+
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
             <CurrentStepComponent form={form} />
           </div>
