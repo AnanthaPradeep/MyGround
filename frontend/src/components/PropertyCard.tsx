@@ -109,9 +109,9 @@ export default function PropertyCard({ property }: Props) {
 
       {/* Content */}
       <div className="p-4">
-        <h3 className="font-body font-semibold text-gray-900 dark:text-gray-100 mb-1 line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400">
+        <h2 className="font-body font-semibold text-gray-900 dark:text-gray-100 mb-1 line-clamp-2 group-hover:text-primary-600 dark:group-hover:text-primary-400 text-base">
           {property.title}
-        </h3>
+        </h2>
         
         <div className="flex items-start gap-1.5 mb-2">
           <MapPinIcon className="w-4 h-4 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
@@ -129,11 +129,11 @@ export default function PropertyCard({ property }: Props) {
             <p className="text-lg font-bold text-primary-600 dark:text-primary-400">
               {formatPrice(price, property.pricing.currency)}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">{priceLabel}</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400">{priceLabel}</p>
           </div>
           <div className="text-right">
-            <p className="text-xs text-gray-500 dark:text-gray-400">{property.views} views</p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">{property.saves} saves</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400">{property.views} views</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400">{property.saves} saves</p>
           </div>
         </div>
 
@@ -157,10 +157,10 @@ export default function PropertyCard({ property }: Props) {
             <span
               className={`text-xs font-medium ${
                 property.assetDNA.legalRisk === 'LOW'
-                  ? 'text-green-600 dark:text-green-400'
+                  ? 'text-green-700 dark:text-green-300'
                   : property.assetDNA.legalRisk === 'MEDIUM'
-                  ? 'text-yellow-600 dark:text-yellow-400'
-                  : 'text-red-600 dark:text-red-400'
+                  ? 'text-yellow-700 dark:text-yellow-300'
+                  : 'text-red-700 dark:text-red-300'
               }`}
             >
               {property.assetDNA.legalRisk} Risk

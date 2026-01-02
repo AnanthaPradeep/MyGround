@@ -181,15 +181,15 @@ export default function SearchBar({ showLoginModal }: SearchBarProps) {
             className="flex-1 text-left flex items-center justify-between min-w-0 h-full"
           >
             <span className={`text-sm sm:text-base truncate ${
-              selectedPropertyType ? 'text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-500'
+              selectedPropertyType ? 'text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400'
             }`}>
               {selectedPropertyType 
                 ? propertyTypes.find(t => t.value === selectedPropertyType)?.label || 'Select Type'
                 : 'Select Property Type'}
             </span>
-            <ChevronDownIcon className={`w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0 ml-2 transition-transform ${
+            <ChevronDownIcon className={`w-4 h-4 text-gray-600 dark:text-gray-400 flex-shrink-0 ml-2 transition-transform ${
               isPropertyTypeOpen ? 'rotate-180' : ''
-            }`} />
+            }`} aria-hidden="true" />
           </button>
 
           {/* Property Type Dropdown Menu */}
@@ -233,7 +233,7 @@ export default function SearchBar({ showLoginModal }: SearchBarProps) {
             className="flex-1 text-left flex items-center justify-between min-w-0 h-full"
           >
             <span className={`text-sm sm:text-base truncate ${
-              minBudget || maxBudget ? 'text-gray-900 dark:text-gray-100' : 'text-gray-400 dark:text-gray-500'
+              minBudget || maxBudget ? 'text-gray-900 dark:text-gray-100' : 'text-gray-600 dark:text-gray-400'
             }`}>
               {formatBudgetDisplay()}
             </span>
@@ -333,9 +333,10 @@ export default function SearchBar({ showLoginModal }: SearchBarProps) {
         <div className="flex items-stretch flex-shrink-0">
           <button
             type="submit"
+            aria-label="Search properties"
             className="bg-primary-600 dark:bg-primary-500 hover:bg-primary-700 dark:hover:bg-primary-600 text-white px-4 sm:px-6 md:px-8 py-3.5 sm:py-4 md:py-5 flex items-center justify-center gap-2 font-semibold text-sm sm:text-base transition-colors whitespace-nowrap rounded-b-2xl sm:rounded-r-full sm:rounded-l-none w-full sm:w-auto min-w-[100px] sm:min-w-[140px]"
           >
-            <MagnifyingGlassIcon className="w-5 h-5 flex-shrink-0" />
+            <MagnifyingGlassIcon className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
             <span className="hidden sm:inline">Search</span>
           </button>
         </div>

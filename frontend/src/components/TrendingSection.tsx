@@ -194,7 +194,7 @@ export default function TrendingSection({ showLoginModal }: TrendingSectionProps
                 {/* Change Indicator */}
                 {item.change !== 0 && (
                   <div className={`flex items-center gap-1 mt-3 ${
-                    item.changeType === 'up' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                    item.changeType === 'up' ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'
                   }`}>
                     {item.changeType === 'up' ? (
                       <ArrowTrendingUpIcon className="w-4 h-4" />

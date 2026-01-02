@@ -37,9 +37,9 @@ export default function Footer({ showLoginModal }: FooterProps) {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-12">
               {/* Company Column */}
               <div>
-                <h4 className="font-semibold text-base sm:text-lg mb-4 text-gray-900 dark:text-gray-100">
+                <h2 className="font-semibold text-base sm:text-lg mb-4 text-gray-900 dark:text-gray-100">
                   Company
-                </h4>
+                </h2>
                 <ul className="space-y-3 text-sm sm:text-base text-gray-600 dark:text-gray-400">
                   <li>
                     <Link 
@@ -78,9 +78,9 @@ export default function Footer({ showLoginModal }: FooterProps) {
 
               {/* Explore Column */}
               <div>
-                <h4 className="font-semibold text-base sm:text-lg mb-4 text-gray-900 dark:text-gray-100">
+                <h2 className="font-semibold text-base sm:text-lg mb-4 text-gray-900 dark:text-gray-100">
                   Explore
-                </h4>
+                </h2>
                 <ul className="space-y-3 text-sm sm:text-base text-gray-600 dark:text-gray-400">
                   <li>
                     <ProtectedLink 
@@ -122,9 +122,9 @@ export default function Footer({ showLoginModal }: FooterProps) {
 
               {/* Community Column */}
               <div>
-                <h4 className="font-semibold text-base sm:text-lg mb-4 text-gray-900 dark:text-gray-100">
+                <h2 className="font-semibold text-base sm:text-lg mb-4 text-gray-900 dark:text-gray-100">
                   Community
-                </h4>
+                </h2>
                 <ul className="space-y-3 text-sm sm:text-base text-gray-600 dark:text-gray-400">
                   <li>
                     <ProtectedLink 

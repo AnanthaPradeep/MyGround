@@ -271,10 +271,10 @@ export default function Step7Review({ form }: Props) {
                 <p
                   className={`text-lg font-bold ${
                     dnaPreview.legalRisk === 'LOW'
-                      ? 'text-green-600 dark:text-green-400'
+                      ? 'text-green-700 dark:text-green-300'
                       : dnaPreview.legalRisk === 'MEDIUM'
-                      ? 'text-yellow-600 dark:text-yellow-400'
-                      : 'text-red-600 dark:text-red-400'
+                      ? 'text-yellow-700 dark:text-yellow-300'
+                      : 'text-red-700 dark:text-red-300'
                   }`}
                 >
                   {dnaPreview.legalRisk}
