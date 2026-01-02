@@ -1,3 +1,8 @@
+# Explicit redirects for SEO files (must come before catch-all)
+/robots.txt  /robots.txt  200
+/sitemap.xml  /sitemap.xml  200
+
+# SPA catch-all redirect (must be last)
 /*    /index.html   200
 
 

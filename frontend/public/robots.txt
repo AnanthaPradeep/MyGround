@@ -1,0 +1,19 @@
+# MyGround Robots.txt
+# Allows all search engines to crawl the site
+
+User-agent: *
+Allow: /
+
+# Disallow admin and private routes
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /settings
+Disallow: /notifications
+Disallow: /wishlist
+Disallow: /properties/create
+Disallow: /properties/*/edit
+Disallow: /location-test
+Disallow: /cookie-preferences
+
+# Sitemap location
+Sitemap: https://www.myground.in/sitemap.xml
