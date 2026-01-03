@@ -3,9 +3,11 @@
 @tailwind utilities;
 
 /* Playfair Display Font Faces - Elegant heading/title font */
+/* Using WOFF2 for better compression (66% smaller than TTF), with TTF fallback */
 @font-face {
   font-family: 'Playfair Display';
-  src: url('./assets/fonts/Playfair_Display/PlayfairDisplay-VariableFont_wght.ttf') format('truetype');
+  src: url('./assets/fonts/Playfair_Display/PlayfairDisplay-VariableFont_wght.woff2') format('woff2'),
+       url('./assets/fonts/Playfair_Display/PlayfairDisplay-VariableFont_wght.ttf') format('truetype');
   font-weight: 400 900;
   font-style: normal;
   font-display: swap; /* Critical font - swap to prevent FOIT */
@@ -13,29 +15,32 @@
 
 @font-face {
   font-family: 'Playfair Display';
-  src: url('./assets/fonts/Playfair_Display/PlayfairDisplay-Italic-VariableFont_wght.ttf') format('truetype');
+  src: url('./assets/fonts/Playfair_Display/PlayfairDisplay-Italic-VariableFont_wght.woff2') format('woff2'),
+       url('./assets/fonts/Playfair_Display/PlayfairDisplay-Italic-VariableFont_wght.ttf') format('truetype');
   font-weight: 400 900;
   font-style: italic;
   font-display: optional; /* Non-critical italic - optional to avoid blocking */
 }
 
 /* Merriweather Font Faces - Optimized for on-screen reading (body text) */
+/* Using WOFF2 for better compression (46% smaller than TTF), with TTF fallback */
 /* Using optional to prevent blocking render - body text is less critical than headings */
-/* Further restricted weight range (400-600) to reduce file size from 2.8MB */
 @font-face {
   font-family: 'Merriweather';
-  src: url('./assets/fonts/Merriweather/Merriweather-VariableFont_opsz,wdth,wght.ttf') format('truetype');
-  font-weight: 400 600; /* Further restricted from 300-700 to reduce file size (2.8MB -> smaller) */
+  src: url('./assets/fonts/Merriweather/Merriweather-VariableFont_opsz,wdth,wght.woff2') format('woff2'),
+       url('./assets/fonts/Merriweather/Merriweather-VariableFont_opsz,wdth,wght.ttf') format('truetype');
+  font-weight: 400 600; /* Restricted weight range to reduce file size */
   font-stretch: normal; /* Use normal width only to reduce size */
   font-style: normal;
-  font-display: optional; /* Changed from swap to optional - prevents blocking render, uses system font if not ready */
+  font-display: optional; /* Prevents blocking render, uses system font if not ready */
   unicode-range: U+0020-007F, U+00A0-00FF, U+0100-017F, U+0180-024F, U+1E00-1EFF; /* Latin + extended Latin */
 }
 
 /* Italic font - load optionally to avoid blocking render */
 @font-face {
   font-family: 'Merriweather';
-  src: url('./assets/fonts/Merriweather/Merriweather-Italic-VariableFont_opsz,wdth,wght.ttf') format('truetype');
+  src: url('./assets/fonts/Merriweather/Merriweather-Italic-VariableFont_opsz,wdth,wght.woff2') format('woff2'),
+       url('./assets/fonts/Merriweather/Merriweather-Italic-VariableFont_opsz,wdth,wght.ttf') format('truetype');
   font-weight: 400 600; /* Restricted to match main font */
   font-stretch: normal;
   font-style: italic;
