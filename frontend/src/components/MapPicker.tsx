@@ -1,8 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents, ZoomControl } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Tooltip, useMap, useMapEvents, ZoomControl, LayersControl } from 'react-leaflet'
 import { Icon, LatLngExpression } from 'leaflet'
 import type { Marker as LeafletMarker } from 'leaflet'
-import { MapPinIcon } from '@heroicons/react/24/outline'
 // Import Leaflet CSS - Vite will code-split this into map-vendor chunk
 // The CSS loads asynchronously when this component is used (lazy-loaded routes)
 // The HTML script will apply media trick to make it non-blocking
@@ -119,7 +118,6 @@ export default function MapPicker({
   }
 
   const [position, setPosition] = useState<[number, number]>(getInitialPosition())
-  const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isLocationChanged, setIsLocationChanged] = useState(false)
   const [pendingLocation, setPendingLocation] = useState<[number, number] | null>(null)
@@ -131,7 +129,6 @@ export default function MapPicker({
     if (latitude && longitude && latitude !== 0 && longitude !== 0) {
       const newPosition: [number, number] = [latitude, longitude]
       setPosition(newPosition)
-      setError(null)
       setIsLocationChanged(false)
       setPendingLocation(null)
     }
@@ -141,7 +138,6 @@ export default function MapPicker({
   const handleLocationChange = useCallback((lat: number, lng: number, isAuto = false) => {
     const newPosition: [number, number] = [lat, lng]
     setPosition(newPosition)
-    setError(null)
     
     // If auto-location (from current location button), confirm immediately
     if (isAuto) {
@@ -178,12 +174,12 @@ export default function MapPicker({
   // Get current location with high accuracy
   const getCurrentLocation = useCallback(() => {
     if (!navigator.geolocation) {
-      setError('Geolocation is not supported by your browser')
+      // Silently handle error - no alert/popup per UX spec
+      console.error('Geolocation is not supported by your browser')
       return
     }
 
     setIsLoading(true)
-    setError(null)
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -200,22 +196,8 @@ export default function MapPicker({
         setIsLoading(false)
       },
       (error) => {
+        // Silently handle error - no alert/popup per UX spec
         console.error('Geolocation error:', error)
-        let errorMessage = 'Unable to get your location'
-        
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage = 'Location access denied. Please enable location permissions in your browser settings.'
-            break
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = 'Location information unavailable. Please try again.'
-            break
-          case error.TIMEOUT:
-            errorMessage = 'Location request timed out. Please try again.'
-            break
-        }
-        
-        setError(errorMessage)
         setIsLoading(false)
       },
       {
@@ -241,7 +223,6 @@ export default function MapPicker({
       
       // Update position immediately
       setPosition([lat, lng])
-      setError(null)
       
       // Immediately call onLocationChange to update parent and trigger reverse geocoding
       // This ensures coordinates and address fields are updated when dragging
@@ -276,10 +257,20 @@ export default function MapPicker({
           className="z-0"
           zoomControl={false}
         >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
+          <LayersControl position="topright">
+            <LayersControl.BaseLayer checked name="Street View">
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+            </LayersControl.BaseLayer>
+            <LayersControl.BaseLayer name="Satellite">
+              <TileLayer
+                attribution='Tiles &copy; <a href="https://www.esri.com/">Esri</a>'
+                url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              />
+            </LayersControl.BaseLayer>
+          </LayersControl>
           
           {/* Custom Zoom Controls - Bottom Right */}
           <ZoomControl position="bottomright" />
@@ -305,32 +296,14 @@ export default function MapPicker({
               dragend: handleMarkerDragEnd,
             } as any}
           >
-            <Popup>
-              <div className="text-center">
-                <p className="font-medium text-gray-900 dark:text-gray-100">Property Location</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  {position[0].toFixed(6)}, {position[1].toFixed(6)}
-                </p>
-                {!readOnly && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Drag marker to adjust location
-                  </p>
-                )}
-              </div>
-            </Popup>
+            {!readOnly && (
+              <Tooltip permanent={false} direction="top" offset={[0, -40]}>
+                Drag to set the exact property location
+              </Tooltip>
+            )}
           </Marker>
         </MapContainer>
       </div>
-
-      {/* Instructions Overlay */}
-      {!readOnly && (
-        <div className="absolute top-2 left-2 bg-white dark:bg-gray-800/95 backdrop-blur-sm px-3 py-2 rounded-lg shadow-lg text-xs text-gray-700 dark:text-gray-300 z-[1000] max-w-[220px] border border-gray-200 dark:border-gray-700">
-          <p className="font-medium mb-1 flex items-center gap-1">
-            <MapPinIcon className="w-4 h-4 text-primary-600 dark:text-primary-400" />
-            Click on map or use current location
-          </p>
-        </div>
-      )}
 
       {/* Current Location Button - Top Right Corner */}
       {!readOnly && (
@@ -393,28 +366,6 @@ export default function MapPicker({
         </button>
       )}
 
-      {readOnly && (
-        <div className="absolute top-2 left-2 bg-white dark:bg-gray-800/95 backdrop-blur-sm px-3 py-2 rounded-lg shadow-lg text-xs text-gray-700 dark:text-gray-300 z-[1000] border border-gray-200 dark:border-gray-700">
-          <p className="font-medium">Property Location</p>
-        </div>
-      )}
-
-      {/* Error Message */}
-      {error && (
-        <div className="absolute top-2 right-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-3 py-2 rounded-lg shadow-lg text-xs z-[1000] max-w-[250px]">
-          <p className="font-medium">⚠️ {error}</p>
-        </div>
-      )}
-
-      {/* Coordinates Display */}
-      {position[0] !== defaultCenter[0] || position[1] !== defaultCenter[1] ? (
-        <div className="absolute bottom-2 left-2 bg-white dark:bg-gray-800/95 backdrop-blur-sm px-3 py-2 rounded-lg shadow-lg text-xs text-gray-700 dark:text-gray-300 z-[1000] border border-gray-200 dark:border-gray-700">
-          <p className="font-medium text-green-600 dark:text-green-400 mb-1">✅ Location Set</p>
-          <p className="text-xs font-mono">
-            {position[0].toFixed(6)}, {position[1].toFixed(6)}
-          </p>
-        </div>
-      ) : null}
     </div>
   )
 }

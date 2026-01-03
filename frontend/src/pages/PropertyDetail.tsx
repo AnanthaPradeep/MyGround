@@ -451,6 +451,12 @@ export default function PropertyDetail() {
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Location on Map</h2>
               <div className="mb-4 space-y-2">
                 <p className="text-gray-700 font-medium">{property.location.address}</p>
+                {/* Coordinates Display - Below Address */}
+                {property.location.coordinates && property.location.coordinates.coordinates[0] !== 0 && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
+                    {property.location.coordinates.coordinates[1].toFixed(6)}, {property.location.coordinates.coordinates[0].toFixed(6)}
+                  </p>
+                )}
                 <div className="flex flex-wrap gap-2 text-sm text-gray-600">
                   <span className="flex items-center gap-1">
                     <MapPinIcon className="w-4 h-4" />
