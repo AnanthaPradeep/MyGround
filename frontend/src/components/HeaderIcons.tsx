@@ -12,7 +12,8 @@ import {
   HomeIcon as PropertyIcon,
   DocumentTextIcon,
   CheckIcon,
-  GlobeAltIcon
+  GlobeAltIcon,
+  BanknotesIcon
 } from '@heroicons/react/24/outline'
 import { useState, useRef, useEffect } from 'react'
 import { useAuthStore } from '../store/authStore'
@@ -413,6 +414,15 @@ export default function HeaderIcons() {
         title="Dashboard"
       >
         <Squares2X2Icon className="w-6 h-6" />
+      </Link>
+
+      {/* eAuction Icon */}
+      <Link
+        to="/eauction"
+        className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+        title="Property eAuction"
+      >
+        <BanknotesIcon className="w-6 h-6" />
       </Link>
 
       {/* Notification Icon with Dropdown */}

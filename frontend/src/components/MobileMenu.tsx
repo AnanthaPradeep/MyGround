@@ -12,7 +12,8 @@ import {
   Squares2X2Icon,
   HeartIcon,
   DocumentTextIcon,
-  MagnifyingGlassIcon
+  MagnifyingGlassIcon,
+  BanknotesIcon
 } from '@heroicons/react/24/outline'
 import { useAuthStore } from '../store/authStore'
 import { useLocationStore } from '../store/locationStore'
@@ -310,6 +311,15 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               >
                 <HomeIcon className="w-5 h-5" />
                 <span>Browse Properties</span>
+              </Link>
+
+              <Link
+                to="/eauction"
+                onClick={onClose}
+                className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                <BanknotesIcon className="w-5 h-5" />
+                <span>Property eAuction</span>
               </Link>
 
               {isAuthenticated ? (
