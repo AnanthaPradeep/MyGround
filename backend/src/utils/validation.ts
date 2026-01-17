@@ -3,7 +3,7 @@ import { body, ValidationChain } from 'express-validator';
 export const validatePropertyListing = (): ValidationChain[] => {
   return [
     body('transactionType')
-      .isIn(['SELL', 'RENT', 'LEASE', 'SUB_LEASE', 'FRACTIONAL'])
+      .isIn(['SELL', 'RENT', 'LEASE', 'SUB_LEASE', 'FRACTIONAL', 'E_AUCTION'])
       .withMessage('Invalid transaction type'),
     
     body('propertyCategory')

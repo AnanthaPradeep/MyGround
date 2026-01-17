@@ -35,6 +35,8 @@ const Notifications = lazy(() => import('./pages/Notifications'))
 const Wishlist = lazy(() => import('./pages/Wishlist'))
 const LocationTest = lazy(() => import('./pages/LocationTest'))
 const CookiePreferences = lazy(() => import('./pages/CookiePreferences'))
+const EAuctionList = lazy(() => import('./pages/EAuctionList'))
+const EAuctionDetail = lazy(() => import('./pages/EAuctionDetail'))
 const NotFoundPage = lazy(() => import('./pages/ErrorPages').then(module => ({ default: module.NotFoundPage })))
 
 function App() {
@@ -114,6 +116,8 @@ function App() {
             <Route path="/cookie-preferences" element={<CookiePreferences />} />
             <Route path="/properties" element={<Properties />} />
             <Route path="/properties/:id" element={<PropertyDetail />} />
+            <Route path="/eauction" element={<EAuctionList />} />
+            <Route path="/eauction/:id" element={<EAuctionDetail />} />
             <Route
               path="/properties/create"
               element={
