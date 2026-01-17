@@ -44,3 +44,4 @@ UserPublicNotificationReadSchema.index({ userId: 1, readAt: -1 });
 
 export default mongoose.model<IUserPublicNotificationRead>('UserPublicNotificationRead', UserPublicNotificationReadSchema);
 
+
