@@ -41,7 +41,8 @@ function App() {
   const { checkAuth } = useAuthStore()
   const { isLocationSet } = useLocationStore()
   const { selectedLanguage } = useLanguageStore()
-  const [isLoading, setIsLoading] = useState(true)
+  const [showSplash, setShowSplash] = useState(true)
+  const [shellReady, setShellReady] = useState(false)
   const [showLocationModal, setShowLocationModal] = useState(false)
 
   // Update language when selectedLanguage changes (but not on initial mount to avoid double load)
@@ -55,39 +56,33 @@ function App() {
   }, [selectedLanguage])
 
   useEffect(() => {
-    // Initialize app: check auth and load resources
-    const initializeApp = async () => {
-      try {
-        await checkAuth()
-      } catch (error) {
-        console.error('Auth check failed:', error)
-      } finally {
-        // Small delay to ensure smooth transition
-        setTimeout(() => {
-          setIsLoading(false)
-          // Show location modal if location is not set
-          // Add a small delay to ensure UI is ready
-          setTimeout(() => {
-            if (!isLocationSet) {
-              setShowLocationModal(true)
-            }
-          }, 800) // Increased delay to ensure everything is loaded
-        }, 500)
-      }
-    }
+    const shellTimer = setTimeout(() => setShellReady(true), 100)
+    const splashTimer = setTimeout(() => setShowSplash(false), 600)
+    const splashFailSafe = setTimeout(() => setShowSplash(false), 800)
 
-    initializeApp()
+    return () => {
+      clearTimeout(shellTimer)
+      clearTimeout(splashTimer)
+      clearTimeout(splashFailSafe)
+    }
+  }, [])
+
+  useEffect(() => {
+    checkAuth().catch((error) => {
+      console.error('Auth check failed:', error)
+    })
   }, [checkAuth])
 
-  const handleSplashComplete = () => {
-    setIsLoading(false)
-    // Show location modal if location is not set
-    setTimeout(() => {
+  useEffect(() => {
+    if (!shellReady) return
+    const timer = setTimeout(() => {
       if (!isLocationSet) {
         setShowLocationModal(true)
       }
-    }, 800)
-  }
+    }, 400)
+
+    return () => clearTimeout(timer)
+  }, [shellReady, isLocationSet])
 
   const handleLocationModalClose = () => {
     setShowLocationModal(false)
@@ -98,11 +93,17 @@ function App() {
       <QueryProvider>
         <ErrorBoundary>
           <Router>
-            {isLoading && <SplashScreen onComplete={handleSplashComplete} minDisplayTime={500} />}
+            {showSplash && (
+              <SplashScreen
+                onComplete={() => setShowSplash(false)}
+                minDisplayTime={300}
+                maxDisplayTime={800}
+              />
+            )}
             <OfflineIndicator />
             <LocationSelectorModal isOpen={showLocationModal} onClose={handleLocationModalClose} />
             <CookieBanner />
-            <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${isLoading ? 'opacity-0' : 'opacity-100 transition-opacity duration-300'}`}>
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             <Suspense fallback={<PageLoader />}>
             <Routes>
             <Route path="/" element={<Home />} />
