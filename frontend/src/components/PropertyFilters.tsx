@@ -102,7 +102,7 @@ export default function PropertyFilters({ searchParams, onFilterChange }: Props)
   // Show loading state while filters are being fetched
   if (loadingFilters) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6 sticky top-20">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">
         <div className="animate-pulse space-y-4">
           <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
           <div className="space-y-3">
@@ -116,7 +116,7 @@ export default function PropertyFilters({ searchParams, onFilterChange }: Props)
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6 sticky top-20">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6">
       {/* Header with active filter count */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Filters</h2>
