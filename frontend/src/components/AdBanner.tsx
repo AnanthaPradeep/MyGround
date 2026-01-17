@@ -101,9 +101,9 @@ export default function AdBanner({
         )}
 
         <div className="flex-1">
-          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
+          <p className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
             {title}
-          </h3>
+          </p>
           {description && (
             <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
               {description}
