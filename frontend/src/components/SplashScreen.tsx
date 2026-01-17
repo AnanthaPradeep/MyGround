@@ -4,27 +4,45 @@ import { logos } from '@/assets'
 interface SplashScreenProps {
   onComplete?: () => void
   minDisplayTime?: number // Minimum time to show splash in ms
+  maxDisplayTime?: number // Failsafe to auto-hide splash
 }
 
 /**
  * Splash Screen Component with Logo and Loader Animation
  * Shows during initial page load and reload
  */
-export default function SplashScreen({ onComplete, minDisplayTime = 1500 }: SplashScreenProps) {
+export default function SplashScreen({
+  onComplete,
+  minDisplayTime = 300,
+  maxDisplayTime = 800,
+}: SplashScreenProps) {
   const [isVisible, setIsVisible] = useState(true)
 
   useEffect(() => {
+    const effectiveMin = Math.min(minDisplayTime, maxDisplayTime)
+
     // Ensure splash screen shows for minimum time
     const timer = setTimeout(() => {
       setIsVisible(false)
       if (onComplete) {
         // Small delay before calling onComplete for smooth transition
-        setTimeout(onComplete, 300)
+        setTimeout(onComplete, 150)
       }
-    }, minDisplayTime)
+    }, effectiveMin)
 
-    return () => clearTimeout(timer)
-  }, [onComplete, minDisplayTime])
+    // Failsafe auto-hide
+    const failSafeTimer = setTimeout(() => {
+      setIsVisible(false)
+      if (onComplete) {
+        setTimeout(onComplete, 50)
+      }
+    }, maxDisplayTime)
+
+    return () => {
+      clearTimeout(timer)
+      clearTimeout(failSafeTimer)
+    }
+  }, [onComplete, minDisplayTime, maxDisplayTime])
 
   if (!isVisible) return null
 
