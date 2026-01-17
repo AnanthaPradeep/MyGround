@@ -19,6 +19,7 @@ import { useWishlistStore } from '../store/wishlistStore'
 import { useWishlist } from '../hooks/useWishlist'
 import api from '../services/api'
 import toast from 'react-hot-toast'
+import AdBanner from '../components/AdBanner'
 
 export default function PropertyDetail() {
   const { id } = useParams<{ id: string }>()
@@ -365,6 +366,17 @@ export default function PropertyDetail() {
                 <p className="text-gray-700 whitespace-pre-line">{property.description}</p>
               </div>
             </div>
+
+            {/* Sponsored Banner */}
+            <AdBanner
+              placement="property"
+              variant="horizontal"
+              imageUrl="/ads/ad-horizontal.svg"
+              title="Home insurance tailored to your property"
+              description="Flexible coverage for verified homes on MyGround."
+              ctaText="View Plans"
+              ctaLink="https://myground.in/partners/home-insurance"
+            />
 
             {/* Property Details */}
             <div className="bg-white rounded-lg shadow-sm p-6">

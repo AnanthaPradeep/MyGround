@@ -1,0 +1,15 @@
+<svg width="970" height="180" viewBox="0 0 970 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#EEF2FF" />
+      <stop offset="1" stop-color="#E0F2FE" />
+    </linearGradient>
+  </defs>
+  <rect width="970" height="180" rx="18" fill="url(#bg)" />
+  <rect x="24" y="24" width="300" height="132" rx="12" fill="#D1D5DB" />
+  <rect x="348" y="36" width="380" height="20" rx="10" fill="#1F2937" opacity="0.9" />
+  <rect x="348" y="72" width="520" height="14" rx="7" fill="#6B7280" opacity="0.8" />
+  <rect x="348" y="96" width="480" height="14" rx="7" fill="#6B7280" opacity="0.6" />
+  <rect x="348" y="124" width="140" height="32" rx="16" fill="#2563EB" />
+  <text x="368" y="145" font-family="Arial, sans-serif" font-size="14" fill="#FFFFFF">Explore Offer</text>
+</svg>

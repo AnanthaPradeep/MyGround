@@ -27,6 +27,7 @@ import UserDropdown from '../components/UserDropdown'
 import { Notification } from '../types/notification'
 import api from '../services/api'
 import toast from 'react-hot-toast'
+import AdBanner from '../components/AdBanner'
 
 export default function Notifications() {
   const { user } = useAuthStore()
@@ -282,9 +283,27 @@ export default function Notifications() {
         {/* Mobile Menu */}
         <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
 
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Header */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="min-[1200px]:grid min-[1200px]:grid-cols-[300px_minmax(0,1fr)_300px] min-[1200px]:gap-6">
+            {/* Left Vertical Ad Rail (Desktop only) */}
+            <div className="hidden min-[1200px]:block">
+              <div className="sticky top-24">
+                <AdBanner
+                  placement="search"
+                  variant="vertical"
+                  imageUrl="/ads/ad-vertical.svg"
+                  title="Trusted developers in your region"
+                  description="Explore verified projects with MG assurance."
+                  ctaText="View Projects"
+                  ctaLink="https://myground.in/partners/developers"
+                />
+              </div>
+            </div>
+
+            {/* Center Content */}
+            <div>
+              {/* Header */}
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h1 className="text-3xl font-heading font-bold text-gray-900 dark:text-gray-100 mb-2">Notifications</h1>
@@ -304,6 +323,19 @@ export default function Notifications() {
                 <CheckIcon className="w-4 h-4" />
                 Mark all as read
               </button>
+            </div>
+
+            {/* Mobile Sponsored Banner */}
+            <div className="mb-6 min-[1200px]:hidden">
+              <AdBanner
+                placement="search"
+                variant="horizontal"
+                imageUrl="/ads/ad-horizontal.svg"
+                title="Stay updated with verified market insights"
+                description="Get weekly alerts on pricing trends and top listings."
+                ctaText="Enable Alerts"
+                ctaLink="https://myground.in/partners/market-insights"
+              />
             </div>
 
             {/* Filter Tabs */}
@@ -456,6 +488,24 @@ export default function Notifications() {
                 )
               })
             )}
+          </div>
+
+            </div>
+
+            {/* Right Vertical Ad Rail (Desktop only) */}
+            <div className="hidden min-[1200px]:block">
+              <div className="sticky top-24">
+                <AdBanner
+                  placement="search"
+                  variant="vertical"
+                  imageUrl="/ads/ad-vertical.svg"
+                  title="Smart mortgage approvals"
+                  description="Pre-verified rates from MG partners."
+                  ctaText="Check Eligibility"
+                  ctaLink="https://myground.in/partners/loans"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>

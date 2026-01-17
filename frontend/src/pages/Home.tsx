@@ -20,6 +20,7 @@ import { Bars3Icon } from '@heroicons/react/24/outline'
 import Logo from '../components/Logo'
 import { CardSkeleton } from '../components/Loader'
 import LoginPromptModal from '../components/LoginPromptModal'
+import AdBanner from '../components/AdBanner'
 
 export default function Home() {
   const { isAuthenticated } = useAuthStore()
@@ -132,6 +133,21 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Sponsored Banner */}
+      <section className="bg-white dark:bg-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <AdBanner
+            placement="homepage"
+            variant="horizontal"
+            imageUrl="/ads/ad-horizontal.svg"
+            title="Home loans with pre-approved rates"
+            description="Compare offers from trusted partners in minutes."
+            ctaText="Check Rates"
+            ctaLink="https://myground.in/partners/home-loans"
+          />
+        </div>
+      </section>
+
       {/* Trust Bar */}
       <TrustBar />
 
@@ -191,6 +207,23 @@ export default function Home() {
               ))}
             </div>
           )}
+        </div>
+      </section>
+
+      {/* Sponsored Banner */}
+      <section className="bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="sm:col-span-2 lg:col-span-3">
+            <AdBanner
+              placement="homepage"
+              variant="native"
+              imageUrl="/ads/ad-square.svg"
+              title="Verified interiors by MG partners"
+              description="Premium interior design packages for verified homes."
+              ctaText="Explore Packages"
+              ctaLink="https://myground.in/partners/interiors"
+            />
+          </div>
         </div>
       </section>
 
