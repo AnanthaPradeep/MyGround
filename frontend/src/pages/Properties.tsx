@@ -19,6 +19,7 @@ export default function Properties() {
   const [showFilters, setShowFilters] = useState(false)
   const [sortBy, setSortBy] = useState('newest')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const showRails = !showFilters
 
   // Scroll to top when component mounts or search params change (navigation from other pages)
   useEffect(() => {
@@ -180,8 +181,15 @@ export default function Properties() {
           </div>
         </div>
 
-        <div className="min-[1200px]:grid min-[1200px]:grid-cols-[300px_minmax(0,1fr)_300px] min-[1200px]:gap-6">
+        <div
+          className={
+            showRails
+              ? 'min-[1200px]:grid min-[1200px]:grid-cols-[300px_minmax(0,1fr)_300px] min-[1200px]:gap-6'
+              : 'min-[1200px]:grid min-[1200px]:grid-cols-[minmax(0,1fr)]'
+          }
+        >
           {/* Left Vertical Ad Rail (Desktop only) */}
+          {showRails && (
           <div className="hidden min-[1200px]:block">
             <div className="sticky top-24">
               <AdBanner
@@ -195,6 +203,7 @@ export default function Properties() {
               />
             </div>
           </div>
+          )}
 
           {/* Center Content */}
           <div>
@@ -202,11 +211,11 @@ export default function Properties() {
               {/* Filters Sidebar */}
               {showFilters && (
                 <div className="lg:col-span-1">
-                  <PropertyFilters
-                    searchParams={searchParams}
-                    onFilterChange={handleFilterChange}
-                  />
-                  <div className="mt-6">
+                  <div className="sticky top-24 space-y-6">
+                    <PropertyFilters
+                      searchParams={searchParams}
+                      onFilterChange={handleFilterChange}
+                    />
                     <AdBanner
                       placement="search"
                       variant="sidebar"
@@ -249,6 +258,7 @@ export default function Properties() {
           </div>
 
           {/* Right Vertical Ad Rail (Desktop only) */}
+          {showRails && (
           <div className="hidden min-[1200px]:block">
             <div className="sticky top-24">
               <AdBanner
@@ -262,6 +272,7 @@ export default function Properties() {
               />
             </div>
           </div>
+          )}
         </div>
       </div>
       
