@@ -24,6 +24,7 @@ import HeaderIcons from '../components/HeaderIcons'
 import HeaderLocation from '../components/HeaderLocation'
 import MobileMenu from '../components/MobileMenu'
 import Footer from '../components/Footer'
+import AdBanner from '../components/AdBanner'
 
 const STEPS = [
   { id: 1, name: 'Category', component: Step1Category },
@@ -478,162 +479,210 @@ export default function CreateProperty() {
       {/* Mobile Menu */}
       <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-heading font-bold text-gray-900 dark:text-gray-100">
-                  {isEditMode ? 'Edit Property' : 'List Your Property'}
-                </h1>
-                {isDraftMode && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded-full text-sm font-medium">
-                    <DocumentTextIcon className="w-4 h-4" />
-                    Draft
-                  </span>
-                )}
-              </div>
-              <p className="text-gray-600 dark:text-gray-400">
-                {isEditMode 
-                  ? 'Update your property details below' 
-                  : 'Fill in the details to create your property listing'}
-              </p>
-              {isDraftMode && (
-                <div className="mt-3 flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
-                  <CheckCircleIcon className="w-4 h-4" />
-                  <span>Saved as Draft</span>
-                  {lastSaved && (
-                    <>
-                      <span className="text-gray-400 dark:text-gray-600">•</span>
-                      <span className="text-gray-500 dark:text-gray-400">
-                        Last saved {formatTimeAgo(lastSaved)}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="min-[1200px]:grid min-[1200px]:grid-cols-[300px_minmax(0,1fr)_300px] min-[1200px]:gap-6">
+          {/* Left Vertical Ad Rail (Desktop only) */}
+          <div className="hidden min-[1200px]:block">
+            <div className="sticky top-24">
+              <AdBanner
+                placement="property"
+                variant="vertical"
+                imageUrl="/ads/ad-vertical.svg"
+                title="Premium listing boosts"
+                description="Get more visibility for your verified listing."
+                ctaText="Boost Listing"
+                ctaLink="https://myground.in/partners/promotions"
+              />
+            </div>
+          </div>
+
+          {/* Center Content */}
+          <div>
+            {/* Header */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h1 className="text-3xl font-heading font-bold text-gray-900 dark:text-gray-100">
+                      {isEditMode ? 'Edit Property' : 'List Your Property'}
+                    </h1>
+                    {isDraftMode && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 rounded-full text-sm font-medium">
+                        <DocumentTextIcon className="w-4 h-4" />
+                        Draft
                       </span>
-                    </>
+                    )}
+                  </div>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {isEditMode 
+                      ? 'Update your property details below' 
+                      : 'Fill in the details to create your property listing'}
+                  </p>
+                  {isDraftMode && (
+                    <div className="mt-3 flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                      <CheckCircleIcon className="w-4 h-4" />
+                      <span>Saved as Draft</span>
+                      {lastSaved && (
+                        <>
+                          <span className="text-gray-400 dark:text-gray-600">•</span>
+                          <span className="text-gray-500 dark:text-gray-400">
+                            Last saved {formatTimeAgo(lastSaved)}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  )}
+                  {isSavingDraft && (
+                    <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                      Saving draft...
+                    </div>
                   )}
                 </div>
-              )}
-              {isSavingDraft && (
-                <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                  Saving draft...
-                </div>
-              )}
+              </div>
+            </div>
+
+            {/* Mobile Sponsored Banner */}
+            <div className="mb-6 min-[1200px]:hidden">
+              <AdBanner
+                placement="property"
+                variant="horizontal"
+                imageUrl="/ads/ad-horizontal.svg"
+                title="Legal verification support"
+                description="Get your documents checked by experts."
+                ctaText="Verify Docs"
+                ctaLink="https://myground.in/partners/legal"
+              />
+            </div>
+
+            {/* Progress Steps */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6 mb-6">
+              <div className="flex items-center">
+                {STEPS.map((step, index) => (
+                  <div key={step.id} className={`flex items-center ${index < STEPS.length - 1 ? 'flex-1 min-w-0' : 'flex-shrink-0'}`}>
+                    <div className="flex flex-col items-center flex-shrink-0">
+                      <div
+                        className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-semibold text-sm sm:text-base ${
+                          currentStep > step.id
+                            ? 'bg-primary-600 dark:bg-primary-500 text-white'
+                            : currentStep === step.id
+                            ? 'bg-primary-600 dark:bg-primary-500 text-white ring-4 ring-primary-100 dark:ring-primary-900/50'
+                            : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                        }`}
+                      >
+                        {currentStep > step.id ? (
+                          <CheckIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+                        ) : (
+                          step.id
+                        )}
+                      </div>
+                      <span
+                        className={`mt-1.5 sm:mt-2 text-[10px] sm:text-xs font-medium text-center whitespace-nowrap ${
+                          currentStep >= step.id ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'
+                        }`}
+                      >
+                        {step.name}
+                      </span>
+                    </div>
+                    {index < STEPS.length - 1 && (
+                      <div
+                        className={`h-1 flex-1 mx-1 sm:mx-2 min-w-[8px] sm:min-w-[12px] ${
+                          currentStep > step.id ? 'bg-primary-600 dark:bg-primary-500' : 'bg-gray-200 dark:bg-gray-700'
+                        }`}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              {/* Step Navigation Arrows */}
+              <div className="flex items-center justify-between mb-4">
+                <button
+                  type="button"
+                  onClick={prevStep}
+                  disabled={currentStep === 1}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                    currentStep === 1
+                      ? 'opacity-50 cursor-not-allowed text-gray-400 dark:text-gray-600'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400'
+                  }`}
+                  aria-label="Previous step"
+                >
+                  <ChevronLeftIcon className="w-5 h-5" />
+                  <span className="hidden sm:inline font-medium">Previous</span>
+                </button>
+                
+                <div className="flex-1"></div>
+                
+                <button
+                  type="button"
+                  onClick={nextStep}
+                  disabled={currentStep === STEPS.length}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                    currentStep === STEPS.length
+                      ? 'opacity-50 cursor-not-allowed text-gray-400 dark:text-gray-600'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400'
+                  }`}
+                  aria-label="Next step"
+                >
+                  <span className="hidden sm:inline font-medium">Next</span>
+                  <ChevronRightIcon className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
+                <CurrentStepComponent form={form} />
+              </div>
+
+              {/* Navigation Buttons */}
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 flex justify-between">
+                <button
+                  type="button"
+                  onClick={prevStep}
+                  disabled={currentStep === 1}
+                  className="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 bg-white dark:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+
+                {currentStep < STEPS.length ? (
+                  <button
+                    type="button"
+                    onClick={nextStep}
+                    className="px-6 py-2 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600"
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="px-6 py-2 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? 'Submitting...' : 'Submit for Review'}
+                  </button>
+                )}
+              </div>
+            </form>
+          </div>
+
+          {/* Right Vertical Ad Rail (Desktop only) */}
+          <div className="hidden min-[1200px]:block">
+            <div className="sticky top-24">
+              <AdBanner
+                placement="property"
+                variant="vertical"
+                imageUrl="/ads/ad-vertical.svg"
+                title="Legal verification support"
+                description="Get your documents checked by experts."
+                ctaText="Verify Docs"
+                ctaLink="https://myground.in/partners/legal"
+              />
             </div>
           </div>
         </div>
-
-        {/* Progress Steps */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 sm:p-6 mb-6">
-          <div className="flex items-center">
-            {STEPS.map((step, index) => (
-              <div key={step.id} className={`flex items-center ${index < STEPS.length - 1 ? 'flex-1 min-w-0' : 'flex-shrink-0'}`}>
-                <div className="flex flex-col items-center flex-shrink-0">
-                  <div
-                    className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-semibold text-sm sm:text-base ${
-                      currentStep > step.id
-                        ? 'bg-primary-600 dark:bg-primary-500 text-white'
-                        : currentStep === step.id
-                        ? 'bg-primary-600 dark:bg-primary-500 text-white ring-4 ring-primary-100 dark:ring-primary-900/50'
-                        : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
-                    }`}
-                  >
-                    {currentStep > step.id ? (
-                      <CheckIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-                    ) : (
-                      step.id
-                    )}
-                  </div>
-                  <span
-                    className={`mt-1.5 sm:mt-2 text-[10px] sm:text-xs font-medium text-center whitespace-nowrap ${
-                      currentStep >= step.id ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400'
-                    }`}
-                  >
-                    {step.name}
-                  </span>
-                </div>
-                {index < STEPS.length - 1 && (
-                  <div
-                    className={`h-1 flex-1 mx-1 sm:mx-2 min-w-[8px] sm:min-w-[12px] ${
-                      currentStep > step.id ? 'bg-primary-600 dark:bg-primary-500' : 'bg-gray-200 dark:bg-gray-700'
-                    }`}
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Form */}
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          {/* Step Navigation Arrows */}
-          <div className="flex items-center justify-between mb-4">
-            <button
-              type="button"
-              onClick={prevStep}
-              disabled={currentStep === 1}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                currentStep === 1
-                  ? 'opacity-50 cursor-not-allowed text-gray-400 dark:text-gray-600'
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400'
-              }`}
-              aria-label="Previous step"
-            >
-              <ChevronLeftIcon className="w-5 h-5" />
-              <span className="hidden sm:inline font-medium">Previous</span>
-            </button>
-            
-            <div className="flex-1"></div>
-            
-            <button
-              type="button"
-              onClick={nextStep}
-              disabled={currentStep === STEPS.length}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                currentStep === STEPS.length
-                  ? 'opacity-50 cursor-not-allowed text-gray-400 dark:text-gray-600'
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-primary-600 dark:hover:text-primary-400'
-              }`}
-              aria-label="Next step"
-            >
-              <span className="hidden sm:inline font-medium">Next</span>
-              <ChevronRightIcon className="w-5 h-5" />
-            </button>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-6">
-            <CurrentStepComponent form={form} />
-          </div>
-
-          {/* Navigation Buttons */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 flex justify-between">
-            <button
-              type="button"
-              onClick={prevStep}
-              disabled={currentStep === 1}
-              className="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 bg-white dark:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Previous
-            </button>
-
-            {currentStep < STEPS.length ? (
-              <button
-                type="button"
-                onClick={nextStep}
-                className="px-6 py-2 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600"
-              >
-                Next
-              </button>
-            ) : (
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="px-6 py-2 bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? 'Submitting...' : 'Submit for Review'}
-              </button>
-            )}
-          </div>
-        </form>
       </div>
       
       {/* Footer */}

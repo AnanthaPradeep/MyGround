@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { HeartIcon, Bars3Icon, TrashIcon } from '@heroicons/react/24/outline'
 import { useAuthStore } from '../store/authStore'
@@ -14,6 +14,7 @@ import Footer from '../components/Footer'
 import UserDropdown from '../components/UserDropdown'
 import PropertyCard from '../components/PropertyCard'
 import { CardSkeleton } from '../components/Loader'
+import AdBanner from '../components/AdBanner'
 import toast from 'react-hot-toast'
 
 export default function Wishlist() {
@@ -42,6 +43,42 @@ export default function Wishlist() {
       toast.error(error.message || 'Failed to remove from wishlist')
     }
   }
+
+  const wishlistGridItems = useMemo(() => {
+    const items: JSX.Element[] = []
+    wishlist.forEach((item, index) => {
+      items.push(
+        <div key={item.id} className="relative group">
+          <PropertyCard property={item.property} />
+          <button
+            onClick={() => handleRemove(item.property._id, item.property.title)}
+            className="absolute top-2 right-2 p-2 bg-white dark:bg-gray-800 rounded-full shadow-md dark:shadow-gray-900 hover:bg-red-50 dark:hover:bg-red-900/20 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+            title="Remove from wishlist"
+          >
+            <TrashIcon className="w-5 h-5 text-red-500 dark:text-red-400" />
+          </button>
+        </div>
+      )
+
+      if ((index + 1) % 4 === 0) {
+        items.push(
+          <div key={`ad-${item.id}`} className="sm:col-span-2 lg:col-span-3 xl:col-span-4">
+            <AdBanner
+              placement="search"
+              variant="native"
+              imageUrl="/ads/ad-square.svg"
+              title="Upgrade your shortlist with expert advice"
+              description="Get verified broker insights tailored to your wishlist."
+              ctaText="Talk to Expert"
+              ctaLink="https://myground.in/partners/advisory"
+            />
+          </div>
+        )
+      }
+    })
+
+    return items
+  }, [wishlist, handleRemove])
 
   return (
     <ProtectedRoute>
@@ -124,18 +161,7 @@ export default function Wishlist() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-              {wishlist.map((item) => (
-                <div key={item.id} className="relative group">
-                  <PropertyCard property={item.property} />
-                  <button
-                    onClick={() => handleRemove(item.property._id, item.property.title)}
-                    className="absolute top-2 right-2 p-2 bg-white dark:bg-gray-800 rounded-full shadow-md dark:shadow-gray-900 hover:bg-red-50 dark:hover:bg-red-900/20 opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                    title="Remove from wishlist"
-                  >
-                    <TrashIcon className="w-5 h-5 text-red-500 dark:text-red-400" />
-                  </button>
-                </div>
-              ))}
+              {wishlistGridItems}
             </div>
           )}
         </div>

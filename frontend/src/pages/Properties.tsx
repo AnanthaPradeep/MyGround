@@ -12,6 +12,7 @@ import MobileMenu from '../components/MobileMenu'
 import Footer from '../components/Footer'
 import { Bars3Icon } from '@heroicons/react/24/outline'
 import { CardSkeleton } from '../components/Loader'
+import AdBanner from '../components/AdBanner'
 
 export default function Properties() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -64,6 +65,29 @@ export default function Properties() {
         return sorted
     }
   }, [allProperties, sortBy])
+
+  const propertyGridItems = useMemo(() => {
+    const items: JSX.Element[] = []
+    properties.forEach((property, index) => {
+      items.push(<PropertyCard key={property._id} property={property} />)
+      if ((index + 1) % 6 === 0) {
+        items.push(
+          <div key={`ad-${property._id}`} className="sm:col-span-2 lg:col-span-3">
+            <AdBanner
+              placement="search"
+              variant="native"
+              imageUrl="/ads/ad-square.svg"
+              title="Smart renovation plans for new homes"
+              description="Trusted contractors, verified pricing, no surprises."
+              ctaText="Get Quote"
+              ctaLink="https://myground.in/partners/renovation"
+            />
+          </div>
+        )
+      }
+    })
+    return items
+  }, [properties])
 
   const handleFilterChange = (key: string, value: any) => {
     const params = new URLSearchParams(searchParams)
@@ -156,43 +180,87 @@ export default function Properties() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
-          {/* Filters Sidebar */}
-          {showFilters && (
-            <div className="lg:col-span-1">
-              <PropertyFilters
-                searchParams={searchParams}
-                onFilterChange={handleFilterChange}
+        <div className="min-[1200px]:grid min-[1200px]:grid-cols-[300px_minmax(0,1fr)_300px] min-[1200px]:gap-6">
+          {/* Left Vertical Ad Rail (Desktop only) */}
+          <div className="hidden min-[1200px]:block">
+            <div className="sticky top-24">
+              <AdBanner
+                placement="search"
+                variant="vertical"
+                imageUrl="/ads/ad-vertical.svg"
+                title="Premium developer showcases"
+                description="Verified projects from trusted builders."
+                ctaText="View Projects"
+                ctaLink="https://myground.in/partners/developers"
               />
             </div>
-          )}
+          </div>
 
-          {/* Properties Grid */}
-          <div className={showFilters ? 'lg:col-span-3' : 'lg:col-span-4'}>
-            {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                <CardSkeleton count={6} />
+          {/* Center Content */}
+          <div>
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
+              {/* Filters Sidebar */}
+              {showFilters && (
+                <div className="lg:col-span-1">
+                  <PropertyFilters
+                    searchParams={searchParams}
+                    onFilterChange={handleFilterChange}
+                  />
+                  <div className="mt-6">
+                    <AdBanner
+                      placement="search"
+                      variant="sidebar"
+                      imageUrl="/ads/ad-square.svg"
+                      title="Move-in services for verified homes"
+                      description="Concierge packing, moving, and setup."
+                      ctaText="Book Now"
+                      ctaLink="https://myground.in/partners/move-in"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Properties Grid */}
+              <div className={showFilters ? 'lg:col-span-3' : 'lg:col-span-4'}>
+                {loading ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                    <CardSkeleton count={6} />
+                  </div>
+                ) : properties.length === 0 ? (
+                  <div className="bg-white rounded-lg shadow-sm p-8 sm:p-12 text-center">
+                    <p className="text-sm sm:text-base text-gray-600 mb-4">No properties found matching your criteria</p>
+                    <button
+                      onClick={() => {
+                        setSearchParams({})
+                        setShowFilters(false)
+                      }}
+                      className="text-sm sm:text-base text-primary-600 hover:text-primary-700"
+                    >
+                      Clear all filters
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                    {propertyGridItems}
+                  </div>
+                )}
               </div>
-            ) : properties.length === 0 ? (
-              <div className="bg-white rounded-lg shadow-sm p-8 sm:p-12 text-center">
-                <p className="text-sm sm:text-base text-gray-600 mb-4">No properties found matching your criteria</p>
-                <button
-                  onClick={() => {
-                    setSearchParams({})
-                    setShowFilters(false)
-                  }}
-                  className="text-sm sm:text-base text-primary-600 hover:text-primary-700"
-                >
-                  Clear all filters
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                {properties.map((property) => (
-                  <PropertyCard key={property._id} property={property} />
-                ))}
-              </div>
-            )}
+            </div>
+          </div>
+
+          {/* Right Vertical Ad Rail (Desktop only) */}
+          <div className="hidden min-[1200px]:block">
+            <div className="sticky top-24">
+              <AdBanner
+                placement="search"
+                variant="vertical"
+                imageUrl="/ads/ad-vertical.svg"
+                title="Smart loan approvals in 24 hours"
+                description="Pre-verified rates from MG partners."
+                ctaText="Check Eligibility"
+                ctaLink="https://myground.in/partners/loans"
+              />
+            </div>
           </div>
         </div>
       </div>
