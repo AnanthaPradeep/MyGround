@@ -3,7 +3,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IProperty extends Document {
   assetId: string; // MG Asset DNA™ ID (immutable)
   listedBy: mongoose.Types.ObjectId;
-  transactionType: 'SELL' | 'RENT' | 'LEASE' | 'SUB_LEASE' | 'FRACTIONAL';
+  transactionType: 'SELL' | 'RENT' | 'LEASE' | 'SUB_LEASE' | 'FRACTIONAL' | 'E_AUCTION';
   propertyCategory: 'RESIDENTIAL' | 'COMMERCIAL' | 'INDUSTRIAL' | 'LAND' | 'SPECIAL' | 'ISLAND';
   propertySubType: string;
   
@@ -147,7 +147,7 @@ const PropertySchema = new Schema<IProperty>(
     },
     transactionType: {
       type: String,
-      enum: ['SELL', 'RENT', 'LEASE', 'SUB_LEASE', 'FRACTIONAL'],
+      enum: ['SELL', 'RENT', 'LEASE', 'SUB_LEASE', 'FRACTIONAL', 'E_AUCTION'],
       required: true,
     },
     propertyCategory: {

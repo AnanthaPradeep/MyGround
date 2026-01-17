@@ -14,7 +14,8 @@
     "fix-phone-index": "tsx scripts/fix-phone-index.ts",
     "seed-filters": "tsx scripts/seedFilterOptions.ts",
     "seed-languages": "tsx scripts/seedLanguages.ts",
-    "seed-translations": "tsx scripts/seedTranslations.ts"
+    "seed-translations": "tsx scripts/seedTranslations.ts",
+    "seed-eauctions": "tsx scripts/seedEAuctions.ts"
   },
   "keywords": [
     "real-estate",
