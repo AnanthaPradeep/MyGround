@@ -13,7 +13,8 @@ import {
   HeartIcon,
   DocumentTextIcon,
   MagnifyingGlassIcon,
-  BanknotesIcon
+  BanknotesIcon,
+  CreditCardIcon
 } from '@heroicons/react/24/outline'
 import { useAuthStore } from '../store/authStore'
 import { useLocationStore } from '../store/locationStore'
@@ -331,6 +332,15 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   >
                     <Squares2X2Icon className="w-5 h-5" />
                     <span>Dashboard</span>
+                  </Link>
+
+                  <Link
+                    to="/payments"
+                    onClick={onClose}
+                    className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                  >
+                    <CreditCardIcon className="w-5 h-5" />
+                    <span>Payments</span>
                   </Link>
 
                   <Link
