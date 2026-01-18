@@ -250,7 +250,7 @@ export default function Dashboard() {
           {/* Tabs */}
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-6">
             <div className="border-b border-gray-200 dark:border-gray-700">
-              <nav className="flex -mb-px">
+              <nav className="flex -mb-px gap-1 sm:gap-0 overflow-x-auto">
                 {[
                   { id: 'properties', label: 'My Properties', icon: HomeIcon },
                   { id: 'drafts', label: 'Draft Properties', icon: DocumentTextIcon, badge: draftCount },
@@ -262,7 +262,7 @@ export default function Dashboard() {
                     <button
                       key={tab.id}
                       onClick={() => handleTabChange(tab.id as any)}
-                      className={`px-6 py-4 text-sm font-medium border-b-2 flex items-center relative ${
+                      className={`px-3 py-3 text-xs sm:px-6 sm:py-4 sm:text-sm font-medium border-b-2 flex items-center relative whitespace-nowrap shrink-0 ${
                         activeTab === tab.id
                           ? 'border-primary-600 dark:border-primary-400 text-primary-600 dark:text-primary-400'
                           : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
@@ -285,7 +285,7 @@ export default function Dashboard() {
             <div className="p-6">
               {activeTab === 'drafts' && (
                 <div>
-                  <div className="flex justify-between items-center mb-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-4">
                     <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Draft Properties</h2>
                     <Link
                       to="/properties/create"
@@ -316,7 +316,7 @@ export default function Dashboard() {
                           key={draft.draftId}
                           className="border border-orange-300 dark:border-orange-700 rounded-lg p-4 hover:shadow-md dark:hover:shadow-gray-900/50 transition-shadow bg-orange-50 dark:bg-orange-900/20"
                         >
-                          <div className="flex justify-between items-start">
+                          <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-start">
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-2">
                                 <DocumentTextIcon className="w-5 h-5 text-orange-600 dark:text-orange-400" />
@@ -350,10 +350,10 @@ export default function Dashboard() {
                                 <span>Step {draft.currentStep} of 7</span>
                               </p>
                             </div>
-                            <div className="flex items-center space-x-2">
+                            <div className="flex flex-wrap gap-2 sm:justify-end">
                               <button
                                 onClick={() => handleEditDraft(draft.draftId)}
-                                className="px-3 py-1 text-sm bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600 flex items-center gap-1"
+                                className="w-full sm:w-auto px-3 py-1 text-sm bg-primary-600 dark:bg-primary-500 text-white rounded-lg hover:bg-primary-700 dark:hover:bg-primary-600 flex items-center justify-center gap-1"
                                 title="Continue editing this draft"
                               >
                                 <PencilIcon className="w-4 h-4" />
@@ -362,7 +362,7 @@ export default function Dashboard() {
                               <button
                                 onClick={() => handleSubmitDraft(draft.draftId)}
                                 disabled={submittingDraftId === draft.draftId}
-                                className="px-3 py-1 text-sm bg-green-600 dark:bg-green-500 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600 disabled:opacity-50 flex items-center gap-1"
+                                className="w-full sm:w-auto px-3 py-1 text-sm bg-green-600 dark:bg-green-500 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-600 disabled:opacity-50 flex items-center justify-center gap-1"
                                 title="Submit draft as published property"
                               >
                                 <CheckCircleIcon className="w-4 h-4" />
@@ -371,7 +371,7 @@ export default function Dashboard() {
                               <button
                                 onClick={() => handleDeleteDraft(draft.draftId)}
                                 disabled={deletingDraftId === draft.draftId}
-                                className="px-3 py-1 text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 disabled:opacity-50 flex items-center gap-1"
+                                className="w-full sm:w-auto px-3 py-1 text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 disabled:opacity-50 flex items-center justify-center gap-1"
                                 title="Delete this draft permanently"
                               >
                                 <TrashIcon className="w-4 h-4" />
@@ -388,7 +388,7 @@ export default function Dashboard() {
 
               {activeTab === 'properties' && (
                 <div>
-                  <div className="flex justify-between items-center mb-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-4">
                     <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">My Properties</h2>
                     <Link
                       to="/properties/create"
@@ -418,7 +418,7 @@ export default function Dashboard() {
                           key={property._id}
                           className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md dark:hover:shadow-gray-900/50 transition-shadow bg-white dark:bg-gray-700/50"
                         >
-                          <div className="flex justify-between items-start">
+                          <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-start">
                             <div className="flex-1">
                               <Link
                                 to={`/properties/${property._id}`}
@@ -441,7 +441,7 @@ export default function Dashboard() {
                                 </span>
                               </div>
                             </div>
-                            <div className="flex items-center space-x-2">
+                            <div className="flex flex-wrap items-center gap-2 sm:justify-end">
                               <span
                                 className={`px-3 py-1 rounded-full text-xs font-medium ${
                                   property.status === 'APPROVED'
@@ -459,7 +459,7 @@ export default function Dashboard() {
                               </span>
                               <Link
                                 to={`/properties/${property._id}`}
-                                className="px-3 py-1 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
+                                className="w-full sm:w-auto px-3 py-1 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300"
                               >
                                 View
                               </Link>
@@ -467,7 +467,7 @@ export default function Dashboard() {
                                 <button
                                   onClick={() => handleResume(property._id)}
                                   disabled={pausingId === property._id}
-                                  className="px-3 py-1 text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 disabled:opacity-50 flex items-center gap-1"
+                                  className="w-full sm:w-auto px-3 py-1 text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 disabled:opacity-50 flex items-center justify-center gap-1"
                                   title="Resume property (make it public)"
                                 >
                                   <PlayIcon className="w-4 h-4" />
@@ -477,7 +477,7 @@ export default function Dashboard() {
                                 <button
                                   onClick={() => handlePause(property._id)}
                                   disabled={pausingId === property._id}
-                                  className="px-3 py-1 text-sm text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 disabled:opacity-50 flex items-center gap-1"
+                                  className="w-full sm:w-auto px-3 py-1 text-sm text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 disabled:opacity-50 flex items-center justify-center gap-1"
                                   title="Pause property (make it private)"
                                 >
                                   <PauseIcon className="w-4 h-4" />
@@ -487,7 +487,7 @@ export default function Dashboard() {
                               <button
                                 onClick={() => handleDelete(property._id, property.title)}
                                 disabled={deletingId === property._id}
-                                className="px-3 py-1 text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 disabled:opacity-50 flex items-center gap-1"
+                                className="w-full sm:w-auto px-3 py-1 text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 disabled:opacity-50 flex items-center justify-center gap-1"
                                 title="Delete property permanently"
                               >
                                 <TrashIcon className="w-4 h-4" />
