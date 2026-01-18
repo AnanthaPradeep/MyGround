@@ -7,9 +7,10 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
-  role: 'USER' | 'OWNER' | 'BROKER' | 'DEVELOPER' | 'ADMIN';
+  role: 'USER' | 'OWNER' | 'BROKER' | 'DEVELOPER' | 'ADMIN' | 'BANK' | 'NBFC' | 'GOVT' | 'COURT' | 'INSTITUTION';
   isVerified: boolean;
   trustScore: number;
+  isPremium?: boolean;
   mobile?: string;
   profilePicture?: string;
 }

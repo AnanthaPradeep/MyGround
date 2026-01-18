@@ -15,7 +15,8 @@
     "seed-filters": "tsx scripts/seedFilterOptions.ts",
     "seed-languages": "tsx scripts/seedLanguages.ts",
     "seed-translations": "tsx scripts/seedTranslations.ts",
-    "seed-eauctions": "tsx scripts/seedEAuctions.ts"
+    "seed-eauctions": "tsx scripts/seedEAuctions.ts",
+    "seed-payments": "tsx scripts/seedPayments.ts"
   },
   "keywords": [
     "real-estate",
@@ -35,6 +36,7 @@
     "mongoose": "^8.0.3",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.10.1",
+    "qrcode": "^1.5.4",
     "sharp": "^0.32.6",
     "socket.io": "^4.6.1",
     "twilio": "^4.23.0",
