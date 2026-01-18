@@ -1,4 +1,4 @@
-export type UserRole = 'USER' | 'OWNER' | 'BROKER' | 'DEVELOPER' | 'ADMIN'
+export type UserRole = 'USER' | 'OWNER' | 'BROKER' | 'DEVELOPER' | 'ADMIN' | 'BANK' | 'NBFC' | 'GOVT' | 'COURT' | 'INSTITUTION'
 
 export type KYCStatus = 'PENDING' | 'VERIFIED' | 'REJECTED'
 
@@ -14,6 +14,7 @@ export interface User {
   isMobileVerified: boolean
   kycStatus: KYCStatus
   trustScore: number
+  isPremium?: boolean
   profilePicture?: string
   createdAt?: string
   updatedAt?: string

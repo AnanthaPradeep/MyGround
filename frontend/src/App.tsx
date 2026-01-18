@@ -37,6 +37,7 @@ const LocationTest = lazy(() => import('./pages/LocationTest'))
 const CookiePreferences = lazy(() => import('./pages/CookiePreferences'))
 const EAuctionList = lazy(() => import('./pages/EAuctionList'))
 const EAuctionDetail = lazy(() => import('./pages/EAuctionDetail'))
+const Payments = lazy(() => import('./pages/Payments'))
 const NotFoundPage = lazy(() => import('./pages/ErrorPages').then(module => ({ default: module.NotFoundPage })))
 
 function App() {
@@ -163,6 +164,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Notifications />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/payments"
+              element={
+                <ProtectedRoute>
+                  <Payments />
                 </ProtectedRoute>
               }
             />

@@ -20,6 +20,9 @@ export interface IUser extends Document {
     businessRegistration?: string;
   };
   trustScore: number;
+  isPremium?: boolean;
+  premiumPlan?: string;
+  premiumUntil?: Date;
   profilePicture?: string;
   savedSearches: mongoose.Types.ObjectId[];
   location?: {
@@ -120,6 +123,17 @@ const UserSchema = new Schema<IUser>(
       default: 0,
       min: 0,
       max: 100,
+    },
+    isPremium: {
+      type: Boolean,
+      default: false,
+    },
+    premiumPlan: {
+      type: String,
+      trim: true,
+    },
+    premiumUntil: {
+      type: Date,
     },
     profilePicture: String,
     savedSearches: [{

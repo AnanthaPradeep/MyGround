@@ -13,7 +13,8 @@ import {
   DocumentTextIcon,
   CheckIcon,
   GlobeAltIcon,
-  BanknotesIcon
+  BanknotesIcon,
+  CreditCardIcon
 } from '@heroicons/react/24/outline'
 import { useState, useRef, useEffect } from 'react'
 import { useAuthStore } from '../store/authStore'
@@ -423,6 +424,15 @@ export default function HeaderIcons() {
         title="Property eAuction"
       >
         <BanknotesIcon className="w-6 h-6" />
+      </Link>
+
+      {/* Payments Icon */}
+      <Link
+        to="/payments"
+        className="relative p-2 text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+        title="Payments"
+      >
+        <CreditCardIcon className="w-6 h-6" />
       </Link>
 
       {/* Notification Icon with Dropdown */}
