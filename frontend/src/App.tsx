@@ -15,7 +15,7 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { OfflineIndicator } from './components/NetworkError'
 import ProtectedRoute from './components/ProtectedRoute'
 import ChatWidget from './components/ChatWidget'
-import { PageLoader } from './components/Loader'
+import { RouteSkeleton } from './components/Loader'
 
 // Keep lightweight routes as direct imports (fast initial load)
 import Home from './pages/Home'
@@ -59,9 +59,9 @@ function App() {
   }, [selectedLanguage])
 
   useEffect(() => {
-    const shellTimer = setTimeout(() => setShellReady(true), 100)
-    const splashTimer = setTimeout(() => setShowSplash(false), 600)
-    const splashFailSafe = setTimeout(() => setShowSplash(false), 800)
+    const shellTimer = setTimeout(() => setShellReady(true), 50)
+    const splashTimer = setTimeout(() => setShowSplash(false), 250)
+    const splashFailSafe = setTimeout(() => setShowSplash(false), 400)
 
     return () => {
       clearTimeout(shellTimer)
@@ -99,15 +99,15 @@ function App() {
             {showSplash && (
               <SplashScreen
                 onComplete={() => setShowSplash(false)}
-                minDisplayTime={300}
-                maxDisplayTime={800}
+                minDisplayTime={150}
+                maxDisplayTime={400}
               />
             )}
             <OfflineIndicator />
             <LocationSelectorModal isOpen={showLocationModal} onClose={handleLocationModalClose} />
             <CookieBanner />
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-            <Suspense fallback={<PageLoader />}>
+            <Suspense fallback={<RouteSkeleton />}>
             <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
